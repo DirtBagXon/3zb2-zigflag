@@ -366,6 +366,17 @@ retry:
 	VectorCopy (trace.endpos, ent->s.origin);
 	gi.linkentity (ent);
 
+	if (trace.plane.type != 2)
+	{
+		// Limit the fix to gibs, debris and dead monsters.
+		if (((strncmp(ent->classname, "monster_", 8) == 0) && ent->health < 1) ||
+			(strcmp(ent->classname, "debris") == 0) || (ent->s.effects & EF_GIB))
+		{
+			// Push slightly away from non-horizontal surfaces
+			VectorAdd(ent->s.origin, trace.plane.normal, ent->s.origin);
+		}
+	}
+
 	if (trace.fraction != 1.0)
 	{
 		SV_Impact (ent, &trace);

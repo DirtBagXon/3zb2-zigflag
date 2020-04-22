@@ -169,10 +169,15 @@ void Cmd_Give_f (edict_t *ent)
 
 	if (give_all || Q_stricmp(gi.argv(1), "health") == 0)
 	{
-		if (gi.argc() == 3)
+		if (gi.argc() == 3) {
 			ent->health = atoi(gi.argv(2));
+			ent->health = ent->health < 1 ? 1 : ent->health;
+		}
 		else
+		{
 			ent->health = ent->max_health;
+		}
+
 		if (!give_all)
 			return;
 	}

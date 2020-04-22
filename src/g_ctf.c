@@ -505,7 +505,7 @@ void CTFFragBonuses(edict_t *targ, edict_t *inflictor, edict_t *attacker)
 		// attacker is on the same team as the flag carrier and
 		// fragged a guy who hurt our flag carrier
 		attacker->client->resp.score += CTF_CARRIER_DANGER_PROTECT_BONUS;
-		gi.bprintf(PRINT_MEDIUM, "%s defends %s's flag carrier against an agressive enemy\n",
+		gi.bprintf(PRINT_MEDIUM, "%s defends %s's flag carrier against an aggressive enemy\n",
 			attacker->client->pers.netname, 
 			CTFTeamName(attacker->client->resp.ctf_team));
 		return;
