@@ -291,7 +291,8 @@ void Get_NextMap()
 			else goto NONEXTMAP;
 		}
 
-		if(Buff[0] == '\n') continue;
+		// Buff[0] == '\n' ?
+		if (strlen(Buff) == 2) continue;
 
 		sscanf(Buff,"%s",nextmap);
 		break;
