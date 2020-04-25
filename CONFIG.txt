@@ -168,7 +168,7 @@ param13		enemy's noise check			(0 - 1) 1-On 0-Off
 param14		can't see through water			(0 - 1) 1-On 0-Off
 param15		teamworking 		(0 - 9) high-high teamworking
 team		team(R or B,refer only when CTF mode)
-autospawnflag	autospawning flag(1 or 0)
+autospawnflag	autospawning flag (1 or 0)
 
 About "autospawnflag"
 ====================
@@ -235,6 +235,6 @@ Set "zigmode" to value "1", Capture and Hold feature will be activated.
 
 - Enables in Deathmatch and Teamplay only.
 - The Zigock Flag will appear on the map:
-- The Holder of this flag gains extra frags every 30 seconds that they hold the flag.
-- In TPM or TPS teammates will also gain points.
+- The Holder of this flag gains an extra frag every 20 seconds that they hold the flag.
+- In TPM or TPS, teammates will also gain points.
 

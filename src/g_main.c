@@ -494,6 +494,7 @@ void G_RunFrame (void)
 	if (level.exitintermission)
 	{
 		ExitLevel ();
+		next_fragadd = 0;
 		return;
 	}
 
@@ -561,8 +562,9 @@ void G_RunFrame (void)
 						zflag_ent = NULL;
 						haveflag = true;
 						gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
-						if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
-													g_edicts[i].client->resp.score += 1;
+						if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) {
+								g_edicts[i].client->resp.score += 1;
+						}
 						else
 						{
 							//旗を持ってるとフラッグを足す
@@ -570,8 +572,9 @@ void G_RunFrame (void)
 							{
 								if(g_edicts[j].inuse)
 								{
-									if(OnSameTeam(&g_edicts[i],&g_edicts[j]))
+									if(OnSameTeam(&g_edicts[i],&g_edicts[j])) {
 										g_edicts[j].client->resp.score += 1;
+									}
 								}
 							}
 						}	
@@ -614,7 +617,7 @@ void G_RunFrame (void)
 			}
 		}
 
-		next_fragadd = level.time + FRAMETIME * 100;
+		next_fragadd = level.time + FRAMETIME * 200;
 	}
 
 	// see if it is time to end a deathmatch

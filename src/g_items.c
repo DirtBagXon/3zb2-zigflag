@@ -1624,12 +1624,13 @@ void ZIGDrop_Flag(edict_t *ent, gitem_t *item)
 	if(zflag_ent) return;
 
 	tech = Drop_Item(ent, item);
-	tech->nextthink = level.time + FRAMETIME * 10;//level.time + CTF_TECH_TIMEOUT;
-	tech->think = ZIGFlagThink;//TechThink;
+	tech->nextthink = level.time + FRAMETIME * 10;
+	tech->think = ZIGFlagThink;
 	if(ent->client) ent->client->pers.inventory[ITEM_INDEX(item)] = 0;
-	/*ent*/tech->s.frame = 173;
+	tech->s.frame = 173;
 	zflag_ent = tech;
 	tech->inuse = true;
+	return;
 }
 
 qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item)
@@ -1639,24 +1640,20 @@ qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item)
 	if(zflag_ent) return false;
 
 	tech = Drop_Item(ent, item);
-	tech->nextthink = level.time + FRAMETIME * 10;//level.time + CTF_TECH_TIMEOUT;
-	tech->think = ZIGFlagThink;//TechThink;
+	tech->nextthink = level.time + FRAMETIME * 10;
+	tech->think = ZIGFlagThink;
 	if(ent->client) ent->client->pers.inventory[ITEM_INDEX(item)] = 0;
-	/*ent*/tech->s.frame = 173;
+	tech->s.frame = 173;
 	zflag_ent = tech;
 	tech->inuse = true;
 	return true;
 }
 
-qboolean ZIGPickup_Flag (edict_t *ent, edict_t *other)
+qboolean ZIGPickup_Flag(edict_t *ent, edict_t *other)
 {
-//	gitem_t *item;
-
-//	other->client->pers.selected_item = ITEM_INDEX(item);
 	zflag_ent = NULL;
 	other->client->pers.inventory[ITEM_INDEX(zflag_item)] = 1;	
-//	other->client->resp.score += 1;
-	other->s.modelindex3 = gi.modelindex("models/zflag.md2"/*item->world_model*/);
+	other->s.modelindex3 = gi.modelindex("models/zflag.md2");
 	return true;
 }
 
