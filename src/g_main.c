@@ -61,6 +61,7 @@ cvar_t	*maplist;
 cvar_t	*botlist;
 cvar_t	*autospawn;
 cvar_t	*zigmode;
+cvar_t	*zigspawn;
 float	spawncycle;
 float	ctfjob_update;
 //ponpoko
@@ -291,8 +292,7 @@ void Get_NextMap()
 			else goto NONEXTMAP;
 		}
 
-		// Buff[0] == '\n' ?
-		if (strlen(Buff) == 2) continue;
+		if (Buff[0] == '\n' || strlen(Buff) == 2 || feof(fp)) continue;
 
 		sscanf(Buff,"%s",nextmap);
 		break;
@@ -477,7 +477,11 @@ void G_InitEdict (edict_t *e);
 void G_RunFrame (void)
 {
 	int		i,j;
-	static float next_fragadd = 0;
+	static unsigned short	zflag_carry = 0;
+	static unsigned short	zflag_stall = 0;
+	static float	next_fragadd = 0;
+	static qboolean	zf_warn = false;
+	static qboolean	zf_move = false;
 	edict_t	*ent;
 
 	vec3_t	v,vv;
@@ -495,6 +499,10 @@ void G_RunFrame (void)
 	{
 		ExitLevel ();
 		next_fragadd = 0;
+		zflag_carry = 0;
+		zflag_stall = 0;
+		zf_warn = false;
+		zf_move = false;
 		return;
 	}
 
@@ -559,6 +567,8 @@ void G_RunFrame (void)
 				{
 					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
 					{
+						zflag_carry++;
+						zflag_stall = 0;
 						zflag_ent = NULL;
 						haveflag = true;
 						gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
@@ -580,19 +590,27 @@ void G_RunFrame (void)
 						}	
 					}
 				}
+
 				if(zflag_ent != NULL)
 				{
 					if(!zflag_ent->inuse)
 					{
-	//				item = FindItem("Zig Flag");
 						SelectSpawnPoint (ent, v, vv);
-			//			VectorCopy (v, ent->s.origin);
 						if(ZIGDrop_FlagCheck(ent,zflag_item))
 						{
 							VectorCopy (v, zflag_ent->s.origin);
 						}			
 					}
 				}
+			}
+
+			if(zigspawn->value == 1 && g_edicts[i].client)
+			{
+				if(zf_warn)
+					gi.sound (ent, CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
+
+				if(zf_move)
+					gi.sound (ent, CHAN_VOICE, gi.soundindex ("misc/tele1.wav"), 1, ATTN_NORM, 0);
 			}
 		}
 /////////////
@@ -605,19 +623,43 @@ void G_RunFrame (void)
 		G_RunEntity (ent);
 	}
 
+	zf_warn = false;
+	zf_move = false;
+
 	if(next_fragadd < level.time)
 	{
+		if( zigmode->value == 1 && zigspawn->value == 1) {
+
+			if(zflag_carry == 0) {
+				zflag_stall++;
+
+				if(zflag_stall == (ZIGRESET - 1)) {
+					zf_warn = true;
+					gi.bprintf (PRINT_HIGH, "Flag bounce in %d clicks ...\n", (int) (FRAMETIME * ZIGTICK));
+				}
+			}
+
+			if(zflag_stall >= ZIGRESET) {
+				zf_move = true;
+				zflag_stall = 0;
+				G_FreeEdict(zflag_ent);
+				SelectSpawnPoint (ent, v, vv);
+				ZIGFlag_Reset(ent, zflag_item);
+				VectorCopy (v, zflag_ent->s.origin);
+				gi.bprintf (PRINT_HIGH, "Flag bounced ...\n");
+			}
+		}
+
 		if(zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 2)
 		{
 			SelectSpawnPoint (ent, v, vv);
-			//VectorCopy (v, ent->s.origin);
 			if(ZIGDrop_FlagCheck(ent,zflag_item))
 			{
 				VectorCopy (v, zflag_ent->s.origin);
 			}
 		}
-
-		next_fragadd = level.time + FRAMETIME * 200;
+		next_fragadd = level.time + FRAMETIME * ZIGTICK;
+		zflag_carry = 0;
 	}
 
 	// see if it is time to end a deathmatch
@@ -629,4 +671,3 @@ void G_RunFrame (void)
 	// build the playerstate_t structures for all players
 	ClientEndServerFrames ();
 }
-

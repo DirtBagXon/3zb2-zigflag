@@ -63,6 +63,10 @@ sudo cp release/game.so /usr/share/games/quake2/3zb2
 
 ## Running bots
 
+To start `$` bots automatically, append:
+
+    +set autospawn $
+
 ### Deathmatch
 
     /usr/lib/yamagi-quake2/quake2 +set basedir /usr/share/games/quake2/ +set vid_gamma 1.400000 +set game 3zb2 +set deathmatch 1 +exec game.cfg
@@ -108,4 +112,5 @@ Improved aim, enable `1` (default) or disable `0` via:
 `Capture and Hold (ZigFlag)` mode for Deathmatch/Team games:
 
     zigmode $
+    zigspawn $
 

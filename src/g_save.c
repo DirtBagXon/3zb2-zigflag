@@ -205,6 +205,7 @@ void InitGame (void)
 
 	// enhancements
 	aimfix = gi.cvar("aimfix", "1", CVAR_ARCHIVE);
+	zigspawn = gi.cvar("zigspawn", "1", CVAR_ARCHIVE);
 
 	// items
 	InitItems ();

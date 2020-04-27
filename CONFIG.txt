@@ -46,23 +46,24 @@ Console commands
 1. Modification of these values will activate when restart the game
 
 vwep			Visible weapon on/off (default on = 1, off = 0)
-maplist			Set the maplist section name(default = "default")
+maplist			Set the maplist section name (default = "default")
 autospawn		Autospawn (default 0, x = number of bots)
 chedit			Chaining mode on/off (default off = 0, on = 1)
-zigmode			Capture and Hold (ZigFlag) mode on/off (default off = 0, on = 1)
-botlist			Set the botlist section name(default = "default")
+zigmode			Capture and Hold (ZigFlag) (default off = 0, on = 1)
+zigspawn		ZigFlag returns home after 120 clicks (default on = 1, off = 0)
+botlist			Set the botlist section name (default = "default")
 ctf			CTF mode on/off (default off = 0, on = 1)
 aimfix			Enable more accurate aiming (default on = 1, off = 0)
 
 2. Modification of this values will activate during the game is running
 
-spectator		set the spectator modeon/off (default off = 0, on = 1)
+spectator		set spectator mode (default off = 0, on = 1)
 
 
 - Server Command
 
 sv	spb	$	Spawn $ of bots
-sv	rspb	$	Spawn $ of bots(ramdom selection from list)
+sv	rspb	$	Spawn $ of bots (ramdom selection from list)
 sv	rmb	$	Remove $ of bots
 sv	dsp	$	Debug spawning, make bot run $ from oldposition
 sv	savechain	Save the chaining route file
@@ -232,6 +233,7 @@ DF_NO_FRIENDLY_FIRE 	256
 2. Special Capture and Hold mode
 
 Set "zigmode" to value "1", Capture and Hold feature will be activated.
+Set "zigspawn" to return unattended flags to spawn point after 120 seconds.
 
 - Enables in Deathmatch and Teamplay only.
 - The Zigock Flag will appear on the map:

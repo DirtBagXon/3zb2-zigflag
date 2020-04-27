@@ -62,6 +62,12 @@
 
 #define	FRAMETIME		0.1
 
+// ZigMode frag bonus frequency
+#define	ZIGTICK			200
+
+// ZigFlag ZIGTICK: Move flag after $ cycles of no activity.
+#define	ZIGRESET		6 	// * (ZIGTICK * FRAMETIME)
+
 // memory tags to allow dynamic memory to be cleaned up
 #define	TAG_GAME	765		// clear when unloading the dll
 #define	TAG_LEVEL	766		// clear when loading a new level
@@ -589,6 +595,7 @@ extern	cvar_t	*maplist;
 extern	cvar_t	*botlist;
 extern	cvar_t	*autospawn;
 extern	cvar_t	*zigmode;
+extern	cvar_t  *zigspawn;
 extern	float	spawncycle;
 //ponpoko
 

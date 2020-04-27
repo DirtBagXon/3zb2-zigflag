@@ -1649,6 +1649,19 @@ qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item)
 	return true;
 }
 
+void ZIGFlag_Reset(edict_t *ent, gitem_t *item)
+{
+	edict_t *tech;
+
+	tech = Drop_Item(ent, item);
+	tech->nextthink = level.time + FRAMETIME * 10;
+	tech->think = ZIGFlagThink;
+	tech->s.frame = 173;
+	zflag_ent = tech;
+	tech->inuse = true;
+	return;
+}
+
 qboolean ZIGPickup_Flag(edict_t *ent, edict_t *other)
 {
 	zflag_ent = NULL;
