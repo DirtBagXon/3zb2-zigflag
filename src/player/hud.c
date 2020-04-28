@@ -515,16 +515,22 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_HELPICON] = 0;
 
 //ponpoko
-	if(ent->client->zc.aiming == 1)
-	{
-		ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight");
+
+	// zigmode now hijacks this - can't find an instance of zsight being used...
+	if(zigmode->value != 1) {
+		if(ent->client->zc.aiming == 1)
+		{
+			ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight");
+		}
+		else if(ent->client->zc.aiming == 3)
+		{
+			if(ent->client->zc.lockon) ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight_l1");
+			else ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight_l0");
+		}
+		else
+			ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
 	}
-	else if(ent->client->zc.aiming == 3)
-	{
-		if(ent->client->zc.lockon) ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight_l1");
-		else ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight_l0");
-	}
-	else ent->client->ps.stats[STAT_SIGHT_PIC] = 0;//gi.imageindex ("i_help"/*"zsight"*/);;
+
 //ponpoko
 
 //ZOID

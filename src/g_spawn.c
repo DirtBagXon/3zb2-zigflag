@@ -1216,6 +1216,75 @@ char *dm_statusbar =
 "endif"
 ;
 
+char *zig_statusbar =
+"yb	-24 "
+
+// health
+"xv	0 "
+"hnum "
+"xv	50 "
+"pic 0 "
+
+// ammo
+"if 2 "
+"	xv	100 "
+"	anum "
+"	xv	150 "
+"	pic 2 "
+"endif "
+
+// armor
+"if 4 "
+"	xv	200 "
+"	rnum "
+"	xv	250 "
+"	pic 4 "
+"endif "
+
+// selected item
+"if 6 "
+"	xv	296 "
+"	pic 6 "
+"endif "
+
+"yb	-50 "
+
+// picked up item
+"if 7 "
+"	xv	0 "
+"	pic 7 "
+"	xv	26 "
+"	yb	-42 "
+"	stat_string 8 "
+"	yb	-50 "
+"endif "
+
+// timer
+"if 9 "
+"	xv	246 "
+"	num	2	10 "
+"	xv	296 "
+"	pic	9 "
+"endif "
+
+//  help / weapon icon
+"if 11 "
+"	xv	148 "
+"	pic	11 "
+"endif "
+
+//  frags
+"xr	-50 "
+"yt 2 "
+"num 3 14 "
+
+// sight becomes flagalert (move under frags)
+"if 31 "
+"   yt 26 "
+"   xr -24 "
+"   pic 31 "
+"endif"
+;
 
 /*QUAKED worldspawn (0 0 0) ?
 
@@ -1271,7 +1340,7 @@ void SP_worldspawn (edict_t *ent)
 	gi.configstring (CS_MAXCLIENTS, va("%i", (int)(maxclients->value) ) );
 
 	// status bar program
-	if (deathmatch->value)
+	if (deathmatch->value) {
 //ZOID
 		if (ctf->value) {
 			gi.configstring (CS_STATUSBAR, ctf_statusbar);
@@ -1295,11 +1364,18 @@ void SP_worldspawn (edict_t *ent)
 				gi.soundindex("weapons/grapple/grpull.wav");
 				gi.soundindex("weapons/grapple/grfire.wav");
 			}*/
-		} else
 //ZOID
-		gi.configstring (CS_STATUSBAR, dm_statusbar);
-	else
+		} else if (zigmode->value == 1) {
+			gi.configstring (CS_STATUSBAR, zig_statusbar);
+			gi.imageindex("i_zig");
+
+		} else {
+			gi.configstring (CS_STATUSBAR, dm_statusbar);
+		}
+
+	} else {
 		gi.configstring (CS_STATUSBAR, single_statusbar);
+	}
 
 	//---------------
 

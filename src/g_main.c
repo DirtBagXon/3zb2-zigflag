@@ -574,10 +574,11 @@ void G_RunFrame (void)
 						gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
 						if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) {
 								g_edicts[i].client->resp.score += 1;
+								gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus.\n", ent->client->pers.netname);
 						}
 						else
 						{
-							//旗を持ってるとフラッグを足す
+							gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus.\n", ent->client->pers.netname);
 							for ( j = 1 ; j <= maxclients->value ; j++)
 							{
 								if(g_edicts[j].inuse)
@@ -604,7 +605,15 @@ void G_RunFrame (void)
 				}
 			}
 
-			if(zigspawn->value == 1 && g_edicts[i].client)
+			if(g_edicts[i].client && ent->health)
+			{
+				if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)] && (level.framenum & 8))
+					ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
+				else
+					ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
+			}
+
+			if(zigspawn->value == 1 && g_edicts[i].client && ent->health)
 			{
 				if(zf_warn)
 					gi.sound (ent, CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
