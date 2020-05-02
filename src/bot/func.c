@@ -509,8 +509,8 @@ void PutBotInServer (edict_t *ent)
 		if (!success) {
 			VectorCopy(ent->s.old_origin, ent->s.origin);
 
-			gi.dprintf("PutBotInServer: attempt to fix bot spawn startsolid failed (%f,%f,%f)\n",
-					ent->s.old_origin[0], ent->s.old_origin[1], ent->s.old_origin[2]);
+			//gi.dprintf("PutBotInServer: attempt to fix bot spawn startsolid failed (%f,%f,%f)\n",
+			//		ent->s.old_origin[0], ent->s.old_origin[1], ent->s.old_origin[2]);
 		}
 	}
 
@@ -760,7 +760,7 @@ void RemoveBot()
 
 	if(i < 0)
 	{
-		gi.cprintf (NULL, PRINT_HIGH, "No Bots in server.");
+		gi.cprintf (NULL, PRINT_HIGH, "No Bots in server.\n");
 		return;
 	}
 

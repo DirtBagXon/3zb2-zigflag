@@ -63,7 +63,7 @@
 #define	FRAMETIME		0.1
 
 // ZigMode frag bonus frequency
-#define	ZIGTICK			200
+#define	ZIGTICK			100	// * FRAMETIME = SECONDS
 
 // ZigFlag ZIGTICK: Move flag after $ cycles of no activity.
 #define	ZIGRESET		6 	// * (ZIGTICK * FRAMETIME)

@@ -50,7 +50,7 @@ maplist			Set the maplist section name (default = "default")
 autospawn		Autospawn (default 0, x = number of bots)
 chedit			Chaining mode on/off (default off = 0, on = 1)
 zigmode			Capture and Hold (ZigFlag) (default off = 0, on = 1)
-zigspawn		ZigFlag returns home after 120 clicks (default on = 1, off = 0)
+zigspawn		ZigFlag returns home after 60s (default on = 1, off = 0)
 botlist			Set the botlist section name (default = "default")
 ctf			CTF mode on/off (default off = 0, on = 1)
 aimfix			Enable more accurate aiming (default on = 1, off = 0)
@@ -233,10 +233,10 @@ DF_NO_FRIENDLY_FIRE 	256
 2. Special Capture and Hold mode
 
 Set "zigmode" to value "1", Capture and Hold feature will be activated.
-Set "zigspawn" to return unattended flags to spawn point after 120 seconds.
+Set "zigspawn" to return unattended flags to spawn point after 60 seconds.
 
 - Enables in Deathmatch and Teamplay only.
 - The Zigock Flag will appear on the map:
-- The Holder of this flag gains an extra frag every 20 seconds that they hold the flag.
+- The Holder of this flag gains an extra frag every 10 seconds that they hold the flag.
 - In TPM or TPS, teammates will also gain points.
 

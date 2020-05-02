@@ -1,18 +1,40 @@
-# 3rd Zigock Bot II for Yamagi Quake II
+# Custom 3rd Zigock Bot II for Yamagi Quake II
 
-This is a port of the 3rd Zigock Bot II to Linux Yamagi Quake II. \
-All warnings (up to gcc8) and unused variables have been fixed from original source. \
-The code has many backport fixes, enhancements and features applied (including tsmod).
+This is a custom port of the 3rd Zigock Bot II to Linux Yamagi Quake II. \
+All warnings (up to gcc8) and unused variables have been fixed in the original source. \
+The code has many backport fixes, enhancements and features applied (custom, tsmod & yquake2).
 
-BASE_DIR is defined in `src/header/local.h`, in Yamagi Quake II for Debian:
+BASE_DIR is defined in `src/header/local.h`, for Yamagi Quake II use in Debian:
 
     /usr/share/games/quake2
 
-For installation in:
+For mod installation in:
 
     /usr/share/games/quake2/3zb2
 
-Bot chaining routes are supplied, further routes can be (re)created via the mod `chedit` (See CONFIG.txt)
+Bot chaining routes are supplied, further routes can be (re)created via the mod `chedit` (See `CONFIG.txt`)
+
+Custom features have been added to the `zigmode` Capture and Hold element of the game. Including enhancements \
+to the HUD, a flag return function and sound feedback additions which subtly alter the game dynamics and add \
+stability over the original release. It plays best on smaller level maps with a few bots.
+
+Example config file for ZigFlag:
+
+```
+set zigmode 1
+set zigspawn 1
+set aimfix 1
+set botlist default
+set autospawn 5
+set vwep 1
+set maxclients 16
+set dmflags 16384
+set fraglimit 40
+set timelimit 15
+map q2dm1
+```
+
+See `CONFIG.txt` for further details.
 
 ## Installation
 
@@ -69,7 +91,7 @@ To start `$` bots automatically, append:
 
 ### Deathmatch
 
-    /usr/lib/yamagi-quake2/quake2 +set basedir /usr/share/games/quake2/ +set vid_gamma 1.400000 +set game 3zb2 +set deathmatch 1 +exec game.cfg
+    /usr/lib/yamagi-quake2/quake2 -datadir /usr/share/games/quake2/ +set game 3zb2 +set deathmatch 1 +set autospawn 5 +exec game.cfg
 
 ### CTF (Capture the Flag)
 
@@ -79,13 +101,13 @@ Copy **CTF** `.pak` files to *3zb2/*
 
 **Single process**:
 
-    /usr/lib/yamagi-quake2/quake2 +set basedir /usr/share/games/quake2/ +set vid_gamma 1.400000 +set game 3zb2 +set deathmatch 1 +exec ctf.cfg 
+    /usr/lib/yamagi-quake2/quake2 -datadir /usr/share/games/quake2/ +set vid_gamma 1.400000 +set game 3zb2 +set deathmatch 1 +exec ctf.cfg 
 
 **Separate server and client**:
 
-    /usr/lib/yamagi-quake2/quake2 +set basedir /usr/share/games/quake2/ +set game 3zb2 +set ip 127.0.0.1 +set port 27910 +set dedicated 1 +set autospawn 5 +exec ctfserver.cfg
+    /usr/lib/yamagi-quake2/q2ded -datadir /usr/share/games/quake2/ +set game 3zb2 +set ip 127.0.0.1 +set port 27910 +set autospawn 5 +exec ctfserver.cfg
 
-    /usr/lib/yamagi-quake2/quake2 +set basedir /usr/share/games/quake2/ +set vid_gamma 1.400000 +game 3zb2 +exec ctfplayer.cfg +connect 127.0.0.1:27910
+    /usr/lib/yamagi-quake2/quake2 -datadir /usr/share/games/quake2/ +set vid_gamma 1.400000 +game 3zb2 +exec ctfplayer.cfg +connect 127.0.0.1:27910
 
 **Default grapple:** `bind MWHEELDOWN +hook`
 

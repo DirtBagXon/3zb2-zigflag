@@ -454,6 +454,8 @@ void TossClientWeapon (edict_t *self)
 		spread = 22.5;
 	else if (item && quadfire)
 		spread = 12.5;
+	else if (item && zflag_item)
+		spread = 42.5;
 	else
 		spread = 0.0;
 
@@ -550,6 +552,9 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 //	self->solid = SOLID_NOT;
 	self->svflags |= SVF_DEADMONSTER;
 
+	if(self->client->pers.inventory[ITEM_INDEX(zflag_item)])
+			ZIGDrop_Flag(self, zflag_item);
+
 	if (!self->deadflag)
 	{
 		if(self->svflags & SVF_MONSTER)
@@ -570,10 +575,6 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 //ZOID
 		if(ctf->value) CTFFragBonuses(self, inflictor, attacker);
 //ZOID
-
-		//旗持ってる場合は落とす
-		if(self->client->pers.inventory[ITEM_INDEX(zflag_item)])
-			zflag_item->drop(self,zflag_item);
 
 		TossClientWeapon (self);
 //ZOID

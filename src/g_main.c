@@ -477,6 +477,8 @@ void G_InitEdict (edict_t *e);
 void G_RunFrame (void)
 {
 	int		i,j;
+	static char	cfh[16];
+	static char	lfh[16];
 	static unsigned short	zflag_carry = 0;
 	static unsigned short	zflag_stall = 0;
 	static float	next_fragadd = 0;
@@ -503,8 +505,12 @@ void G_RunFrame (void)
 		zflag_stall = 0;
 		zf_warn = false;
 		zf_move = false;
+		lfh[0] = 0;
 		return;
 	}
+
+	if(level.intermissiontime)
+		next_fragadd = level.time * 2;
 
 	G_EmergencyMaintainMinimumFreeEntityPool(EMERGENCY_ENTITY_FREE_POOL_SIZE);
 
@@ -569,26 +575,35 @@ void G_RunFrame (void)
 					{
 						zflag_carry++;
 						zflag_stall = 0;
-						zflag_ent = NULL;
-						haveflag = true;
-						gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
-						if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) {
-								g_edicts[i].client->resp.score += 1;
-								gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus.\n", ent->client->pers.netname);
+						memcpy(cfh, ent->client->pers.netname, sizeof(cfh));
+
+						if(strncmp(cfh, lfh, sizeof(cfh))) {
+							next_fragadd = level.time + ((FRAMETIME * ZIGTICK) / 2);
 						}
 						else
 						{
-							gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus.\n", ent->client->pers.netname);
-							for ( j = 1 ; j <= maxclients->value ; j++)
+							zflag_ent = NULL;
+							haveflag = true;
+							gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+							if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) {
+								g_edicts[i].client->resp.score += 1;
+								gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n", cfh);
+							}
+							else
 							{
-								if(g_edicts[j].inuse)
+								for ( j = 1 ; j <= maxclients->value ; j++)
 								{
-									if(OnSameTeam(&g_edicts[i],&g_edicts[j])) {
-										g_edicts[j].client->resp.score += 1;
+									if(g_edicts[j].inuse)
+									{
+										if(OnSameTeam(&g_edicts[i],&g_edicts[j])) {
+											g_edicts[j].client->resp.score += 1;
+										}
 									}
 								}
+								gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n", cfh);
 							}
-						}	
+						}
+						memcpy(lfh, cfh, sizeof(lfh));
 					}
 				}
 
@@ -605,24 +620,26 @@ void G_RunFrame (void)
 				}
 			}
 
-			if(g_edicts[i].client && ent->health)
+			if(g_edicts[i].client && !ENT_IS_BOT(ent))
 			{
 				if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)] && (level.framenum & 8))
 					ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
 				else
 					ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
-			}
 
-			if(zigspawn->value == 1 && g_edicts[i].client && ent->health)
-			{
-				if(zf_warn)
-					gi.sound (ent, CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
+				if(zigspawn->value == 1)
+				{
+					if(zf_warn)
+						gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
 
-				if(zf_move)
-					gi.sound (ent, CHAN_VOICE, gi.soundindex ("misc/tele1.wav"), 1, ATTN_NORM, 0);
+					if(zf_move)
+						gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("3zb/telezf.wav"), 1, ATTN_NORM, 0);
+				}
 			}
 		}
 /////////////
+
+
 		if (i > 0 && i <= maxclients->value && !(ent->svflags & SVF_MONSTER))
 		{
 			ClientBeginServerFrame (ent);
@@ -644,7 +661,7 @@ void G_RunFrame (void)
 
 				if(zflag_stall == (ZIGRESET - 1)) {
 					zf_warn = true;
-					gi.bprintf (PRINT_HIGH, "Flag bounce in %d clicks ...\n", (int) (FRAMETIME * ZIGTICK));
+					gi.bprintf (PRINT_HIGH, "Flag bounce in %d seconds ...\n", (int) (FRAMETIME * ZIGTICK));
 				}
 			}
 
