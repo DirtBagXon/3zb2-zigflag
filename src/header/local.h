@@ -16,7 +16,8 @@
 //ZOID
 
 // Define a GLOBAL for BASE_DIR
-#define	Q2_BASE_DIR	"/usr/share/games/quake2"
+//#define	Q2_BASE_DIR	"."
+#define	Q2_BASE_DIR	"/usr/share/games/quake2" // Debian
 
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
@@ -596,6 +597,7 @@ extern	cvar_t	*botlist;
 extern	cvar_t	*autospawn;
 extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
+extern	cvar_t  *spawnbotfar;
 extern	float	spawncycle;
 //ponpoko
 

@@ -62,6 +62,7 @@ cvar_t	*botlist;
 cvar_t	*autospawn;
 cvar_t	*zigmode;
 cvar_t	*zigspawn;
+cvar_t	*spawnbotfar;
 float	spawncycle;
 float	ctfjob_update;
 //ponpoko
@@ -565,7 +566,7 @@ void G_RunFrame (void)
 			}
 		}
 //////////旗のスコアチェック
-		if(zigmode->value == 1)
+		if(zigmode->value == 1 && !ctf->value)
 		{
 			if(next_fragadd < level.time)
 			{
@@ -654,7 +655,7 @@ void G_RunFrame (void)
 
 	if(next_fragadd < level.time)
 	{
-		if( zigmode->value == 1 && zigspawn->value == 1) {
+		if(!ctf->value && zigmode->value == 1 && zigspawn->value == 1) {
 
 			if(zflag_carry == 0) {
 				zflag_stall++;
@@ -667,8 +668,12 @@ void G_RunFrame (void)
 
 			if(zflag_stall >= ZIGRESET) {
 				zf_move = true;
+				int i = 0;
+				while(i < zflag_stall) {
+					G_FreeEdict(zflag_ent);
+					i++;
+				}
 				zflag_stall = 0;
-				G_FreeEdict(zflag_ent);
 				SelectSpawnPoint (ent, v, vv);
 				ZIGFlag_Reset(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);

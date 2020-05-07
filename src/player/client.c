@@ -913,6 +913,40 @@ edict_t *SelectFarthestDeathmatchSpawnPoint (void)
 	return spot;
 }
 
+/*
+================
+Spawn bots away from players
+
+================
+*/
+edict_t *SelectBotSpawnPoint (void)
+{
+	edict_t	*botspot;
+	float	botdistance, playerdistance;
+	edict_t	*spot;
+
+	spot = NULL;
+	botspot = NULL;
+	botdistance = 0;
+	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
+	{
+		playerdistance = PlayersRangeFromSpot (spot);
+
+		if (playerdistance > botdistance)
+		{
+			botspot = spot;
+			botdistance = playerdistance;
+		}
+	}
+
+	if (botspot && botdistance > 250)
+	{
+		return botspot;
+	}
+
+	return NULL;
+}
+
 edict_t *SelectDeathmatchSpawnPoint (void)
 {
 	if ( (int)(dmflags->value) & DF_SPAWN_FARTHEST)
@@ -971,11 +1005,11 @@ void	SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
 	edict_t	*spot = NULL;
 
 	if (deathmatch->value)
-//ZOID
 		if (ctf->value)
 			spot = SelectCTFSpawnPoint(ent);
+		else if (spawnbotfar->value && ((ent)->client && ((ent)->client->zc.botindex || (ent)->client->zc.routeindex > 0)))
+			spot = SelectBotSpawnPoint();
 		else
-//ZOID
 			spot = SelectDeathmatchSpawnPoint ();
 	else if (coop->value)
 		spot = SelectCoopSpawnPoint (ent);
@@ -1007,7 +1041,7 @@ void	SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
 	}
 
 	VectorCopy (spot->s.origin, origin);
-	if(ent->svflags & SVF_MONSTER) origin[2] += 32;
+	if((ent)->client && ((ent)->client->zc.botindex || (ent)->client->zc.routeindex > 0)) origin[2] += 32;
 	else origin[2] += 9;
 	VectorCopy (spot->s.angles, angles);
 }

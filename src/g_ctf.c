@@ -3003,7 +3003,7 @@ void CTFSetupNavSpawn()
 	unsigned int size;
 
 //PONKO
-	spawncycle = level.time + FRAMETIME * 10;
+	spawncycle = level.time + FRAMETIME * 20;
 //PONKO
 	//ルート初期化
 	CurrentIndex = 0;

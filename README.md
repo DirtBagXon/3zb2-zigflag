@@ -14,6 +14,8 @@ For mod installation in:
 
 Bot chaining routes are supplied, further routes can be (re)created via the mod `chedit` (See `CONFIG.txt`)
 
+### ZigMode ZigFlag (Capture and Hold)
+
 Custom features have been added to the `zigmode` Capture and Hold element of the game. Including enhancements \
 to the HUD, a flag return function and sound feedback additions which subtly alter the game dynamics and add \
 stability over the original release. It plays best on smaller level maps with a few bots.
@@ -23,14 +25,17 @@ Example config file for ZigFlag:
 ```
 set zigmode 1
 set zigspawn 1
+set ctf 0
 set aimfix 1
+set spawnbotfar 1
 set botlist default
-set autospawn 5
+set autospawn 4
 set vwep 1
 set maxclients 16
 set dmflags 16384
 set fraglimit 40
 set timelimit 15
+set maplist q2dmx
 map q2dm1
 ```
 
@@ -88,6 +93,10 @@ sudo cp release/game.so /usr/share/games/quake2/3zb2
 To start `$` bots automatically, append:
 
     +set autospawn $
+
+### Spawn bots at the furthest point
+
+    spawnbotfar $
 
 ### Deathmatch
 

@@ -217,7 +217,7 @@ BOTLIST_NOTFOUND:
 	fclose(fp);
 
 	gi.dprintf("%i of Bots is listed.\n",ListedBots);	
-	spawncycle = level.time + FRAMETIME * 10;
+	spawncycle = level.time + FRAMETIME * 20;
 }
 
 //----------------------------------------------------------------
@@ -570,10 +570,9 @@ void PutBotInServer (edict_t *ent)
 		client->zc.ctfstate = CTFS_OFFENCER;
 	}
 
-#ifdef _DEBUG
-	if (!KillBox(ent)) 
-		gi.dprintf("Couldn't spawn in?\n");
-#endif
+	if (!KillBox(ent))
+	{	//Couldn't spawn in?
+	}
 
 	gi.linkentity (ent);
 	G_TouchTriggers (ent);
