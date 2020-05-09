@@ -86,12 +86,13 @@ void Load_BotInfo()
 
 	//load info
 	//sprintf(Buff,"%s/3ZBConfig.cfg",gamepath->string);
-	sprintf(Buff,"%s/%s/3zbconfig.cfg",Q2_BASE_DIR,gamepath->string);
+	sprintf(Buff,"%s/%s/3zbconfig.cfg",GET_BASEPATH_STR(),gamepath->string);
 	fp = fopen(Buff,"rt");
 	if(fp == NULL)
 	{
 		gi.dprintf("3ZB CFG: file not found: %s\n", Buff);
-		return;
+		gi.dprintf("\nUse: +set basepath\n\n");
+		gi.error (ERR_FATAL);
 	}
 	else
 	{

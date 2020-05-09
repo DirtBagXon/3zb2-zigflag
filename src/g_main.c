@@ -54,6 +54,7 @@ cvar_t	*sv_cheats;
 cvar_t  *aimfix;
 
 //ponpoko
+cvar_t	*basepath;
 cvar_t	*gamepath;
 cvar_t	*chedit;
 cvar_t	*vwep;
@@ -214,7 +215,7 @@ void Get_NextMap()
 	if(!maplist->string) return;
 
 	//sprintf(Buff,".\\%s\\3ZBMAPS.LST",gamepath->string);
-	sprintf(Buff,"%s/%s/3zbmaps.lst",Q2_BASE_DIR,gamepath->string);
+	sprintf(Buff,"%s/%s/3zbmaps.lst",GET_BASEPATH_STR(),gamepath->string);
 	fp = fopen(Buff,"r");
 	if(fp == NULL) return;
 	
@@ -608,7 +609,7 @@ void G_RunFrame (void)
 					}
 				}
 
-				if(zflag_ent != NULL)
+				if(zigspawn->value == 0 && zflag_ent != NULL)
 				{
 					if(!zflag_ent->inuse)
 					{
@@ -655,24 +656,24 @@ void G_RunFrame (void)
 
 	if(next_fragadd < level.time)
 	{
-		if(!ctf->value && zigmode->value == 1 && zigspawn->value == 1) {
-
+		if(!ctf->value && zigmode->value == 1 && zigspawn->value == 1)
+		{
 			if(zflag_carry == 0) {
 				zflag_stall++;
 
-				if(zflag_stall == (ZIGRESET - 1)) {
+				if(zflag_stall == (ZIGRESET - 1))
+				{
 					zf_warn = true;
 					gi.bprintf (PRINT_HIGH, "Flag bounce in %d seconds ...\n", (int) (FRAMETIME * ZIGTICK));
 				}
 			}
 
-			if(zflag_stall >= ZIGRESET) {
-				zf_move = true;
-				int i = 0;
-				while(i < zflag_stall) {
+			if(zflag_stall >= ZIGRESET)
+			{
+				if(zflag_ent)
 					G_FreeEdict(zflag_ent);
-					i++;
-				}
+
+				zf_move = true;
 				zflag_stall = 0;
 				SelectSpawnPoint (ent, v, vv);
 				ZIGFlag_Reset(ent, zflag_item);
@@ -681,7 +682,7 @@ void G_RunFrame (void)
 			}
 		}
 
-		if(zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 2)
+		if(zigspawn->value == 0 && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 2)
 		{
 			SelectSpawnPoint (ent, v, vv);
 			if(ZIGDrop_FlagCheck(ent,zflag_item))

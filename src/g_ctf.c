@@ -3012,8 +3012,8 @@ void CTFSetupNavSpawn()
 
 	if(ctf->value) gi.dprintf("We are in CTF mode.\n");
 
-	if(!ctf->value) sprintf(name,"%s/%s/chdtm/%s.chn",Q2_BASE_DIR,gamepath->string,level.mapname);
-	else sprintf(name,"%s/%s/chctf/%s.chf",Q2_BASE_DIR,gamepath->string,level.mapname);
+	if(!ctf->value) sprintf(name,"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+	else sprintf(name,"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
 
 	//if(!ctf->value) sprintf(name,"%s/chdtm/%s.chn",gamepath->string,level.mapname);
 	//else sprintf(name,"%s/chctf/%s.chf",gamepath->string,level.mapname);
@@ -3022,7 +3022,14 @@ void CTFSetupNavSpawn()
 	if(fpout == NULL)
 	{
 
-		if(!ctf->value) gi.dprintf("Chaining: file %s/chdtm/%s.chn not found.\n",gamepath->string,level.mapname);
+		if(!ctf->value) {
+			gi.dprintf("Chaining: file %s/chdtm/%s.chn not found.\n",gamepath->string,level.mapname);
+			if(zigmode->value)
+			{
+				gi.dprintf("\nChaining file required for zigmode.\n\n");
+				gi.error (ERR_FATAL);
+			}
+		}
 		else gi.dprintf("Chaining: file %s/chctf/%s.chf not found.\n",gamepath->string,level.mapname);
 
 		//if(!ctf->value) gi.dprintf("Chaining: file %s.chn not found.\n",level.mapname);

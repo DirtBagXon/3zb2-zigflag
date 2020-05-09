@@ -1,24 +1,32 @@
-# Custom 3rd Zigock Bot II for Yamagi Quake II
+# Custom 3rd Zigock Bot II for Linux Quake II
 
-This is a custom port of the 3rd Zigock Bot II to Linux Yamagi Quake II. \
-All warnings (up to gcc8) and unused variables have been fixed in the original source. \
-The code has many backport fixes, enhancements and features applied (custom, tsmod & yquake2).
+This is a custom port of the 3rd Zigock Bot II to Linux Quake II clients or servers. \
+All warnings (up to gcc8) and unused variables have been addressed from the original source. \
+The code has backport fixes, enhancements and features applied from various sources: tsmod, \
+yquake2 and custom.
 
-BASE_DIR is defined in `src/header/local.h`, for Yamagi Quake II use in Debian:
+This was modified for my own use and driven by nostalgia for the Quake II servers of old. \
+It was also fun, and sometimes exasperating, to dive into the codebase of such a classic game. \
+There are many heavily modified versions of Quake II games, this mod keeps the look and feel of \
+the original game, but allows the Quake II multiplayer experience sadly lacking in the present day. 
 
-    /usr/share/games/quake2
+Tip of the hat to `Ponpoko`, original mod author and bot creator.
 
-For mod installation in:
+On global linux installs, **e.g.** `/usr/share/games`, you may need to specify `basepath` - See details below.
 
-    /usr/share/games/quake2/3zb2
-
-Bot chaining routes are supplied, further routes can be (re)created via the mod `chedit` (See `CONFIG.txt`)
+Bot chaining routes are supplied, further routes can be (re)created via the mod command `chedit` (See `CONFIG.txt`)
 
 ### ZigMode ZigFlag (Capture and Hold)
 
-Custom features have been added to the `zigmode` Capture and Hold element of the game. Including enhancements \
-to the HUD, a flag return function and sound feedback additions which subtly alter the game dynamics and add \
-stability over the original release. It plays best on smaller level maps with a few bots.
+As the original `zigmode` appeared to be buggy and even half implemented, I have made this fun feature \
+a little more enhanced, while keeping the original look and feel of the game. Minimal HUD enhancements, \
+a timed flag return feature, bot distant spawning and added sound notifications to subtly alter the game \
+dynamics and improve stability over the original game element.
+
+`ZigMode` requires the included `.pak` file and a route chaining file for the map, many popular maps are \
+included, further `.chn` can be created via the mod `chedit` function.
+
+`Capture and Hold` plays best on smaller level maps with a couple of bots throw in.
 
 Example config file for ZigFlag:
 
@@ -29,12 +37,13 @@ set ctf 0
 set aimfix 1
 set spawnbotfar 1
 set botlist default
-set autospawn 4
+set autospawn 3
 set vwep 1
 set maxclients 16
+set basepath "/usr/share/games/quake2"
 set dmflags 16384
-set fraglimit 40
-set timelimit 15
+set fraglimit 30
+set timelimit 10
 set maplist q2dmx
 map q2dm1
 ```
@@ -144,4 +153,17 @@ Improved aim, enable `1` (default) or disable `0` via:
 
     zigmode $
     zigspawn $
+
+## Errata
+
+Specify a `basedir` to inform the mod of the system `baseq2` directory location. \
+On system level installs this may be needed to ensure the mod can find`3zbconfig.cfg,` \
+`3zbmaps.lst` and `chaining` files. The basedir can be specified in config via:
+
+    set basepath "/usr/share/games/quake2"
+
+Use on the following errors:
+
+    3ZB CFG: file not found: ./3zb2/3zbconfig.cfg
+    Chaining: file 3zb2/chdtm/q2dm1.chn not found.
 

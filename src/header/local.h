@@ -15,12 +15,13 @@
 #include "menu.h"
 //ZOID
 
-// Define a GLOBAL for BASE_DIR
-//#define	Q2_BASE_DIR	"."
-#define	Q2_BASE_DIR	"/usr/share/games/quake2" // Debian
+// Override BASE_DIR
+#define	DEFAULTPATH	"."
+#define GET_BASEPATH_STR()	((strlen(basepath->string)) == 0 ? DEFAULTPATH : basepath->string)
 
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
+
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -589,6 +590,7 @@ extern	cvar_t	*filterban;
 extern  cvar_t  *aimfix;
 
 //ponpoko
+extern	cvar_t	*basepath;
 extern	cvar_t	*gamepath;
 extern	cvar_t	*chedit;
 extern	cvar_t	*vwep;

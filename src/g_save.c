@@ -207,6 +207,7 @@ void InitGame (void)
 	aimfix = gi.cvar("aimfix", "1", CVAR_ARCHIVE);
 	spawnbotfar = gi.cvar("spawnbotfar", "0", CVAR_ARCHIVE);
 	zigspawn = gi.cvar("zigspawn", "1", CVAR_ARCHIVE);
+	basepath = gi.cvar("basepath", ".", CVAR_NOSET);
 
 	// items
 	InitItems ();

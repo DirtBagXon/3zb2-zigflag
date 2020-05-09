@@ -313,8 +313,8 @@ void SaveChain()
 	//if(ctf->value) 	sprintf(name,".\\%s\\chctf\\%s.chf",gamepath->string,level.mapname);
 	//else 	sprintf(name,".\\%s\\chdtm\\%s.chn",gamepath->string,level.mapname);
 
-	if(ctf->value) 	sprintf(name,"%s/%s/chctf/%s.chf",Q2_BASE_DIR,gamepath->string,level.mapname);
-	else 	sprintf(name,"%s/%s/chdtm/%s.chn",Q2_BASE_DIR,gamepath->string,level.mapname);
+	if(ctf->value) 	sprintf(name,"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+	else 	sprintf(name,"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
 
 	fpout = fopen(name,"wb");
 	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);
