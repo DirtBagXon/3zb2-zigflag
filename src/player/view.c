@@ -1123,12 +1123,13 @@ void ClientEndServerFrame (edict_t *ent)
 	if (ent->client->showscores && !(level.framenum & 31) 
 		&& !(ent->svflags & SVF_MONSTER))
 	{
-//ZOID
-		if (ent->client->menu) {
+		if (ent->client->menu)
 			PMenu_Update(ent);
-		} else
-//ZOID
+		else if (zigmode->value)
+			DeathmatchScoreboardMessage (ent, ent->flagholder);
+		else
 			DeathmatchScoreboardMessage (ent, ent->enemy);
+
 		gi.unicast (ent, false);
 	}
 }

@@ -1368,6 +1368,7 @@ void SP_worldspawn (edict_t *ent)
 		} else if (zigmode->value == 1) {
 			gi.configstring (CS_STATUSBAR, zig_statusbar);
 			gi.imageindex("i_zig");
+			gi.imageindex("zigtag");
 
 		} else {
 			gi.configstring (CS_STATUSBAR, dm_statusbar);

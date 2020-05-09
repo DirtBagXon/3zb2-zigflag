@@ -1228,6 +1228,7 @@ struct edict_s
 
 	edict_t		*chain;
 	edict_t		*enemy;
+	edict_t		*flagholder;
 	edict_t		*oldenemy;
 	edict_t		*activator;
 	edict_t		*groundentity;

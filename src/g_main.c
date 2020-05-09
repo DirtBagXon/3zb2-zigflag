@@ -1,4 +1,4 @@
-
+#include <float.h>
 #include "header/local.h"
 #include "header/bot.h"
 
@@ -486,10 +486,12 @@ void G_RunFrame (void)
 	static float	next_fragadd = 0;
 	static qboolean	zf_warn = false;
 	static qboolean	zf_move = false;
+	static edict_t	*flagholder = NULL;
 	edict_t	*ent;
 
 	vec3_t	v,vv;
 	qboolean haveflag;
+	qboolean zf_score = false;
 
 	level.framenum++;
 	level.time = level.framenum*FRAMETIME;
@@ -512,7 +514,7 @@ void G_RunFrame (void)
 	}
 
 	if(level.intermissiontime)
-		next_fragadd = level.time * 2;
+		next_fragadd = FLT_MAX;
 
 	G_EmergencyMaintainMinimumFreeEntityPool(EMERGENCY_ENTITY_FREE_POOL_SIZE);
 
@@ -622,11 +624,21 @@ void G_RunFrame (void)
 				}
 			}
 
+			if((level.framenum & 31))
+				if(ent->client && ent->client->pers.inventory[ITEM_INDEX(zflag_item)]) {
+					flagholder = ent;
+					zf_score = true;
+				}
+
 			if(g_edicts[i].client && !ENT_IS_BOT(ent))
 			{
-				if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)] && (level.framenum & 8))
-					ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
-				else
+				ent->flagholder = flagholder;
+
+				if(level.framenum & 8)
+				{
+					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
+						ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
+				} else
 					ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
 
 				if(zigspawn->value == 1)
@@ -654,6 +666,9 @@ void G_RunFrame (void)
 	zf_warn = false;
 	zf_move = false;
 
+	if(!zf_score)
+		flagholder = NULL;
+
 	if(next_fragadd < level.time)
 	{
 		if(!ctf->value && zigmode->value == 1 && zigspawn->value == 1)
@@ -675,8 +690,9 @@ void G_RunFrame (void)
 
 				zf_move = true;
 				zflag_stall = 0;
+				zflag_ent = NULL;
 				SelectSpawnPoint (ent, v, vv);
-				ZIGFlag_Reset(ent, zflag_item);
+				ZIGDrop_Flag(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);
 				gi.bprintf (PRINT_HIGH, "Flag bounced ...\n");
 			}

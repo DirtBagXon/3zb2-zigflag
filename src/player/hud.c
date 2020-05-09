@@ -53,7 +53,11 @@ void MoveClientToIntermission (edict_t *ent)
 
 	if (deathmatch->value && !(ent->svflags & SVF_MONSTER)) 
 	{
-		DeathmatchScoreboardMessage (ent, NULL);
+		if(zigmode->value)
+			DeathmatchScoreboardMessage (ent, ent->flagholder);
+		else
+			DeathmatchScoreboardMessage (ent, NULL);
+
 		gi.unicast (ent, true);
 	}
 
@@ -203,9 +207,13 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		if (cl_ent == ent)
 			tag = "tag1";
 		else if (cl_ent == killer)
-			tag = "tag2";
+			if (zigmode->value)
+				tag = "zigtag";
+			else
+				tag = "tag2";
 		else
 			tag = NULL;
+
 		if (tag)
 		{
 			Com_sprintf (entry, sizeof(entry),
@@ -243,7 +251,11 @@ Note that it isn't that hard to overflow the 1400 byte message limit!
 */
 void DeathmatchScoreboard (edict_t *ent)
 {
-	DeathmatchScoreboardMessage (ent, ent->enemy);
+	if(zigmode->value)
+		DeathmatchScoreboardMessage (ent, ent->flagholder);
+	else
+		DeathmatchScoreboardMessage (ent, ent->enemy);
+
 	gi.unicast (ent, true);
 }
 
