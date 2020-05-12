@@ -214,6 +214,10 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		else
 			tag = NULL;
 
+		if(zigmode->value)
+			if(killer != NULL && cl_ent == killer)
+				tag = "zigtag";
+
 		if (tag)
 		{
 			Com_sprintf (entry, sizeof(entry),

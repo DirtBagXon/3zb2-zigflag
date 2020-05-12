@@ -6,9 +6,10 @@ The code has backport fixes, enhancements and features applied from various sour
 yquake2 and custom.
 
 This was modified for my own use and driven by nostalgia for the Quake II servers of old. \
-It was also fun, and sometimes exasperating, to dive into the codebase of such a classic game. \
 There are many heavily modified versions of Quake II games, this mod keeps the look and feel of \
-the original game, but allows the Quake II multiplayer experience sadly lacking in the present day. 
+the original game, but allowed the Quake II multiplayer experience sadly lacking in the present day. \
+I couldn't find any `Capture and Hold` servers running on [q2servers](http://q2servers.com) so this offered the ability to \
+return a firm favourite.
 
 Tip of the hat to `Ponpoko`, original mod author and bot creator.
 
@@ -18,10 +19,12 @@ Bot chaining routes are supplied, further routes can be (re)created via the mod 
 
 ### ZigMode ZigFlag (Capture and Hold)
 
-As the original `zigmode` appeared to be buggy and even half implemented, I have made this fun feature \
-a little more enhanced, while keeping the original look and feel of the game. Minimal HUD enhancements, \
-a timed flag return feature, bot distant spawning and added sound notifications to subtly alter the game \
-dynamics and improve stability over the original game element.
+As the original `zigmode` appeared to be buggy and only half implemented, I have made this favourite feature \
+a little more refined, whilst keeping the look and feel of the original game. A few **simple** HUD enhancements, \
+an optional flag return feature, optional flagholder frag bonus, flagholder on scoreboard, distant bot spawning \
+and added visual and audio notifications.
+
+These subtly alter the game dynamics and improve on the original element of the modification, IMHO.
 
 `ZigMode` requires the included `.pak` file and a route chaining file for the map, many popular maps are \
 included, further `.chn` can be created via the mod `chedit` function.
@@ -33,6 +36,7 @@ Example config file for ZigFlag:
 ```
 set zigmode 1
 set zigspawn 1
+set zigbonus 1
 set ctf 0
 set aimfix 1
 set spawnbotfar 1
@@ -153,6 +157,7 @@ Improved aim, enable `1` (default) or disable `0` via:
 
     zigmode $
     zigspawn $
+    zigbonus $
 
 ## Errata
 

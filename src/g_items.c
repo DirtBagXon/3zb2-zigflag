@@ -695,15 +695,28 @@ qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count)
 
 qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 {
-	int		count;
+	int   oldcount;
+	int   count;
+	qboolean weapon;
 
-	if (ent->count)
+	weapon = (ent->item->flags & IT_WEAPON);
+	if ( (weapon) && ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+		count = 1000;
+	else if (ent->count)
 		count = ent->count;
 	else
 		count = ent->item->quantity;
 
+	oldcount = other->client->pers.inventory[ITEM_INDEX(ent->item)];
+
 	if (!Add_Ammo (other, ent->item, count))
 		return false;
+
+	if (weapon && !oldcount)
+	{
+		 if (other->client->pers.weapon != ent->item && ( !deathmatch->value || other->client->pers.weapon == Fdi_BLASTER ) )
+			other->client->newweapon = ent->item;
+	}
 
 	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) && (deathmatch->value))
 		SetRespawn (ent, 30);

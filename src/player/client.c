@@ -385,7 +385,23 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			}
 			if (message)
 			{
+				if(zigmode->value && zigbonus->value)
+				{
+					if(attacker->flagholder && attacker->flagholder == self)
+					{
+						if(ff && OnSameTeam(self,attacker)) {
+							gi.bprintf (PRINT_MEDIUM,"%s kills his team Flagholder\n", attacker->client->pers.netname);
+							attacker->client->resp.score--;
+						}
+						else {
+							gi.bprintf (PRINT_MEDIUM,"%s gets a Flagholder kill\n", attacker->client->pers.netname);
+							attacker->client->resp.score++;
+						}
+					}
+				}
+
 				gi.bprintf (PRINT_MEDIUM,"%s %s %s%s\n", self->client->pers.netname, message, attacker->client->pers.netname, message2);
+
 				if (deathmatch->value)
 				{
 					if (ff)
@@ -913,40 +929,6 @@ edict_t *SelectFarthestDeathmatchSpawnPoint (void)
 	return spot;
 }
 
-/*
-================
-Spawn bots away from players
-
-================
-*/
-edict_t *SelectBotSpawnPoint (void)
-{
-	edict_t	*botspot;
-	float	botdistance, playerdistance;
-	edict_t	*spot;
-
-	spot = NULL;
-	botspot = NULL;
-	botdistance = 0;
-	while ((spot = G_Find (spot, FOFS(classname), "info_player_deathmatch")) != NULL)
-	{
-		playerdistance = PlayersRangeFromSpot (spot);
-
-		if (playerdistance > botdistance)
-		{
-			botspot = spot;
-			botdistance = playerdistance;
-		}
-	}
-
-	if (botspot && botdistance > 250)
-	{
-		return botspot;
-	}
-
-	return NULL;
-}
-
 edict_t *SelectDeathmatchSpawnPoint (void)
 {
 	if ( (int)(dmflags->value) & DF_SPAWN_FARTHEST)
@@ -1008,7 +990,7 @@ void	SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
 		if (ctf->value)
 			spot = SelectCTFSpawnPoint(ent);
 		else if (spawnbotfar->value && ((ent)->client && ((ent)->client->zc.botindex || (ent)->client->zc.routeindex > 0)))
-			spot = SelectBotSpawnPoint();
+			spot = SelectFarthestDeathmatchSpawnPoint();
 		else
 			spot = SelectDeathmatchSpawnPoint ();
 	else if (coop->value)

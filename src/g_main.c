@@ -63,6 +63,7 @@ cvar_t	*botlist;
 cvar_t	*autospawn;
 cvar_t	*zigmode;
 cvar_t	*zigspawn;
+cvar_t	*zigbonus;
 cvar_t	*spawnbotfar;
 float	spawncycle;
 float	ctfjob_update;
@@ -579,10 +580,10 @@ void G_RunFrame (void)
 					{
 						zflag_carry++;
 						zflag_stall = 0;
-						memcpy(cfh, ent->client->pers.netname, sizeof(cfh));
+						memcpy(cfh, g_edicts[i].client->pers.netname, sizeof(cfh));
 
 						if(strncmp(cfh, lfh, sizeof(cfh))) {
-							next_fragadd = level.time + ((FRAMETIME * ZIGTICK) / 2);
+							next_fragadd = level.time + ((FRAMETIME * ZIGTICK) / 5);
 						}
 						else
 						{
@@ -625,29 +626,32 @@ void G_RunFrame (void)
 			}
 
 			if((level.framenum & 31))
-				if(ent->client && ent->client->pers.inventory[ITEM_INDEX(zflag_item)]) {
+				if(g_edicts[i].client && g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)]) {
 					flagholder = ent;
 					zf_score = true;
 				}
 
-			if(g_edicts[i].client && !ENT_IS_BOT(ent))
+			if(g_edicts[i].client)
 			{
 				ent->flagholder = flagholder;
 
-				if(level.framenum & 8)
+				if(!ENT_IS_BOT(ent))
 				{
-					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
-						ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
-				} else
-					ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
+					if(level.framenum & 8)
+					{
+						if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
+							ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
+					} else
+						ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
 
-				if(zigspawn->value == 1)
-				{
-					if(zf_warn)
-						gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
+					if(zigspawn->value == 1)
+					{
+						if(zf_warn)
+							gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
 
-					if(zf_move)
-						gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("3zb/telezf.wav"), 1, ATTN_NORM, 0);
+						if(zf_move)
+							gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("3zb/telezf.wav"), 1, ATTN_NORM, 0);
+					}
 				}
 			}
 		}
