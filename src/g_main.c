@@ -690,7 +690,17 @@ void G_RunFrame (void)
 			if(zflag_stall >= ZIGRESET)
 			{
 				if(zflag_ent)
+				{
+					if(zflag_ent->s.modelindex)
+					{
+						gi.WriteByte (svc_temp_entity);
+						gi.WriteByte (TE_SHIELD_SPARKS);
+						gi.WritePosition (zflag_ent->s.origin);
+						gi.WriteDir (vec3_origin);
+						gi.multicast (zflag_ent->s.origin, MULTICAST_PVS);
+					}
 					G_FreeEdict(zflag_ent);
+				}
 
 				zf_move = true;
 				zflag_stall = 0;

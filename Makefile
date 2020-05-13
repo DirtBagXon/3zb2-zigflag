@@ -79,7 +79,7 @@ CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
 		  -Wall -pipe -g -fwrapv -arch i386 -arch x86_64
 else
 CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
-		  -Wall -pipe -g -MMD -fwrapv -fPIC -Wno-unused-result
+		  -Wall -pipe -g -MMD -fwrapv -fPIC -msse2 -mfpmath=sse -Wno-unused-result
 endif
 
 # ----------
