@@ -2755,7 +2755,7 @@ pmenu_t joinmenu[] = {
 	{ "Chase Camera",		PMENU_ALIGN_LEFT, NULL, CTFChaseCam },
 	{ "Credits",			PMENU_ALIGN_LEFT, NULL, CTFCredits },
 	{ NULL,					PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "Use [ to move cursor",	PMENU_ALIGN_LEFT, NULL, NULL },
+	{ "Use [ and ] to move cursor",	PMENU_ALIGN_LEFT, NULL, NULL },
 	{ "ENTER to select",	PMENU_ALIGN_LEFT, NULL, NULL },
 	{ "ESC to Exit Menu",	PMENU_ALIGN_LEFT, NULL, NULL },
 	{ "(TAB to Return)",	PMENU_ALIGN_LEFT, NULL, NULL },

@@ -1602,9 +1602,12 @@ void ZIGFlagThink(edict_t *ent)
 		vec3_t	v,vv;
 
 		i = gi.pointcontents (ent->s.origin);
-		if(i & MASK_OPAQUE)
+		if(i & MASK_OPAQUE && !zigspawn->value)
 		{
+			G_FreeEdict(ent);
+			zflag_ent = NULL;
 			SelectSpawnPoint (ent, v, vv);
+			ZIGDrop_Flag(ent, zflag_item);
 			VectorCopy (v, ent->s.origin);
 		}
 		for ( i=maxclients->value+1 ; i<globals.num_edicts ; i++)
@@ -1662,9 +1665,27 @@ qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item)
 	return true;
 }
 
+void ZIGDeadDropFlag(edict_t *ent)
+{
+	gitem_t *tech;
+	edict_t *dropped;
+
+	if ((tech = FindItem("Zig Flag")) != NULL &&
+	ent->client->pers.inventory[ITEM_INDEX(tech)]) {
+		dropped = Drop_Item(ent, tech);
+		dropped->nextthink = level.time + FRAMETIME * 10;
+		dropped->think = ZIGFlagThink;
+		dropped->s.frame = 173;
+		dropped->owner = NULL;
+		ent->client->pers.inventory[ITEM_INDEX(tech)] = 0;
+		zflag_ent = dropped;
+        }
+}
+
 qboolean ZIGPickup_Flag(edict_t *ent, edict_t *other)
 {
 	zflag_ent = NULL;
+	other->flag_pickup_time = level.time;
 	other->client->pers.inventory[ITEM_INDEX(zflag_item)] = 1;	
 	other->s.modelindex3 = gi.modelindex("models/zflag.md2");
 	return true;

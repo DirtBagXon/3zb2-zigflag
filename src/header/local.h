@@ -599,7 +599,7 @@ extern	cvar_t	*botlist;
 extern	cvar_t	*autospawn;
 extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
-extern	cvar_t  *zigbonus;
+extern	cvar_t  *zigkiller;
 extern	cvar_t  *spawnbotfar;
 extern	float	spawncycle;
 //ponpoko
@@ -1208,6 +1208,7 @@ struct edict_s
 	float		damage_debounce_time;
 	float		fly_sound_debounce_time;	//move to clientinfo
 	float		last_move_time;
+	float		flag_pickup_time;
 
 	int			health;
 	int			max_health;

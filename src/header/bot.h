@@ -78,6 +78,7 @@ void UpdateExplIndex(edict_t* ent);
 
 //flag
 void ZIGDrop_Flag(edict_t *ent, gitem_t *item);
+void ZIGDeadDropFlag(edict_t *ent);
 qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item);
 
 //p_view.c

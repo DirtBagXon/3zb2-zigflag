@@ -781,6 +781,8 @@ void RemoveBot()
 				if(Bot[botindex].spflg != BOT_NEXTLEVEL) Bot[botindex].spflg = BOT_SPAWNNOT;
 				else Bot[botindex].spflg = BOT_SPRESERVED;
 
+				if(zigmode->value) ZIGDeadDropFlag(e);
+
 				gi.bprintf (PRINT_HIGH, "%s disconnected\n", e->client->pers.netname);
 	
 				// send effect
@@ -792,8 +794,11 @@ void RemoveBot()
 				e->s.modelindex = 0;
 				e->solid = SOLID_NOT;
 
-	if(ctf->value) CTFPlayerResetGrapple(e);
-				
+				if(ctf->value) {
+					CTFPlayerResetGrapple(e);
+					CTFDeadDropFlag(e);
+					CTFDeadDropTech(e);
+				}
 				gi.linkentity (e);
 
 				e->inuse = false;

@@ -63,7 +63,7 @@ cvar_t	*botlist;
 cvar_t	*autospawn;
 cvar_t	*zigmode;
 cvar_t	*zigspawn;
-cvar_t	*zigbonus;
+cvar_t	*zigkiller;
 cvar_t	*spawnbotfar;
 float	spawncycle;
 float	ctfjob_update;
@@ -480,19 +480,16 @@ void G_InitEdict (edict_t *e);
 void G_RunFrame (void)
 {
 	int		i,j;
-	static char	cfh[16];
-	static char	lfh[16];
-	static unsigned short	zflag_carry = 0;
 	static unsigned short	zflag_stall = 0;
 	static float	next_fragadd = 0;
 	static qboolean	zf_warn = false;
 	static qboolean	zf_move = false;
 	static edict_t	*flagholder = NULL;
+	static edict_t	*lastholder = NULL;
 	edict_t	*ent;
 
 	vec3_t	v,vv;
 	qboolean haveflag;
-	qboolean zf_score = false;
 
 	level.framenum++;
 	level.time = level.framenum*FRAMETIME;
@@ -506,11 +503,11 @@ void G_RunFrame (void)
 	{
 		ExitLevel ();
 		next_fragadd = 0;
-		zflag_carry = 0;
+		flagholder = NULL;
+		lastholder = NULL;
 		zflag_stall = 0;
 		zf_warn = false;
 		zf_move = false;
-		lfh[0] = 0;
 		return;
 	}
 
@@ -572,27 +569,58 @@ void G_RunFrame (void)
 //////////旗のスコアチェック
 		if(zigmode->value == 1 && !ctf->value)
 		{
+			if(i > 0 && i <= maxclients->value)
+			{
+				if(g_edicts[i].client)
+				{
+					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
+					{
+						flagholder = ent;
+						haveflag = true;
+						zflag_stall = 0;
+						zflag_ent = NULL;
+					}
+
+					ent->flagholder = flagholder;
+
+					if(!ENT_IS_BOT(ent))
+					{
+						if(level.framenum & 8)
+						{
+							if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
+								ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
+						} else
+							ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
+
+						if(zigspawn->value == 1)
+						{
+							if(zf_warn)
+								gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
+
+							if(zf_move)
+								gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("3zb/telezf.wav"), 1, ATTN_NORM, 0);
+						}
+					}
+				}
+			}
+
 			if(next_fragadd < level.time)
 			{
 				if(i > 0 && i <= maxclients->value && g_edicts[i].client)
 				{
 					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
 					{
-						zflag_carry++;
-						zflag_stall = 0;
-						memcpy(cfh, g_edicts[i].client->pers.netname, sizeof(cfh));
-
-						if(strncmp(cfh, lfh, sizeof(cfh))) {
-							next_fragadd = level.time + ((FRAMETIME * ZIGTICK) / 5);
+						if(flagholder != lastholder) {
+							next_fragadd = g_edicts[i].flag_pickup_time + (FRAMETIME * ZIGTICK);
 						}
 						else
 						{
-							zflag_ent = NULL;
-							haveflag = true;
 							gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
-							if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS))) {
+
+							if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
+							{
 								g_edicts[i].client->resp.score += 1;
-								gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n", cfh);
+								gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n",  flagholder->client->pers.netname);
 							}
 							else
 							{
@@ -605,10 +633,11 @@ void G_RunFrame (void)
 										}
 									}
 								}
-								gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n", cfh);
+								gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n",  flagholder->client->pers.netname);
 							}
 						}
-						memcpy(lfh, cfh, sizeof(lfh));
+
+						lastholder = flagholder;
 					}
 				}
 
@@ -625,35 +654,6 @@ void G_RunFrame (void)
 				}
 			}
 
-			if((level.framenum & 31))
-				if(g_edicts[i].client && g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)]) {
-					flagholder = ent;
-					zf_score = true;
-				}
-
-			if(g_edicts[i].client)
-			{
-				ent->flagholder = flagholder;
-
-				if(!ENT_IS_BOT(ent))
-				{
-					if(level.framenum & 8)
-					{
-						if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
-							ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("i_zig");
-					} else
-						ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
-
-					if(zigspawn->value == 1)
-					{
-						if(zf_warn)
-							gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
-
-						if(zf_move)
-							gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("3zb/telezf.wav"), 1, ATTN_NORM, 0);
-					}
-				}
-			}
 		}
 /////////////
 
@@ -670,21 +670,19 @@ void G_RunFrame (void)
 	zf_warn = false;
 	zf_move = false;
 
-	if(!zf_score)
+	if(!haveflag)
 		flagholder = NULL;
 
 	if(next_fragadd < level.time)
 	{
-		if(!ctf->value && zigmode->value == 1 && zigspawn->value == 1)
+		if(!flagholder && !ctf->value && zigmode->value == 1 && zigspawn->value == 1)
 		{
-			if(zflag_carry == 0) {
-				zflag_stall++;
+			zflag_stall++;
 
-				if(zflag_stall == (ZIGRESET - 1))
-				{
-					zf_warn = true;
-					gi.bprintf (PRINT_HIGH, "Flag bounce in %d seconds ...\n", (int) (FRAMETIME * ZIGTICK));
-				}
+			if(zflag_stall == (ZIGRESET - 1))
+			{
+				zf_warn = true;
+				gi.bprintf (PRINT_HIGH, "Flag bounce in %d seconds ...\n", (int) (FRAMETIME * ZIGTICK));
 			}
 
 			if(zflag_stall >= ZIGRESET)
@@ -701,7 +699,6 @@ void G_RunFrame (void)
 					}
 					G_FreeEdict(zflag_ent);
 				}
-
 				zf_move = true;
 				zflag_stall = 0;
 				zflag_ent = NULL;
@@ -720,8 +717,7 @@ void G_RunFrame (void)
 				VectorCopy (v, zflag_ent->s.origin);
 			}
 		}
-		next_fragadd = level.time + FRAMETIME * ZIGTICK;
-		zflag_carry = 0;
+		next_fragadd = level.time + (FRAMETIME * ZIGTICK);
 	}
 
 	// see if it is time to end a deathmatch

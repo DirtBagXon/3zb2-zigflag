@@ -268,8 +268,11 @@ void Move_LastRouteIndex()
 
 	if(CurrentIndex < MAXNODES)
 	{
-		memset(&Route[CurrentIndex],0,sizeof(route_t));
-		if(CurrentIndex > 0) Route[CurrentIndex].index = Route[CurrentIndex - 1].index + 1; 
+	       if(CurrentIndex > 0)
+	       {
+			memset(&Route[CurrentIndex],0,sizeof(route_t));
+			Route[CurrentIndex].index = Route[CurrentIndex - 1].index + 1;
+		}
 	}
 }
 

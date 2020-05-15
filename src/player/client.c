@@ -385,7 +385,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			}
 			if (message)
 			{
-				if(zigmode->value && zigbonus->value)
+				if(zigmode->value && zigkiller->value)
 				{
 					if(attacker->flagholder && attacker->flagholder == self)
 					{
@@ -1587,7 +1587,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		name = name_buf;
 	}
 
-	strncpy(ent->client->pers.netname, name, sizeof(ent->client->pers.netname) - 1);
+	memcpy(ent->client->pers.netname, name, sizeof(ent->client->pers.netname) - 1);
 
 	// set spectator
 	s = Info_ValueForKey (userinfo, "spectator");
@@ -1743,6 +1743,8 @@ void ClientDisconnect (edict_t *ent)
 	CTFDeadDropFlag(ent);
 	CTFDeadDropTech(ent);
 //ZOID
+
+	if(zigmode->value) ZIGDeadDropFlag(ent);
 
 	// send effect
 	gi.WriteByte (svc_muzzleflash);
@@ -2221,12 +2223,15 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 //--------------------------------------
 	level.current_entity = ent;
 	client = ent->client;
+	float delay = 5.0;
+
+	if(zigmode->value) delay = (FRAMETIME * ZIGTICK);
 
 	if (level.intermissiontime)
 	{
 		client->ps.pmove.pm_type = PM_FREEZE;
-		// can exit intermission after five seconds
-		if (level.time > level.intermissiontime + 5.0 
+		// can exit intermission after 'delay' seconds
+		if (level.time > level.intermissiontime + delay
 			&& (ucmd->buttons & BUTTON_ANY) )
 			level.exitintermission = true;
 		return;

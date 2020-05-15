@@ -1,7 +1,7 @@
 # Custom 3rd Zigock Bot II for Linux Quake II
 
 This is a custom port of the 3rd Zigock Bot II to Linux Quake II clients or servers. \
-All warnings (up to gcc8) and unused variables have been addressed from the original source. \
+All warnings (up to GCC9) and unused variables have been addressed from the original source. \
 The code has backport fixes, enhancements and features applied from various sources: tsmod, \
 yquake2 and custom.
 
@@ -9,7 +9,7 @@ This was modified for my own use and driven by nostalgia for the Quake II server
 There are many heavily modified versions of Quake II games, this mod keeps the look and feel of \
 the original game, but allowed the Quake II multiplayer experience sadly lacking in the present day. \
 I couldn't find any `Capture and Hold` servers running on [q2servers](http://q2servers.com) so this offered the ability to \
-return a firm favourite.
+return a firm favourite via the `zigmode` function.
 
 Tip of the hat to `Ponpoko`, original mod author and bot creator.
 
@@ -19,12 +19,19 @@ Bot chaining routes are supplied, further routes can be (re)created via the mod 
 
 ### ZigMode ZigFlag (Capture and Hold)
 
-As the original `zigmode` appeared to be buggy and only half implemented, I have made this favourite feature \
-a little more refined, whilst keeping the look and feel of the original game. A few **simple** HUD enhancements, \
-an optional flag return feature, optional flagholder frag bonus, flagholder on scoreboard, distant bot spawning \
-and added visual and audio notifications.
+The premise is simple: **Get the flag and keep it** - *plays on standard Deathmatch maps*.
 
-These subtly alter the game dynamics and improve on the original element of the modification, IMHO.
+The original `zigmode` was released belated, buggy and only half implemented, I attempted to make this popular feature \
+a little more refined, for fun. Whilst keeping the look and feel of the original game, essentially extending deathmatch. \
+A few **simple** HUD enhancements, an optional flag return feature, optional flagholder frag bonus, flagholder on scoreboard, \
+added visual/audio notifications and many bugfixes was the final outcome.
+
+The changes subtly alter the game dynamics and improve on the original zigmode game element, IMHO. \
+The original gameplay can still be enabled by disabling the new elements via cvars.
+
+I don't have a Windows development environment to compile a `.dll`, but paths for config, maplist and chaining files have \
+been made unixcentric. `git grep BASEPATH` will provide concerned locations. I am happy to include a `.dll` if anyone \
+stumbles across this project and can compile.
 
 `ZigMode` requires the included `.pak` file and a route chaining file for the map, many popular maps are \
 included, further `.chn` can be created via the mod `chedit` function.
@@ -36,7 +43,7 @@ Example config file for ZigFlag:
 ```
 set zigmode 1
 set zigspawn 1
-set zigbonus 1
+set zigkiller 1
 set ctf 0
 set aimfix 1
 set spawnbotfar 1
@@ -107,7 +114,7 @@ To start `$` bots automatically, append:
 
     +set autospawn $
 
-### Spawn bots at the furthest point
+### Spawn bots at the farthest point
 
     spawnbotfar $
 
@@ -157,7 +164,7 @@ Improved aim, enable `1` (default) or disable `0` via:
 
     zigmode $
     zigspawn $
-    zigbonus $
+    zigkiller $
 
 ## Errata
 
