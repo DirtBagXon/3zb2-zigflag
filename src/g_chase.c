@@ -107,6 +107,7 @@ void ChaseNext(edict_t *ent)
 			break;
 	} while (e != ent->client->chase_target);
 
+	gi.centerprintf(ent,  "Chase Cam on %s..\n", e->client->pers.netname);
 	ent->client->chase_target = e;
 	ent->client->update_chase = true;
 }
@@ -131,6 +132,7 @@ void ChasePrev(edict_t *ent)
 			break;
 	} while (e != ent->client->chase_target);
 
+	gi.centerprintf(ent,  "Chase Cam on %s..\n", e->client->pers.netname);
 	ent->client->chase_target = e;
 	ent->client->update_chase = true;
 }
@@ -146,6 +148,7 @@ void GetChaseTarget(edict_t *ent)
 			ent->client->chase_target = other;
 			ent->client->update_chase = true;
 			UpdateChaseCam(ent);
+			gi.centerprintf(ent,  "Chase Cam on %s..\n", other->client->pers.netname);
 			return;
 		}
 	}

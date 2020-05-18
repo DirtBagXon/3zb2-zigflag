@@ -65,6 +65,7 @@ cvar_t	*zigmode;
 cvar_t	*zigspawn;
 cvar_t	*zigkiller;
 cvar_t	*spawnbotfar;
+cvar_t	*sedative;
 float	spawncycle;
 float	ctfjob_update;
 //ponpoko
@@ -579,6 +580,47 @@ void G_RunFrame (void)
 						haveflag = true;
 						zflag_stall = 0;
 						zflag_ent = NULL;
+
+						if(next_fragadd < level.time)
+						{
+							if(flagholder != lastholder) {
+								next_fragadd = g_edicts[i].flag_pickup_time + (FRAMETIME * ZIGTICK);
+							}
+							else
+							{
+								if(sedative->value && !strncmp(ent->client->pers.netname, SEDATIVE, sizeof(ent->client->pers.netname)))
+								{
+									ent->client->resp.score = 0;
+									ent->deadflag = DEAD_DEAD;
+									ent->health = -100;
+									player_die (ent, ent, ent, 100000, vec3_origin);
+									continue;
+								}
+
+								gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+
+								if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
+								{
+									g_edicts[i].client->resp.score += 1;
+									gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n",  flagholder->client->pers.netname);
+								}
+								else
+								{
+									for ( j = 1 ; j <= maxclients->value ; j++)
+									{
+										if(g_edicts[j].inuse)
+										{
+											if(OnSameTeam(&g_edicts[i],&g_edicts[j])) {
+												g_edicts[j].client->resp.score += 1;
+											}
+										}
+									}
+									gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n",  flagholder->client->pers.netname);
+								}
+							}
+
+							lastholder = flagholder;
+						}
 					}
 
 					ent->flagholder = flagholder;
@@ -592,7 +634,7 @@ void G_RunFrame (void)
 						} else
 							ent->client->ps.stats[STAT_SIGHT_PIC] = 0;
 
-						if(zigspawn->value == 1)
+						if(zigspawn->value)
 						{
 							if(zf_warn)
 								gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("misc/talk1.wav"), 1, ATTN_NORM, 0);
@@ -600,56 +642,6 @@ void G_RunFrame (void)
 							if(zf_move)
 								gi.sound (ent, CHAN_RELIABLE+CHAN_VOICE, gi.soundindex ("3zb/telezf.wav"), 1, ATTN_NORM, 0);
 						}
-					}
-				}
-			}
-
-			if(next_fragadd < level.time)
-			{
-				if(i > 0 && i <= maxclients->value && g_edicts[i].client)
-				{
-					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
-					{
-						if(flagholder != lastholder) {
-							next_fragadd = g_edicts[i].flag_pickup_time + (FRAMETIME * ZIGTICK);
-						}
-						else
-						{
-							gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
-
-							if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
-							{
-								g_edicts[i].client->resp.score += 1;
-								gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n",  flagholder->client->pers.netname);
-							}
-							else
-							{
-								for ( j = 1 ; j <= maxclients->value ; j++)
-								{
-									if(g_edicts[j].inuse)
-									{
-										if(OnSameTeam(&g_edicts[i],&g_edicts[j])) {
-											g_edicts[j].client->resp.score += 1;
-										}
-									}
-								}
-								gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n",  flagholder->client->pers.netname);
-							}
-						}
-
-						lastholder = flagholder;
-					}
-				}
-
-				if(zigspawn->value == 0 && zflag_ent != NULL)
-				{
-					if(!zflag_ent->inuse)
-					{
-						SelectSpawnPoint (ent, v, vv);
-						if(ZIGDrop_FlagCheck(ent,zflag_item))
-						{
-							VectorCopy (v, zflag_ent->s.origin);
-						}			
 					}
 				}
 			}
@@ -691,10 +683,13 @@ void G_RunFrame (void)
 				{
 					if(zflag_ent->s.modelindex)
 					{
-						gi.WriteByte (svc_temp_entity);
-						gi.WriteByte (TE_SHIELD_SPARKS);
-						gi.WritePosition (zflag_ent->s.origin);
-						gi.WriteDir (vec3_origin);
+						for (i=0 ; i<6 ; i++) {
+							gi.WriteByte (svc_temp_entity);
+							gi.WriteByte (TE_GREENBLOOD);
+							zflag_ent->s.origin[2] += i + 5;
+							gi.WritePosition (zflag_ent->s.origin);
+							gi.WriteDir (vec3_origin);
+						}
 						gi.multicast (zflag_ent->s.origin, MULTICAST_PVS);
 					}
 					G_FreeEdict(zflag_ent);
@@ -709,7 +704,7 @@ void G_RunFrame (void)
 			}
 		}
 
-		if(zigspawn->value == 0 && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 2)
+		if(!zigspawn->value && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 2)
 		{
 			SelectSpawnPoint (ent, v, vv);
 			if(ZIGDrop_FlagCheck(ent,zflag_item))

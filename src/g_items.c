@@ -1592,6 +1592,7 @@ void PrecacheItem (gitem_t *it)
 void ZIGFlagThink(edict_t *ent)
 {
 	static unsigned short count;
+	qboolean respawn = false;
 	int i;
 
 	count ++;
@@ -1602,14 +1603,19 @@ void ZIGFlagThink(edict_t *ent)
 		vec3_t	v,vv;
 
 		i = gi.pointcontents (ent->s.origin);
-		if(i & MASK_OPAQUE && !zigspawn->value)
-		{
+
+		if(i & MASK_SOLID) respawn = true;
+
+		if(i & MASK_OPAQUE && !zigspawn->value) respawn = true;
+
+		if(respawn) {
 			G_FreeEdict(ent);
 			zflag_ent = NULL;
 			SelectSpawnPoint (ent, v, vv);
 			ZIGDrop_Flag(ent, zflag_item);
 			VectorCopy (v, ent->s.origin);
 		}
+
 		for ( i=maxclients->value+1 ; i<globals.num_edicts ; i++)
 		{
 			tre = &g_edicts[i];

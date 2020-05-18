@@ -1278,7 +1278,16 @@ char *zig_statusbar =
 "yt 2 "
 "num 3 14 "
 
-// sight becomes flagalert (move under frags)
+// Chase Cam
+"if 16 "
+  "xv 0 "
+  "yb -48 "
+  "string \"Viewing:\" "
+  "xv 74 "
+  "stat_string 16 "
+"endif "
+
+// Flagalert
 "if 31 "
 "   yt 26 "
 "   xr -24 "

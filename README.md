@@ -1,15 +1,15 @@
 # Custom 3rd Zigock Bot II for Linux Quake II
 
-This is a custom port of the 3rd Zigock Bot II to Linux Quake II clients or servers. \
-All warnings (up to GCC9) and unused variables have been addressed from the original source. \
-The code has backport fixes, enhancements and features applied from various sources: tsmod, \
-yquake2 and custom.
+This is a custom port of the 3rd Zigock Bot II to Linux Quake II - Yamagi Quake II advised.  \
+All warnings (up to GCC9) and unused variables have been addressed in the original source. \
+The code also has backport fixes, enhancements and features applied from various sources: \
+`tsmod`, `yquake2` and custom.
 
-This was modified for my own use and driven by nostalgia for the Quake II servers of old. \
-There are many heavily modified versions of Quake II games, this mod keeps the look and feel of \
-the original game, but allowed the Quake II multiplayer experience sadly lacking in the present day. \
-I couldn't find any `Capture and Hold` servers running on [q2servers](http://q2servers.com) so this offered the ability to \
-return a firm favourite via the `zigmode` function.
+This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
+There are many heavily modified versions of Quake II games, this mod tries to keeps the look and feel of \
+the original game deathmatch, but allows the multiplayer experience with some of the best bots for the Quake II\
+engine. I also couldn't locate any `Capture and Hold` servers running on [q2servers](http://q2servers.com) so this offered \
+the ability to rekindle a firm favourite via the `zigmode` modification.
 
 Tip of the hat to `Ponpoko`, original mod author and bot creator.
 
@@ -21,20 +21,21 @@ Bot chaining routes are supplied, further routes can be (re)created via the mod 
 
 The premise is simple: **Get the flag and keep it** - *plays on standard Deathmatch maps*.
 
-The original `zigmode` was released belated, buggy and only half implemented, I attempted to make this popular feature \
-a little more refined, for fun. Whilst keeping the look and feel of the original game, essentially extending deathmatch. \
-A few **simple** HUD enhancements, an optional flag return feature, optional flagholder frag bonus, flagholder on scoreboard, \
-added visual/audio notifications and many bugfixes was the final outcome.
+The original `zigmode` was released belated, buggy and only half implemented, I attempted to make this feature a little \
+more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and whistles.
+
+A few **simple** HUD enhancements, optional flag return feature, optional flagholder frag bonuses, flagholder on scoreboard, \
+added visual/audio notifications and many bugfixes was the final outcome of playing around with the code.
 
 The changes subtly alter the game dynamics and improve on the original zigmode game element, IMHO. \
-The original gameplay can still be enabled by disabling the new elements via cvars.
+The original gameplay, with bugfixes, can still be enabled by disabling the new elements via cvars.
 
 I don't have a Windows development environment to compile a `.dll`, but paths for config, maplist and chaining files have \
 been made unixcentric. `git grep BASEPATH` will provide concerned locations. I am happy to include a `.dll` if anyone \
 stumbles across this project and can compile.
 
-`ZigMode` requires the included `.pak` file and a route chaining file for the map, many popular maps are \
-included, further `.chn` can be created via the mod `chedit` function.
+`ZigMode` requires the included small `.pak` file, for the flag model, and a route chaining file for the map. Many popular \
+maps are included, further route chaining `.chn` files can be created via the mod `chedit` function.
 
 `Capture and Hold` plays best on smaller level maps with a couple of bots throw in.
 
@@ -179,3 +180,7 @@ Use on the following errors:
     3ZB CFG: file not found: ./3zb2/3zbconfig.cfg
     Chaining: file 3zb2/chdtm/q2dm1.chn not found.
 
+
+## 獄
+
+![captureandhold](https://raw.githubusercontent.com/DirtBagXon/3zb2/master/screenshot.png)

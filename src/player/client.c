@@ -1172,7 +1172,7 @@ void spectator_respawn (edict_t *ent)
 				numspec++;
 
 		if (numspec >= maxspectators->value) {
-			gi.cprintf(ent, PRINT_HIGH, "Server spectator limit is full.");
+			gi.cprintf(ent, PRINT_HIGH, "Server spectator limit is full.\n");
 			ent->client->pers.spectator = false;
 			// reset his spectator var
 			gi.WriteByte (svc_stufftext);
@@ -1254,6 +1254,10 @@ void PutClientInServer (edict_t *ent)
 	// do it before setting health back up, so farthest
 	// ranging doesn't count this client
 	SelectSpawnPoint (ent, spawn_origin, spawn_angles);
+
+	// If we respawn as a spectator, ensure we drop the flag
+	if(ent->client->pers.inventory[ITEM_INDEX(zflag_item)] && ent->client->pers.spectator)
+		ZIGDrop_Flag(ent, zflag_item);
 
 	index = ent-g_edicts-1;
 	client = ent->client;
@@ -1581,7 +1585,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		ClearClientBotTag(name, name_buf, sizeof(name_buf));
 
 		if (strlen(name_buf) < 1) {
-			strcpy(name_buf, "BOZO");
+			strcpy(name_buf, SEDATIVE);
 			gi.dprintf("%s Alert...\n", name_buf);
 		}
 		name = name_buf;
@@ -2232,7 +2236,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		client->ps.pmove.pm_type = PM_FREEZE;
 		// can exit intermission after 'delay' seconds
 		if (level.time > level.intermissiontime + delay
-			&& (ucmd->buttons & BUTTON_ANY) )
+			&& (ucmd->buttons & BUTTON_ATTACK) )
 			level.exitintermission = true;
 		return;
 	}

@@ -22,6 +22,9 @@
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
 
+// Sedative name
+#define	SEDATIVE	"_GONZO_"
+
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -600,6 +603,7 @@ extern	cvar_t	*autospawn;
 extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
 extern	cvar_t  *zigkiller;
+extern	cvar_t  *sedative;
 extern	cvar_t  *spawnbotfar;
 extern	float	spawncycle;
 //ponpoko
