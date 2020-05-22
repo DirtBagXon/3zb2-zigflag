@@ -79,7 +79,9 @@ void UpdateExplIndex(edict_t* ent);
 //flag
 void ZIGDrop_Flag(edict_t *ent, gitem_t *item);
 void ZIGDeadDropFlag(edict_t *ent);
+void ZIGBounce_Flag(edict_t *ent, gitem_t *item);
 qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item);
+edict_t *Transition_Flag (edict_t *ent, gitem_t *item);
 
 //p_view.c
 void BotEndServerFrame (edict_t *ent);

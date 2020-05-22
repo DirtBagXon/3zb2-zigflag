@@ -1609,11 +1609,10 @@ void ZIGFlagThink(edict_t *ent)
 		if(i & MASK_OPAQUE && !zigspawn->value) respawn = true;
 
 		if(respawn) {
-			G_FreeEdict(ent);
-			zflag_ent = NULL;
 			SelectSpawnPoint (ent, v, vv);
-			ZIGDrop_Flag(ent, zflag_item);
+			ZIGBounce_Flag(ent, zflag_item);
 			VectorCopy (v, ent->s.origin);
+			ent->solid = SOLID_TRIGGER;
 		}
 
 		for ( i=maxclients->value+1 ; i<globals.num_edicts ; i++)
@@ -1669,6 +1668,52 @@ qboolean ZIGDrop_FlagCheck(edict_t *ent, gitem_t *item)
 	zflag_ent = tech;
 	tech->inuse = true;
 	return true;
+}
+
+void ZIGBounce_Flag(edict_t *ent, gitem_t *item)
+{
+	edict_t *tech;
+
+	G_FreeEdict(zflag_ent);
+	tech = Transition_Flag(ent, item);
+	zflag_ent = tech;
+	return;
+}
+
+edict_t *Transition_Flag (edict_t *ent, gitem_t *item)
+{
+	edict_t	*bounce;
+	vec3_t	forward, right;
+
+	bounce = G_Spawn();
+
+	bounce->classname = item->classname;
+	bounce->item = item;
+	bounce->spawnflags = DROPPED_ITEM;
+	bounce->s.frame = 173;
+	bounce->s.effects = item->world_model_flags;
+	bounce->s.renderfx = RF_GLOW;
+	VectorSet (bounce->mins, -15, -15, -15);
+	VectorSet (bounce->maxs, 15, 15, 15);
+	gi.setmodel (bounce, bounce->item->world_model);
+	bounce->solid = SOLID_NOT;
+	bounce->movetype = MOVETYPE_TOSS;
+	bounce->touch = drop_temp_touch;
+	bounce->owner = ent;
+
+	AngleVectors (ent->s.angles, forward, right, NULL);
+	VectorCopy (ent->s.origin, bounce->s.origin);
+
+	VectorScale (forward, 100, bounce->velocity);
+	bounce->velocity[2] = 200;
+
+	bounce->think = ZIGFlagThink;
+	bounce->nextthink = level.time + FRAMETIME * 10;
+	bounce->inuse = true;
+
+	gi.linkentity (bounce);
+
+	return bounce;
 }
 
 void ZIGDeadDropFlag(edict_t *ent)

@@ -792,14 +792,12 @@ void G_FindRouteLink(edict_t *ent)
 	//旗を発生させる
 	if(!ctf->value && zigmode->value == 1)
 	{
-		gi.dprintf("Starting ZigFlag mode...\n");
 		SelectSpawnPoint (ent, v, vv);
-	//	VectorCopy (v, ent->s.origin);
 		if(ZIGDrop_FlagCheck(ent,zflag_item))
 		{
+			gi.dprintf("Starting ZigFlag mode...\n");
 			VectorCopy (v, zflag_ent->s.origin);
 		}
-		//ZIGDrop_Flag(ent,item);
 		zigflag_spawn = 2;
 	}
 	gi.dprintf("Linking routes...\n");

@@ -692,14 +692,13 @@ void G_RunFrame (void)
 						}
 						gi.multicast (zflag_ent->s.origin, MULTICAST_PVS);
 					}
-					G_FreeEdict(zflag_ent);
 				}
 				zf_move = true;
 				zflag_stall = 0;
-				zflag_ent = NULL;
 				SelectSpawnPoint (ent, v, vv);
-				ZIGDrop_Flag(ent, zflag_item);
+				ZIGBounce_Flag(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);
+				zflag_ent->solid = SOLID_TRIGGER;
 				gi.bprintf (PRINT_HIGH, "Flag bounced ...\n");
 			}
 		}
