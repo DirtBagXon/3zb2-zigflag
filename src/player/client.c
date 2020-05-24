@@ -1422,6 +1422,12 @@ void PutClientInServer (edict_t *ent)
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;
 	ChangeWeapon (ent);
+
+	if(respawn_protection->value) {
+		client->invincible_framenum = level.framenum + SPAWNPROTECT;
+		client->resp.spawnframe = level.framenum;
+	}
+
 }
 
 /*

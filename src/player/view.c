@@ -796,17 +796,25 @@ void G_SetClientEffects (edict_t *ent)
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/quadfire2.wav"), 1, ATTN_NORM, 0);
 	}
 
-	if (ent->client->invincible_framenum > level.framenum
-//ZOID
-		&& (level.framenum & 8)
-//ZOID
-		)
-	{
+	if (ent->client->invincible_framenum > level.framenum) {
+
 		remaining = ent->client->invincible_framenum - level.framenum;
-		if (remaining > 30 || (remaining & 4) )
-			ent->s.effects |= EF_PENT;
-		if (remaining == 30 && (ent->svflags & SVF_MONSTER))	// beginning to fade
-			gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect2.wav"), 1, ATTN_NORM, 0);
+
+		if(respawn_protection->value && (level.framenum - ent->client->resp.spawnframe) < SPAWNPROTECT)
+		{
+			ent->s.effects |= EF_COLOR_SHELL;
+			ent->s.renderfx |= (RF_SHELL_RED|RF_SHELL_GREEN|RF_SHELL_BLUE);
+		}
+		else
+		{
+			if(level.framenum & 8)
+			{
+				if (remaining > 30 || (remaining & 4) )
+					ent->s.effects |= EF_PENT;
+				if (remaining == 30 && (ent->svflags & SVF_MONSTER))	// beginning to fade
+					gi.sound(ent, CHAN_ITEM, gi.soundindex("items/protect2.wav"), 1, ATTN_NORM, 0);
+			}
+		}
 	}
 
 	// show cheaters!!!
@@ -877,6 +885,29 @@ void G_SetClientSound (edict_t *ent)
 		ent->s.sound = ent->client->weapon_sound;
 	else
 		ent->s.sound = 0;
+
+	if (ent->s.sound == 0 && ent->client->pers.inventory[ITEM_INDEX(zflag_item)] && !ent->waterlevel) {
+
+		if(ent->client->resp.flagsound > 80)
+		{
+			static int r;
+			static qboolean rs = true;
+
+			if(rs) {
+				r = rand()%4;
+				rs = false;
+			}
+
+			if(r == 0) ent->s.sound = gi.soundindex("3zb/zposs1.wav");
+			if(r == 2) ent->s.sound = gi.soundindex("3zb/zposs2.wav");
+
+			if(ent->client->resp.flagsound > 92) { //  1.2 sec soundbytes
+				ent->client->resp.flagsound = 0;
+				rs = true;
+			}
+		}
+		ent->client->resp.flagsound += 1;
+	}
 }
 
 /*

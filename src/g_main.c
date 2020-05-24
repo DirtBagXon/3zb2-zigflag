@@ -66,6 +66,7 @@ cvar_t	*zigspawn;
 cvar_t	*zigkiller;
 cvar_t	*spawnbotfar;
 cvar_t	*sedative;
+cvar_t	*respawn_protection;
 float	spawncycle;
 float	ctfjob_update;
 //ponpoko

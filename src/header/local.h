@@ -25,6 +25,8 @@
 // Sedative name
 #define	SEDATIVE	"_GONZO_"
 
+// Immune on respawn (n * FRAMETIME) sec
+#define	SPAWNPROTECT	10
 
 // protocol bytes that can be directly added to messages
 #define	svc_muzzleflash		1
@@ -604,6 +606,7 @@ extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
 extern	cvar_t  *zigkiller;
 extern	cvar_t  *sedative;
+extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
 extern	float	spawncycle;
 //ponpoko
@@ -999,6 +1002,8 @@ typedef struct
 {
 	client_persistant_t	coop_respawn;	// what to set client->pers to on a respawn
 	int			enterframe;			// level.framenum the client entered the game
+	int			spawnframe;			// level.framenum the client last spawned
+	int			flagsound;			// span out flag possession sound
 	int			score;				// frags, etc
 //ZOID
 	int			ctf_team;			// CTF team

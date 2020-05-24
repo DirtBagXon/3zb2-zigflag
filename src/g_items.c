@@ -3150,7 +3150,7 @@ tank commander's head
 		0,
 		NULL,
 		0,
-/* precache */ "ctf/flagcap.wav"
+/* precache */ "3zb/zposs1.wav 3zb/zposs2.wav"
 	},
 /* Resistance Tech */
 	{

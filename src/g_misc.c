@@ -1965,6 +1965,14 @@ void teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_
 	KillBox (other);
 
 	gi.linkentity (other);
+
+	if(zigmode->value && !ENT_IS_BOT(other)) {
+		gi.WriteByte (svc_muzzleflash);
+		gi.WriteShort (other - g_edicts);
+		gi.WriteByte (MZ_LOGOUT);
+		gi.multicast (other->s.origin, MULTICAST_PVS);
+	}
+
 }
 
 /*QUAKED misc_teleporter (1 0 0) (-32 -32 -24) (32 32 -16)

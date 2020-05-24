@@ -550,6 +550,11 @@ void PutBotInServer (edict_t *ent)
 	zc->first_target = NULL;
 	zc->zcstate = STS_IDLE;
 
+	if(respawn_protection->value) {
+		ent->client->invincible_framenum = level.framenum + SPAWNPROTECT;
+		ent->client->resp.spawnframe = level.framenum;
+	}
+
 	if(ent->client->resp.enterframe == level.framenum && !chedit->value)
 	{
 		gi.WriteByte (svc_muzzleflash);

@@ -52,6 +52,7 @@ set botlist default
 set autospawn 3
 set vwep 1
 set maxclients 16
+set respawn_protection 1
 set basepath "/usr/share/games/quake2"
 set dmflags 16384
 set fraglimit 30

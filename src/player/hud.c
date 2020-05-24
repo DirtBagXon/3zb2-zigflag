@@ -464,8 +464,10 @@ void G_SetStats (edict_t *ent)
 	}
 	else if (ent->client->invincible_framenum > level.framenum)
 	{
-		ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
-		ent->client->ps.stats[STAT_TIMER] = (ent->client->invincible_framenum - level.framenum)/10;
+		if((level.framenum - ent->client->resp.spawnframe) > SPAWNPROTECT) {
+			ent->client->ps.stats[STAT_TIMER_ICON] = gi.imageindex ("p_invulnerability");
+			ent->client->ps.stats[STAT_TIMER] = (ent->client->invincible_framenum - level.framenum)/10;
+		}
 	}
 	else if (ent->client->enviro_framenum > level.framenum)
 	{
