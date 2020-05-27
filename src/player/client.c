@@ -185,7 +185,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 	int			mod;
 	char		*message;
 	char		*message2;
-	qboolean	ff;
+	qboolean	ff, fk;
 
 	if (coop->value && attacker->client)
 		meansOfDeath |= MOD_FRIENDLY_FIRE;
@@ -196,6 +196,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
 		message = NULL;
 		message2 = "";
+		fk = false;
 
 		switch (mod)
 		{
@@ -389,18 +390,36 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				{
 					if(attacker->flagholder && attacker->flagholder == self)
 					{
-						if(ff && OnSameTeam(self,attacker)) {
-							gi.bprintf (PRINT_MEDIUM,"%s kills his team Flagholder\n", attacker->client->pers.netname);
+						if(ff && OnSameTeam(self,attacker))
+						{
+							if(rand() & 1)
+								gi.bprintf (PRINT_MEDIUM,"%s%s kills team Flag holder %s\n",
+										attacker->client->pers.netname, message2, self->client->pers.netname);
+							else
+								gi.bprintf (PRINT_MEDIUM,"%s%s purges teammate %s of the Flag\n",
+										attacker->client->pers.netname, message2, self->client->pers.netname);
+
 							attacker->client->resp.score--;
-						}
-						else {
-							gi.bprintf (PRINT_MEDIUM,"%s gets a Flagholder kill\n", attacker->client->pers.netname);
+
+						} else {
+
+							if(rand() & 1)
+								gi.bprintf (PRINT_MEDIUM,"%s%s executes Flag holder %s\n",
+										attacker->client->pers.netname, message2, self->client->pers.netname);
+							else
+								gi.bprintf (PRINT_MEDIUM,"%s%s ends %s's Flag ownership\n",
+										attacker->client->pers.netname, message2, self->client->pers.netname);
+
 							attacker->client->resp.score++;
+
 						}
+
+						fk = true;
 					}
 				}
 
-				gi.bprintf (PRINT_MEDIUM,"%s %s %s%s\n", self->client->pers.netname, message, attacker->client->pers.netname, message2);
+				if(!fk)
+					gi.bprintf (PRINT_MEDIUM,"%s %s %s%s\n", self->client->pers.netname, message, attacker->client->pers.netname, message2);
 
 				if (deathmatch->value)
 				{

@@ -1,15 +1,15 @@
-# Custom 3rd Zigock Bot II for Linux Quake II
+# Custom 3rd Zigock Bot II for Quake II
 
-This is a custom port of the 3rd Zigock Bot II to Linux Quake II - Yamagi Quake II advised.  \
+This is a custom port of the 3rd Zigock Bot II to Quake II - Yamagi Quake II is recommended.  \
 All warnings (up to GCC9) and unused variables have been addressed in the original source. \
 The code also has backport fixes, enhancements and features applied from various sources: \
-`tsmod`, `yquake2` and custom.
+`tsmod`, `yquake2` and many custom.
 
 This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
-There are many heavily modified versions of Quake II games, this mod tries to keeps the look and feel of \
-the original game deathmatch, but allows the multiplayer experience with some of the best bots for the Quake II\
-engine. I also couldn't locate any `Capture and Hold` servers running on [q2servers](http://q2servers.com) so this offered \
-the ability to rekindle a firm favourite via the `zigmode` modification.
+There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
+the original game deathmatch, but allows a multiplayer experience with some of the best bots for the Quake II\
+engine. I couldn't locate any `Capture and Hold` servers on [q2servers](http://q2servers.com), so this offered the opportunity to rekindle \
+a firm favourite via the `zigmode` modification.
 
 Tip of the hat to `Ponpoko`, original mod author and bot creator.
 
@@ -24,24 +24,33 @@ The premise is simple: **Get the flag and keep it** - *plays on standard Deathma
 The original `zigmode` was released belated, buggy and only half implemented, I attempted to make this feature a little \
 more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and whistles.
 
-A few **simple** HUD enhancements, optional flag return feature, optional flagholder frag bonuses, flagholder on scoreboard, \
-added visual/audio notifications and many bugfixes was the final outcome of playing around with the code.
+* Simple HUD enhancements.
+* Optional Flag respawn feature.
+* Optional Flagholder frag bonus.
+* Optional respawn protection.
+* Spawn bots at a distance.
+* Autospawn bots at level start.
+* Flagholder dogtag displayed on scoreboard.
+* Visual/audio notifications to Flagholder.
+
+..and many bugfixes was the final outcome of playing around with the code.
+
+The mod also supports skin and model teams with appropriate bonuses and penalties on Flag possession and `FRIENDLY_FIRE`.
 
 The changes subtly alter the game dynamics and improve on the original zigmode game element, IMHO. \
 The original gameplay, with bugfixes, can still be enabled by disabling the new elements via cvars.
 
-I don't have a Windows development environment to compile a `.dll`, but paths for config, maplist and chaining files have \
-been made unixcentric. `git grep BASEPATH` will provide concerned locations. I am happy to include a `.dll` if anyone \
-stumbles across this project and can compile.
-
-`ZigMode` requires the included small `.pak` file, for the flag model, and a route chaining file for the map. Many popular \
-maps are included, further route chaining `.chn` files can be created via the mod `chedit` function.
-
 `Capture and Hold` plays best on smaller level maps with a couple of bots throw in.
 
-Example config file for ZigFlag:
+### Pak file (Flag model) and Route Chaining files
+
+`ZigMode` requires the included small `.pak` file, for the flag model, and route chaining files for the maps. \
+Many popular maps are included, further route chaining `.chn` files can be created via the mod `chedit` function.
+
+#### Example config file for ZigFlag:
 
 ```
+exec addbot.cfg
 set zigmode 1
 set zigspawn 1
 set zigkiller 1
@@ -53,7 +62,7 @@ set autospawn 3
 set vwep 1
 set maxclients 16
 set respawn_protection 1
-set basepath "/usr/share/games/quake2"
+//set basepath "/usr/share/games/quake2"   <- Check requirement in Windows
 set dmflags 16384
 set fraglimit 30
 set timelimit 10
@@ -63,7 +72,28 @@ map q2dm1
 
 See `CONFIG.txt` for further details.
 
-## Installation
+## Windows Installation
+
+A Windows `game.dll` file has been provided in the `windows` subdirectory. Paths for config, maplist and chaining files have \
+been made unixoid in the main source. `git grep BASEPATH` will provide concerned locations for future compilations.  I have \
+also provided a small patch file to switch these paths with ease. This is also included in the `windows` subdirectory.
+
+Install the `.dll` in the *3zb2* folder:
+
+    copy .\windows\gamex86.dll .\3zb2\game.dll
+    copy .\windows\gamex86.dll .\3zb2\gamex86.dll
+
+Move the *3zb2* directory in the main Quake II installation folder, alongside *baseq2*.
+
+    move 3zb2 C:\Program Files\Quake2\
+
+Adjust the `zig.cfg` (see above) in the *3zb2* directory if required, then create a `.bat` file using the below arguments as a minimum:
+
+    quake2.exe +set game 3zb2 +set deathmatch 1 +exec zig.cfg
+
+**Note:** `basepath` directive may **NOT** be required in Windows Quake II configuration files.
+
+## Linux Installation
 
 * Copy the *3zb2/* dir to your Quake II directory.
 * Build the `game.so` by calling `make` and copy it to the *3zb2/* dir.

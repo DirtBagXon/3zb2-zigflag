@@ -1,0 +1,92 @@
+diff -ru a/Makefile b/Makefile
+--- a/Makefile	2020-05-24 16:23:44.722134311 +0100
++++ b/Makefile	2020-05-25 12:04:17.000000000 +0100
+@@ -79,7 +79,7 @@
+ 		  -Wall -pipe -g -fwrapv -arch i386 -arch x86_64
+ else
+ CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
+-		  -Wall -pipe -g -MMD -fwrapv -fPIC -msse2 -mfpmath=sse -Wno-unused-result
++		  -Wall -pipe -g -MMD -fwrapv -fPIC -msse2 -mfpmath=sse -Wno-unused-result -Wno-unknown-pragmas
+ endif
+ 
+ # ----------
+diff -ru a/src/bot/func.c b/src/bot/func.c
+--- a/src/bot/func.c	2020-05-24 16:23:44.742134897 +0100
++++ b/src/bot/func.c	2020-05-25 12:41:19.000000000 +0100
+@@ -85,8 +85,7 @@
+ 	gamepath = gi.cvar ("game", "0", CVAR_NOSET);
+ 
+ 	//load info
+-	//sprintf(Buff,"%s/3ZBConfig.cfg",gamepath->string);
+-	sprintf(Buff,"%s/%s/3zbconfig.cfg",GET_BASEPATH_STR(),gamepath->string);
++	sprintf(Buff,"%s\\%s\\3zbconfig.cfg",GET_BASEPATH_STR(),gamepath->string);
+ 	fp = fopen(Buff,"rt");
+ 	if(fp == NULL)
+ 	{
+diff -ru a/src/g_ctf.c b/src/g_ctf.c
+--- a/src/g_ctf.c	2020-05-24 16:23:44.742134897 +0100
++++ b//src/g_ctf.c	2020-05-25 12:41:34.000000000 +0100
+@@ -3012,11 +3012,8 @@
+ 
+ 	if(ctf->value) gi.dprintf("We are in CTF mode.\n");
+ 
+-	if(!ctf->value) sprintf(name,"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+-	else sprintf(name,"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+-
+-	//if(!ctf->value) sprintf(name,"%s/chdtm/%s.chn",gamepath->string,level.mapname);
+-	//else sprintf(name,"%s/chctf/%s.chf",gamepath->string,level.mapname);
++	if(!ctf->value) sprintf(name,"%s\\%s\\chdtm\\%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
++	else sprintf(name,"%s\\%s\\chctf\\%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+ 
+ 	fpout = fopen(name,"rb");
+ 	if(fpout == NULL)
+diff -ru a/src/g_main.c b/src/g_main.c
+--- a/src/g_main.c	2020-05-24 16:23:44.742134897 +0100
++++ b/src/g_main.c	2020-05-25 12:41:48.000000000 +0100
+@@ -217,8 +217,8 @@
+ 	
+ 	if(!maplist->string) return;
+ 
+-	//sprintf(Buff,".\\%s\\3ZBMAPS.LST",gamepath->string);
+-	sprintf(Buff,"%s/%s/3zbmaps.lst",GET_BASEPATH_STR(),gamepath->string);
++	sprintf(Buff,"%s\\%s\\3zbmaps.lst",GET_BASEPATH_STR(),gamepath->string);
++
+ 	fp = fopen(Buff,"r");
+ 	if(fp == NULL) return;
+ 	
+diff -ru a/src/g_svcmds.c b/src/g_svcmds.c
+--- a/src/g_svcmds.c	2020-05-24 16:23:44.742134897 +0100
++++ b/src/g_svcmds.c	2020-05-25 12:42:33.000000000 +0100
+@@ -312,12 +312,8 @@
+ 		return;
+ 	}
+ 
+-	//とりあえずCTFだめ
+-	//if(ctf->value) 	sprintf(name,".\\%s\\chctf\\%s.chf",gamepath->string,level.mapname);
+-	//else 	sprintf(name,".\\%s\\chdtm\\%s.chn",gamepath->string,level.mapname);
+-
+-	if(ctf->value) 	sprintf(name,"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+-	else 	sprintf(name,"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
++	if(ctf->value) 	sprintf(name,"%s\\%s\\chctf\\%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
++	else 	sprintf(name,"%s\\%s\\chdtm\\%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+ 
+ 	fpout = fopen(name,"wb");
+ 	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);
+diff -ru a/src/header/local.h b/src/header/local.h
+--- a/src/header/local.h	2020-05-24 16:23:44.742134897 +0100
++++ b/src/header/local.h	2020-05-25 12:18:01.000000000 +0100
+@@ -550,10 +550,10 @@
+ 
+ extern	edict_t			*g_edicts;
+ 
+-#define	FOFS(x) (long)&(((edict_t *)0)->x)
+-#define	STOFS(x) (long)&(((spawn_temp_t *)0)->x)
+-#define	LLOFS(x) (long)&(((level_locals_t *)0)->x)
+-#define	CLOFS(x) (long)&(((gclient_t *)0)->x)
++#define	FOFS(x) (int)&(((edict_t *)0)->x)
++#define	STOFS(x) (int)&(((spawn_temp_t *)0)->x)
++#define	LLOFS(x) (int)&(((level_locals_t *)0)->x)
++#define	CLOFS(x) (int)&(((gclient_t *)0)->x)
+ 
+ #define random()	((rand () & 0x7fff) / ((float)0x7fff))
+ #define crandom()	(2.0 * (random() - 0.5))
