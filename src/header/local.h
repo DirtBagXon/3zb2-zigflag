@@ -25,6 +25,9 @@
 // Sedative name
 #define	SEDATIVE	"_GONZO_"
 
+// Player ID
+#define CS_PLAYERNAMES	(CS_GENERAL + 1)
+
 // Immune on respawn (n * FRAMETIME) sec
 #define	SPAWNPROTECT	10
 
@@ -66,6 +69,7 @@
 #define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
 #define FL_RESPAWN				0x80000000	// used for item respawning
 
+#define	MAX_SPAWNS		64
 
 #define	FRAMETIME		0.1
 
@@ -342,6 +346,8 @@ typedef struct
 	char		level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
 	char		mapname[MAX_QPATH];		// the server name (base1, etc)
 	char		nextmap[MAX_QPATH];		// go here when fraglimit is hit
+	edict_t		*spawns[MAX_SPAWNS];
+	int		numspawns;
 
 	// intermission state
 	float		intermissiontime;		// time the intermission was started
@@ -593,6 +599,9 @@ extern	cvar_t	*maxspectators;
 extern	cvar_t	*filterban;
 
 extern  cvar_t  *aimfix;
+extern	cvar_t  *fixflaws;
+extern	cvar_t  *playerid;
+extern	cvar_t  *playerid_alt;
 
 //ponpoko
 extern	cvar_t	*basepath;

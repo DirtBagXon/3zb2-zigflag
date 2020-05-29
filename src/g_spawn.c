@@ -792,13 +792,13 @@ void G_FindRouteLink(edict_t *ent)
 	//旗を発生させる
 	if(!ctf->value && zigmode->value == 1)
 	{
-		SelectSpawnPoint (ent, v, vv);
+		SelectFlagSpawnPoint (ent, v, vv);
 		if(ZIGDrop_FlagCheck(ent,zflag_item))
 		{
 			gi.dprintf("Starting ZigFlag mode...\n");
 			VectorCopy (v, zflag_ent->s.origin);
 		}
-		zigflag_spawn = 2;
+		zigflag_spawn = 1;
 	}
 	gi.dprintf("Linking routes...\n");
 
@@ -964,8 +964,10 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	strncpy (game.spawnpoint, spawnpoint, sizeof(game.spawnpoint)-1);
 
 	// set client fields on player ents
-	for (i=0 ; i<game.maxclients ; i++)
+	for (i=0 ; i<game.maxclients ; i++) {
 		g_edicts[i+1].client = game.clients + i;
+		gi.configstring(CS_PLAYERNAMES + i, g_edicts[i+1].client->pers.netname);
+	}
 
 	ent = NULL;
 	inhibit = 0;
@@ -1051,13 +1053,22 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 
 	if(zigmode->value == 1) zigflag_spawn = 1;
 	else zigflag_spawn = 0;
-	//旗のアイテムアドレス取得
+
 	zflag_item =  FindItem("Zig Flag");
-	zflag_ent = NULL;		//初期化
-//	if(CurrentIndex > 0)
-//ponko
+	zflag_ent = NULL;
 
 	ctfjob_update = level.time;
+
+	ent = NULL;
+
+	while ((ent = G_Find(ent, FOFS(classname), "info_player_deathmatch")) != NULL) {
+		level.spawns[level.numspawns++] = ent;
+		if (level.numspawns == MAX_SPAWNS) {
+			break;
+		}
+	}
+	gi.dprintf("%d spawn points.\n", level.numspawns);
+
 }
 
 
@@ -1206,6 +1217,22 @@ char *dm_statusbar =
 "yt 2 "
 "num 3 14 "
 
+// view id1
+"if 29 "
+  "xv 100 "
+  "yb -80 "
+  "string \"Target:\" "
+  "xv 165 "
+  "stat_string 29 "
+"endif "
+
+// view id2
+"if 30 "
+  "xv 160 "
+  "yb -245 "
+  "stat_string 30 "
+"endif "
+
 //sight
 "if 31 "
 "   xv 96 "
@@ -1283,6 +1310,22 @@ char *zig_statusbar =
   "string \"Viewing:\" "
   "xv 74 "
   "stat_string 16 "
+"endif "
+
+// view id1
+"if 29 "
+  "xv 100 "
+  "yb -80 "
+  "string \"Target:\" "
+  "xv 165 "
+  "stat_string 29 "
+"endif "
+
+// view id2
+"if 30 "
+  "xv 160 "
+  "yb -245 "
+  "stat_string 30 "
 "endif "
 
 // Flagalert

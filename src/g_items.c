@@ -1609,7 +1609,7 @@ void ZIGFlagThink(edict_t *ent)
 		if(i & MASK_OPAQUE && !zigspawn->value) respawn = true;
 
 		if(respawn) {
-			SelectSpawnPoint (ent, v, vv);
+			SelectFlagSpawnPoint (ent, v, vv);
 			ZIGBounce_Flag(ent, zflag_item);
 			VectorCopy (v, ent->s.origin);
 			ent->solid = SOLID_TRIGGER;

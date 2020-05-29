@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <time.h>
 
 #if defined _M_IX86 && !defined C_ONLY
@@ -149,6 +150,8 @@ vec_t _DotProduct (vec3_t v1, vec3_t v2);
 void _VectorSubtract (vec3_t veca, vec3_t vecb, vec3_t out);
 void _VectorAdd (vec3_t veca, vec3_t vecb, vec3_t out);
 void _VectorCopy (vec3_t in, vec3_t out);
+
+uint32_t rand_uniform(uint32_t n);
 
 void ClearBounds (vec3_t mins, vec3_t maxs);
 void AddPointToBounds (vec3_t v, vec3_t mins, vec3_t maxs);
@@ -997,9 +1000,11 @@ typedef enum
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
 
-#define STAT_SIGHT_PIC			31
+#define STAT_VIEWID1			29
+#define STAT_VIEWID2			30
 
-#define	MAX_STATS				32
+#define STAT_SIGHT_PIC			31
+#define	MAX_STATS			32
 
 
 // dmflags->value flags

@@ -853,7 +853,63 @@ float	PlayersRangeFromSpot (edict_t *spot)
 
 /*
 ================
-SelectRandomDeathmatchSpawnPoint
+SelectRandomDeathmatchSpawnPointAvoidClosest (Fixed)
+
+go to a random point, but NOT the two points closest
+to other players
+================
+*/
+
+edict_t *SelectTrueRandomDeathmatchSpawnPoint(void)
+{
+	return level.spawns[rand_uniform(level.numspawns)];
+}
+
+edict_t *SelectRandomDeathmatchSpawnPointAvoidClosest (void)
+{
+	edict_t *spot, *spot1, *spot2;
+	float   range, range1, range2;
+	int     i;
+
+	range1 = range2 = 99999;
+	spot1 = spot2 = NULL;
+
+	for (i = 0; i < level.numspawns; i++) {
+		spot = level.spawns[i];
+
+		range = PlayersRangeFromSpot(spot);
+		if (range < range1)
+		{
+			range1 = range;
+			spot1 = spot;
+		}
+	}
+
+	for (i = 0; i < level.numspawns; i++) {
+		spot = level.spawns[i];
+
+		if (spot == spot1)
+			continue;
+
+		range = PlayersRangeFromSpot(spot);
+
+		if (range < range2)
+		{
+			range2 = range;
+			spot2 = spot;
+		}
+	}
+
+	do {
+		spot = SelectTrueRandomDeathmatchSpawnPoint();
+	} while (spot == spot1 || spot == spot2);
+
+	return spot;
+}
+
+/*
+================
+SelectRandomDeathmatchSpawnPoint (Original)
 
 go to a random point, but NOT the two points closest
 to other players
@@ -861,10 +917,10 @@ to other players
 */
 edict_t *SelectRandomDeathmatchSpawnPoint (void)
 {
-	edict_t	*spot, *spot1, *spot2;
-	int		count = 0;
-	int		selection;
-	float	range, range1, range2;
+	edict_t *spot, *spot1, *spot2;
+	int             count = 0;
+	int             selection;
+	float   range, range1, range2;
 
 	spot = NULL;
 	range1 = range2 = 99999;
@@ -953,9 +1009,11 @@ edict_t *SelectDeathmatchSpawnPoint (void)
 	if ( (int)(dmflags->value) & DF_SPAWN_FARTHEST)
 		return SelectFarthestDeathmatchSpawnPoint ();
 	else
-		return SelectRandomDeathmatchSpawnPoint ();
+		if(fixflaws->value)
+			return SelectRandomDeathmatchSpawnPointAvoidClosest ();
+		else
+			return SelectRandomDeathmatchSpawnPoint ();
 }
-
 
 edict_t *SelectCoopSpawnPoint (edict_t *ent)
 {
@@ -1042,8 +1100,35 @@ void	SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
 	}
 
 	VectorCopy (spot->s.origin, origin);
-	if((ent)->client && ((ent)->client->zc.botindex || (ent)->client->zc.routeindex > 0)) origin[2] += 32;
+	if((ent)->client && ((ent)->client->zc.botindex || (ent)->client->zc.routeindex > 0)) origin[2] += 14;
 	else origin[2] += 9;
+	VectorCopy (spot->s.angles, angles);
+}
+
+/*
+===========
+SelectFlagSpawnPoint
+
+============
+*/
+void	SelectFlagSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
+{
+	edict_t	*spot = NULL;
+
+	spot = SelectTrueRandomDeathmatchSpawnPoint ();
+
+	if (!spot)
+	{
+		if (!game.spawnpoint[0])
+		{
+			spot = G_Find (spot, FOFS(classname), "info_player_start");
+		}
+		if (!spot)
+			gi.error ("Couldn't find spawn point %s\n", game.spawnpoint);
+	}
+
+	VectorCopy (spot->s.origin, origin);
+	origin[2] += 20;
 	VectorCopy (spot->s.angles, angles);
 }
 
@@ -1630,6 +1715,7 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	s = Info_ValueForKey (userinfo, "skin");
 
 	playernum = ent-g_edicts-1;
+	gi.configstring(CS_PLAYERNAMES + playernum, ent->client->pers.netname);
 
 	// combine name and skin into a configstring
 //ZOID
@@ -2254,7 +2340,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	client = ent->client;
 	float delay = 5.0;
 
-	if(zigmode->value) delay = (FRAMETIME * ZIGTICK);
+	if(zigmode->value) delay = 7.5;
 
 	if (level.intermissiontime)
 	{

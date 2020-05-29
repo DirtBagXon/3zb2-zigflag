@@ -235,6 +235,9 @@ void ChangeWeapon (edict_t *ent)
 
 	if (ent->client->grenade_time)
 	{
+		if (fixflaws->value)
+			is_quad = (ent->client->quad_framenum > level.framenum);
+
 		ent->client->grenade_time = level.time;
 		ent->client->weapon_sound = 0;
 		weapon_grenade_fire (ent, false);

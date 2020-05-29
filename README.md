@@ -1,9 +1,9 @@
-# Custom 3rd Zigock Bot II for Quake II
+# ZigFlag - Custom 3rd Zigock Bot II for Quake II
 
 This is a custom port of the 3rd Zigock Bot II to Quake II - Yamagi Quake II is recommended.  \
 All warnings (up to GCC9) and unused variables have been addressed in the original source. \
-The code also has backport fixes, enhancements and features applied from various sources: \
-`tsmod`, `yquake2` and many custom.
+The code also has handpicked backport fixes, enhancements and features applied from various \
+sources: `TSmod`, `yquake2`, `OpenTDM` and custom.
 
 This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
 There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
@@ -30,8 +30,9 @@ more refined, just for fun. I was trying to keep the look and feel of the origin
 * Optional respawn protection.
 * Spawn bots at a distance.
 * Autospawn bots at level start.
-* Flagholder dogtag displayed on scoreboard.
 * Visual/audio notifications to Flagholder.
+* HUD Identification of player in the crosshair.
+* Flagholder dogtag displayed on scoreboard.
 
 ..and many bugfixes was the final outcome of playing around with the code.
 
@@ -57,6 +58,8 @@ set zigkiller 1
 set ctf 0
 set aimfix 1
 set spawnbotfar 1
+set playerid 1
+set playerid_alt 0
 set botlist default
 set autospawn 3
 set vwep 1
@@ -190,13 +193,23 @@ Remove `$` bots via:
 
 Improved aim, enable `1` (default) or disable `0` via:
 
-    aimfix $
+    aimfix 1
+
+Fix noted Quake 2 gameplay flaws (opentdm), enable `1` (default) or disable `0` via:
+
+    fixflaws 1
+
+Identify player in the crosshair, enable `1` or disable `0` (default) \
+Additional cvar for alternate positioning of the player_id label: `playerid_alt`:
+
+    playerid 1
+    playerid_alt 1
 
 `Capture and Hold (ZigFlag)` mode for Deathmatch/Team games:
 
-    zigmode $
-    zigspawn $
-    zigkiller $
+    zigmode 1
+    zigspawn 1
+    zigkiller 1
 
 ## Errata
 
@@ -210,6 +223,13 @@ Use on the following errors:
 
     3ZB CFG: file not found: ./3zb2/3zbconfig.cfg
     Chaining: file 3zb2/chdtm/q2dm1.chn not found.
+
+The mod has a random issues in `SV_RunThink()`, resulting in a segfault, during bot tracing \
+when the *lightweight* `gamemap` command is used for level change. Use the `map` command which \
+causes a full level reset to overcome the issue. Note: **Q2Pro** attempts to enforce the use of \
+`gamemap`, use `sv_allow_map 1` in Q2Pro to overcome this:
+
+    map q2dm1
 
 
 ## 獄

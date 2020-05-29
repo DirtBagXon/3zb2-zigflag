@@ -48,6 +48,7 @@ qboolean TargetJump(edict_t *ent,vec3_t tpos);
 qboolean Bot_traceS (edict_t *ent,edict_t *other);
 qboolean Bot_Fall(edict_t *ent,vec3_t pos,float dist);
 
+void SelectFlagSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles);
 void SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles);
 void ClientUserinfoChanged (edict_t *ent, char *userinfo);
 void CopyToBodyQue (edict_t *ent);

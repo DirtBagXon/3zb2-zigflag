@@ -204,13 +204,16 @@ void InitGame (void)
 	bob_roll = gi.cvar ("bob_roll", "0.002", 0);
 
 	// enhancements
+	fixflaws = gi.cvar("fixflaws", "1", CVAR_ARCHIVE);
 	aimfix = gi.cvar("aimfix", "1", CVAR_ARCHIVE);
+	playerid = gi.cvar("playerid", "0", CVAR_ARCHIVE);
+	playerid_alt = gi.cvar("playerid_alt", "0", CVAR_ARCHIVE);
 	spawnbotfar = gi.cvar("spawnbotfar", "0", CVAR_ARCHIVE);
 	zigspawn = gi.cvar("zigspawn", "1", CVAR_ARCHIVE);
 	zigkiller = gi.cvar("zigkiller", "1", CVAR_ARCHIVE);
 	sedative = gi.cvar("sedative", "1", CVAR_ARCHIVE);
-	respawn_protection = gi.cvar("respawn_protection", "0", CVAR_ARCHIVE);
 	basepath = gi.cvar("basepath", ".", CVAR_NOSET);
+	respawn_protection = gi.cvar("respawn_protection", "0", CVAR_ARCHIVE);
 
 	// items
 	InitItems ();

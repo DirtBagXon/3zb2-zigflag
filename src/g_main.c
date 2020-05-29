@@ -51,7 +51,10 @@ cvar_t	*bob_roll;
 
 cvar_t	*sv_cheats;
 
-cvar_t  *aimfix;
+cvar_t	*aimfix;
+cvar_t	*fixflaws;
+cvar_t	*playerid;
+cvar_t	*playerid_alt;
 
 //ponpoko
 cvar_t	*basepath;
@@ -696,7 +699,7 @@ void G_RunFrame (void)
 				}
 				zf_move = true;
 				zflag_stall = 0;
-				SelectSpawnPoint (ent, v, vv);
+				SelectFlagSpawnPoint (ent, v, vv);
 				ZIGBounce_Flag(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);
 				zflag_ent->solid = SOLID_TRIGGER;
@@ -704,9 +707,9 @@ void G_RunFrame (void)
 			}
 		}
 
-		if(!zigspawn->value && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 2)
+		if(!zigspawn->value && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 1)
 		{
-			SelectSpawnPoint (ent, v, vv);
+			SelectFlagSpawnPoint (ent, v, vv);
 			if(ZIGDrop_FlagCheck(ent,zflag_item))
 			{
 				VectorCopy (v, zflag_ent->s.origin);

@@ -377,7 +377,7 @@ retry:
 		}
 	}
 
-	if (trace.fraction != 1.0)
+	if (trace.fraction != 1.0 || (trace.allsolid && fixflaws->value))
 	{
 		SV_Impact (ent, &trace);
 

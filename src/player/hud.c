@@ -370,6 +370,168 @@ void Cmd_Help_f (edict_t *ent)
 }
 
 
+/*
+==========
+Player ID
+==========
+*/
+
+static qboolean visiblemask(edict_t *self, edict_t *other, int mask)
+{
+    vec3_t  spot1;
+    vec3_t  spot2;
+    trace_t trace;
+    int     i;
+
+    VectorCopy(self->s.origin, spot1);
+    spot1[2] += self->viewheight;
+
+    VectorCopy(other->s.origin, spot2);
+    spot2[2] += other->viewheight;
+
+    for (i = 0; i < 10; i++) {
+        trace = gi.trace(spot1, vec3_origin, vec3_origin, spot2, self, mask);
+
+        if (trace.fraction == 1.0f)
+            return true;
+
+        if (trace.allsolid && (trace.contents & MASK_WATER)) {
+            mask &= ~MASK_WATER;
+            continue;
+        }
+
+        if (trace.ent == world && trace.surface &&
+            (trace.surface->flags & (SURF_TRANS33 | SURF_TRANS66))) {
+            mask &= ~MASK_WATER;
+            VectorCopy(trace.endpos, spot1);
+            continue;
+        }
+
+        break;
+    }
+    return false;
+}
+
+
+static edict_t *find_by_tracing(edict_t *ent)
+{
+    edict_t     *ignore;
+    vec3_t      forward;
+    trace_t     tr;
+    vec3_t      start;
+    vec3_t      mins = { -4, -4, -4 };
+    vec3_t      maxs = { 4, 4, 4 };
+    int         i;
+    int         tracemask;
+
+    VectorCopy(ent->s.origin, start);
+    start[2] += ent->viewheight;
+
+    AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+
+    VectorScale(forward, 4096, forward);
+    VectorAdd(ent->s.origin, forward, forward);
+
+    ignore = ent;
+
+    tracemask = CONTENTS_SOLID | CONTENTS_MONSTER | MASK_WATER;
+
+    for (i = 0; i < 10; i++) {
+        tr = gi.trace(start, mins, maxs, forward, ignore, tracemask);
+
+        if (tr.allsolid && (tr.contents & MASK_WATER)) {
+            tracemask &= ~MASK_WATER;
+            continue;
+        }
+
+        if (tr.ent == world && tr.surface &&
+            (tr.surface->flags & (SURF_TRANS33 | SURF_TRANS66))) {
+            tracemask &= ~MASK_WATER;
+            VectorCopy(tr.endpos, start);
+            continue;
+        }
+
+        if (tr.ent == world || tr.fraction == 1.0f)
+            break;
+
+        if (tr.ent && tr.ent->client && tr.ent->health > 0 &&
+            visiblemask(tr.ent, ent, CONTENTS_SOLID | MASK_WATER)) {
+            return tr.ent;
+        }
+
+        VectorCopy(tr.endpos, start);
+        ignore = tr.ent;
+    }
+
+    return NULL;
+}
+
+static edict_t *find_by_angles(edict_t *ent)
+{
+    vec3_t      forward;
+    edict_t     *who, *best;
+    vec3_t      dir;
+    float       distance, bdistance = 0.0f;
+    float       bd = 0.0f, d;
+
+    AngleVectors(ent->client->v_angle, forward, NULL, NULL);
+    best = NULL;
+
+    for (who = g_edicts + 1; who <= g_edicts + game.maxclients; who++) {
+        if (!who->inuse)
+            continue;
+        if (who->client->pers.connected == false)
+            continue;
+        if (who->health <= 0)
+            continue;
+
+        if (who == ent)
+            continue;
+
+        VectorSubtract(who->s.origin, ent->s.origin, dir);
+        distance = VectorLength(dir);
+
+        VectorNormalize(dir);
+        d = DotProduct(forward, dir);
+
+        if (d > bd &&
+            visiblemask(ent, who, CONTENTS_SOLID | MASK_WATER) &&
+            visiblemask(who, ent, CONTENTS_SOLID | MASK_WATER)) {
+            bdistance = distance;
+            bd = d;
+            best = who;
+        }
+    }
+
+    if (!best) {
+        return NULL;
+    }
+
+    if ((bdistance < 150 && bd > 0.50f) ||
+        (bdistance < 250 && bd > 0.90f) ||
+        (bdistance < 600 && bd > 0.96f) ||
+        bd > 0.98f) {
+        return best;
+    }
+
+    return NULL;
+}
+
+int G_GetPlayerIdView(edict_t *ent)
+{
+    edict_t *target;
+
+    target = find_by_tracing(ent);
+    if (!target) {
+        target = find_by_angles(ent);
+        if (!target) {
+            return 0;
+        }
+    }
+
+    return CS_PLAYERNAMES + (target - g_edicts) - 1;
+}
+
 //=======================================================================
 
 /*
@@ -382,6 +544,7 @@ void G_SetStats (edict_t *ent)
 	gitem_t		*item;
 	int			index, cells;
 	int			power_armor_type;
+	qboolean		view_id = false;
 
 	//
 	// health
@@ -495,6 +658,25 @@ void G_SetStats (edict_t *ent)
 
 	ent->client->ps.stats[STAT_SELECTED_ITEM] = ent->client->pers.selected_item;
 
+	// targeting_id
+
+	if(playerid->value && !playerid_alt->value) {
+		ent->client->ps.stats[STAT_VIEWID1] = G_GetPlayerIdView(ent);
+		ent->client->ps.stats[STAT_VIEWID2] = 0;
+		view_id = true;
+	}
+
+	if(playerid_alt->value) {
+		ent->client->ps.stats[STAT_VIEWID1] = 0;
+		ent->client->ps.stats[STAT_VIEWID2] = G_GetPlayerIdView(ent);
+		view_id = true;
+	}
+
+	if (!view_id) {
+		ent->client->ps.stats[STAT_VIEWID1] = 0;
+		ent->client->ps.stats[STAT_VIEWID2] = 0;
+	}
+
 	//
 	// layouts
 	//
@@ -503,8 +685,12 @@ void G_SetStats (edict_t *ent)
 	if (deathmatch->value)
 	{
 		if (ent->client->pers.health <= 0 || level.intermissiontime
-			|| ent->client->showscores)
+			|| ent->client->showscores) {
 			ent->client->ps.stats[STAT_LAYOUTS] |= 1;
+			ent->client->ps.stats[STAT_VIEWID1] = 0;
+			ent->client->ps.stats[STAT_VIEWID2] = 0;
+		}
+
 		if (ent->client->showinventory && ent->client->pers.health > 0)
 			ent->client->ps.stats[STAT_LAYOUTS] |= 2;
 	}
@@ -604,4 +790,3 @@ void G_SetSpectatorStats (edict_t *ent)
 	else
 		cl->ps.stats[STAT_CHASE] = 0;
 }
-

@@ -642,20 +642,44 @@ of ent.  Ent should be unlinked before calling this!
 */
 qboolean KillBox (edict_t *ent)
 {
-	trace_t		tr;
-
-	while (1)
+	if (fixflaws->value)
 	{
-		tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, NULL, MASK_PLAYERSOLID);
-		if (!tr.ent)
-			break;
+		edict_t *touch[MAX_EDICTS];
+		int     count;
+		int     i;
 
-		// nail it
-		T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+		count = gi.BoxEdicts(ent->absmin, ent->absmax, touch, MAX_EDICTS, AREA_SOLID);
 
-		// if we didn't kill it, fail
-		if (tr.ent->solid)
-			return false;
+		for (i = 0; i < count; i++)
+		{
+			if (touch[i] == ent)
+				continue;
+
+			if (touch[i]->solid == SOLID_NOT || (touch[i]->svflags & SVF_DEADMONSTER))
+				continue;
+
+			if (touch[i]->inuse)
+				T_Damage(touch[i], ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+		}
+	}
+	else
+	{
+		trace_t		tr;
+
+		while (1)
+		{
+			tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, NULL, MASK_PLAYERSOLID);
+
+			if (!tr.ent)
+				break;
+
+			// nail it
+			T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
+
+			// if we didn't kill it, fail
+			if (tr.ent->solid)
+				return false;
+		}
 	}
 
 	return true;		// all clear

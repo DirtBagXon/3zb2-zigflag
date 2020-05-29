@@ -69,7 +69,20 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 #pragma optimize( "", on )
 #endif
 
+uint32_t rand_uniform(uint32_t n)
+{
+	uint32_t r, m;
 
+	if (n < 2)
+		return 0;
+
+	m = -n % n;
+	do {
+		r = rand();
+	} while (r < m);
+
+	return r % n;
+}
 
 void AngleVectors (vec3_t angles, vec3_t forward, vec3_t right, vec3_t up)
 {

@@ -14,6 +14,7 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 {
 	vec3_t	dest;
 	trace_t	trace;
+	int i;
 
 // bmodels need special checking because their origin is 0,0,0
 	if (targ->movetype == MOVETYPE_PUSH)
@@ -28,38 +29,50 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 		return false;
 	}
 	
-	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, targ->s.origin, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
+
+	trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, targ->s.origin, inflictor, MASK_SOLID);
+	if (trace.fraction == 1.0f)
 		return true;
 
-	VectorCopy (targ->s.origin, dest);
-	dest[0] += 15.0;
-	dest[1] += 15.0;
-	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
-		return true;
+	if (fixflaws->value) {
+		vec_t *bounds[] = { targ->absmin, targ->absmax };
 
-	VectorCopy (targ->s.origin, dest);
-	dest[0] += 15.0;
-	dest[1] -= 15.0;
-	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
-		return true;
+		for (i = 0; i < 8; i++)
+		{
+			dest[0] = bounds[(i >> 0) & 1][0];
+			dest[1] = bounds[(i >> 1) & 1][1];
+			dest[2] = bounds[(i >> 2) & 1][2];
 
-	VectorCopy (targ->s.origin, dest);
-	dest[0] -= 15.0;
-	dest[1] += 15.0;
-	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
-		return true;
+			trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
 
-	VectorCopy (targ->s.origin, dest);
-	dest[0] -= 15.0;
-	dest[1] -= 15.0;
-	trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
-	if (trace.fraction == 1.0)
-		return true;
+			if (trace.fraction == 1.0f)
+				return true;
+		}
+	}
+	else
+	{
+		dest[2] = targ->s.origin[2];
 
+		for (i = 0; i < 4; i++) {
+
+			if (i & 1) {
+				dest[0] = targ->s.origin[0] - 15.0f;
+			} else {
+				dest[0] = targ->s.origin[0] + 15.0f;
+			}
+
+			if (i & 2) {
+				dest[1] = targ->s.origin[1] - 15.0f;
+			} else {
+				dest[1] = targ->s.origin[1] + 15.0f;
+			}
+
+			trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
+
+			if (trace.fraction == 1.0f)
+				return true;
+		}
+	}
 
 	return false;
 }

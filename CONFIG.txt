@@ -58,6 +58,9 @@ aimfix			Enable more accurate aiming (default on = 1, off = 0)
 respawn_protection	Enable brief immunity on respawn (default off = 0, on = 1)
 spawnbotfar		Spawn bots on farthest spawn points (default off = 0, on = 1)
 basepath		Specify mod basedir path to 'quake2' directory (default = ".")
+fixflaws		Fix some noted Quake 2 gameplay flaws (opentdm) (default on = 1, off = 0)
+playerid		Indentify player in the crosshair (default off = 0, on = 1)
+playerid_alt		Additional cvar for alternate positioning of the player_id label.
 
 2. Modification of this values will activate during the game is running
 
