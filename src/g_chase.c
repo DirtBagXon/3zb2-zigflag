@@ -91,6 +91,7 @@ void ChaseNext(edict_t *ent)
 {
 	int i;
 	edict_t *e;
+	char netname[MAX_NAME];
 
 	if (!ent->client->chase_target)
 		return;
@@ -107,7 +108,8 @@ void ChaseNext(edict_t *ent)
 			break;
 	} while (e != ent->client->chase_target);
 
-	gi.centerprintf(ent,  "Chase Cam on %s..\n", e->client->pers.netname);
+	HighlightStr(netname, e->client->pers.netname, MAX_NAME);
+	gi.centerprintf(ent,  "Chase Cam: %s\n", netname);
 	ent->client->chase_target = e;
 	ent->client->update_chase = true;
 }
@@ -116,6 +118,7 @@ void ChasePrev(edict_t *ent)
 {
 	int i;
 	edict_t *e;
+	char netname[MAX_NAME];
 
 	if (!ent->client->chase_target)
 		return;
@@ -132,7 +135,8 @@ void ChasePrev(edict_t *ent)
 			break;
 	} while (e != ent->client->chase_target);
 
-	gi.centerprintf(ent,  "Chase Cam on %s..\n", e->client->pers.netname);
+	HighlightStr(netname, e->client->pers.netname, MAX_NAME);
+	gi.centerprintf(ent,  "Chase Cam: %s\n", netname);
 	ent->client->chase_target = e;
 	ent->client->update_chase = true;
 }
@@ -141,6 +145,7 @@ void GetChaseTarget(edict_t *ent)
 {
 	int i;
 	edict_t *other;
+	char netname[MAX_NAME];
 
 	for (i = 1; i <= maxclients->value; i++) {
 		other = g_edicts + i;
@@ -148,7 +153,8 @@ void GetChaseTarget(edict_t *ent)
 			ent->client->chase_target = other;
 			ent->client->update_chase = true;
 			UpdateChaseCam(ent);
-			gi.centerprintf(ent,  "Chase Cam on %s..\n", other->client->pers.netname);
+			HighlightStr(netname, other->client->pers.netname, MAX_NAME);
+			gi.centerprintf(ent,  "Chase Cam: %s\n", netname);
 			return;
 		}
 	}

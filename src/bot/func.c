@@ -34,6 +34,7 @@ qboolean Get_YenPos(char *Buff,int *curr)
 void Load_BotInfo()
 {
 	char	MessageSection[50];
+	char	MessageHighlight[MAX_STRING_CHARS];
 	char	Buff[1024];
 	int		i,j,k,l;
 
@@ -109,7 +110,8 @@ void Load_BotInfo()
 			if(Buff[0] == '.' || Buff[0] == '[' || Buff[0] == '#') break;
 			k = strlen(Buff);
 			if((strlen(Buff) + strlen(ClientMessage)) > MAX_STRING_CHARS - 1) break;
-			strcat(ClientMessage,Buff);
+			HighlightStr(MessageHighlight, Buff, MAX_STRING_CHARS);
+			strcat(ClientMessage, MessageHighlight);
 		}
 MESS_NOTFOUND:
 		//if(botlist->string == NULL) strcpy(MessageSection,BOTLIST_SECTION_DM);

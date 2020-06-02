@@ -69,7 +69,10 @@
 #define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
 #define FL_RESPAWN				0x80000000	// used for item respawning
 
+#define	FLAG_HEALTH		5
 #define	MAX_SPAWNS		64
+#define	MAX_TEXT		64
+#define	MAX_NAME		16
 
 #define	FRAMETIME		0.1
 
@@ -548,6 +551,7 @@ extern	int	body_armor_index;
 #define MOD_BLASTOFF		38
 #define MOD_GEKK			39
 #define MOD_TRAP			40
+#define MOD_FLAG			41
 // END 14-APR-98
 #define MOD_FRIENDLY_FIRE	0x8000000
 
@@ -617,6 +621,7 @@ extern	cvar_t  *zigkiller;
 extern	cvar_t  *sedative;
 extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
+extern	cvar_t  *heavyflag;
 extern	float	spawncycle;
 //ponpoko
 
@@ -725,6 +730,8 @@ char	*vtos (vec3_t v);
 
 float vectoyaw (vec3_t vec);
 void vectoangles (vec3_t vec, vec3_t angles);
+
+size_t HighlightStr(char *dst, const char *src, size_t size);
 
 //
 // g_combat.c
@@ -843,6 +850,7 @@ void ClientBeginServerFrame (edict_t *ent);
 //
 // g_player.c
 //
+qboolean IsFemale (edict_t *ent);
 void player_pain (edict_t *self, edict_t *other, float kick, int damage);
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 
@@ -1226,6 +1234,7 @@ struct edict_s
 	float		damage_debounce_time;
 	float		fly_sound_debounce_time;	//move to clientinfo
 	float		last_move_time;
+	float		last_fire_time;
 	float		flag_pickup_time;
 
 	int			health;

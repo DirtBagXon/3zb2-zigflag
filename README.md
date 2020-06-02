@@ -3,7 +3,7 @@
 This is a custom port of the 3rd Zigock Bot II to Quake II - Yamagi Quake II is recommended.  \
 All warnings (up to GCC9) and unused variables have been addressed in the original source. \
 The code also has handpicked backport fixes, enhancements and features applied from various \
-sources: `TSmod`, `yquake2`, `OpenTDM` and custom.
+sources: `tastyspleen`, `yquake2`, `OpenTDM`, `OpenFFA` and custom.
 
 This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
 There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
@@ -25,8 +25,10 @@ The original `zigmode` was released belated, buggy and only half implemented, I 
 more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and whistles.
 
 * Simple HUD enhancements.
+* Optional OpenTDM gameplay fixes.
 * Optional Flag respawn feature.
 * Optional Flagholder frag bonus.
+* Optional Flag draws health from holder.
 * Optional respawn protection.
 * Spawn bots at a distance.
 * Autospawn bots at level start.
@@ -58,6 +60,8 @@ set zigkiller 1
 set ctf 0
 set aimfix 1
 set spawnbotfar 1
+set heavyflag 1
+set fixflaws 1
 set playerid 1
 set playerid_alt 0
 set botlist default
@@ -199,6 +203,12 @@ Fix noted Quake 2 gameplay flaws (opentdm), enable `1` (default) or disable `0` 
 
     fixflaws 1
 
+Flag takes health from a subdued holder, anti-camping, enable `1` or disable `0` (default):
+
+    heavyflag 1
+
+**Stay-in-the-fray** to avoid penalty.
+
 Identify player in the crosshair, enable `1` or disable `0` (default) \
 Additional cvar for alternate positioning of the player_id label: `playerid_alt`:
 
@@ -224,8 +234,8 @@ Use on the following errors:
     3ZB CFG: file not found: ./3zb2/3zbconfig.cfg
     Chaining: file 3zb2/chdtm/q2dm1.chn not found.
 
-The mod has a random issues in `SV_RunThink()`, resulting in a segfault, during bot tracing \
-when the *lightweight* `gamemap` command is used for level change. Use the `map` command which \
+The mod has a random issues using `gamemap`, resulting in a lockup or segfault. Bot tracing in \
+`SV_RunThink()` seems to be the related area, but I have yet to track down. Use the `map` command which \
 causes a full level reset to overcome the issue. Note: **Q2Pro** attempts to enforce the use of \
 `gamemap`, use `sv_allow_map 1` in Q2Pro to overcome this:
 

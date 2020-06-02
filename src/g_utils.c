@@ -621,7 +621,30 @@ void	G_TouchSolids (edict_t *ent)
 	}
 }
 
+/*
+============
+HighlightStr
 
+Highlight text
+============
+*/
+size_t HighlightStr(char *dst, const char *src, size_t size)
+{
+	size_t ret = strlen(src);
+
+	if (size) {
+		size_t i;
+		for (i = 0; i < min(ret, size - 1); i++)
+			if(src[i] == 13)
+				dst[i] = 32;
+			else if(src[i] == 10)
+				dst[i] = src[i];
+			else
+				dst[i] = src[i] | 0x80;
+		dst[i] = 0;
+	}
+	return ret;
+}
 
 
 /*
@@ -645,13 +668,21 @@ qboolean KillBox (edict_t *ent)
 	if (fixflaws->value)
 	{
 		edict_t *touch[MAX_EDICTS];
+		trace_t	tr;
 		int     count;
 		int     i;
+
+		// SSP_SIAMESE_SPAWN_FIX
+		tr = gi.trace (ent->s.origin, ent->mins, ent->maxs, ent->s.origin, NULL, CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER);
+
+		if (tr.ent)
+			T_Damage (tr.ent, ent, ent, vec3_origin, ent->s.origin, vec3_origin, 100000, 0, DAMAGE_NO_PROTECTION, MOD_TELEFRAG);
 
 		count = gi.BoxEdicts(ent->absmin, ent->absmax, touch, MAX_EDICTS, AREA_SOLID);
 
 		for (i = 0; i < count; i++)
 		{
+
 			if (touch[i] == ent)
 				continue;
 

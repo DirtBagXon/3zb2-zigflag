@@ -68,6 +68,7 @@ cvar_t	*zigmode;
 cvar_t	*zigspawn;
 cvar_t	*zigkiller;
 cvar_t	*spawnbotfar;
+cvar_t	*heavyflag;
 cvar_t	*sedative;
 cvar_t	*respawn_protection;
 float	spawncycle;
@@ -264,7 +265,7 @@ void Get_NextMap()
 			else goto NONEXTMAP;
 		}
 
-		if(Buff[0] == '\n') continue;
+		if(Buff[0] == 10 || Buff[0] == 13) continue;
 
 		sscanf(Buff,"%s",nextmap);
 
@@ -300,7 +301,7 @@ void Get_NextMap()
 			else goto NONEXTMAP;
 		}
 
-		if (Buff[0] == '\n' || strlen(Buff) == 2 || feof(fp)) continue;
+		if (Buff[0] == 10 || Buff[0] == 13 || feof(fp)) continue;
 
 		sscanf(Buff,"%s",nextmap);
 		break;
@@ -491,6 +492,8 @@ void G_RunFrame (void)
 	static qboolean	zf_move = false;
 	static edict_t	*flagholder = NULL;
 	static edict_t	*lastholder = NULL;
+	char   buffer[MAX_TEXT];
+	char   hitxt[MAX_TEXT];
 	edict_t	*ent;
 
 	vec3_t	v,vv;
@@ -598,15 +601,46 @@ void G_RunFrame (void)
 									ent->deadflag = DEAD_DEAD;
 									ent->health = -100;
 									player_die (ent, ent, ent, 100000, vec3_origin);
+									lastholder = NULL;
 									continue;
 								}
 
-								gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+								if(heavyflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / 2)
+								{
+									if(flagholder->health > FLAG_HEALTH + 1)
+										flagholder->health -= FLAG_HEALTH;
+									else
+										flagholder->health -= 1;
+
+									if(flagholder->health <= 0)
+									{
+											lastholder = NULL;
+											meansOfDeath = MOD_FLAG;
+											player_die (flagholder, zflag_ent, zflag_ent, FLAG_HEALTH, vec3_origin);
+											continue;
+									}
+
+									flagholder->client->damage_alpha = 0.2;
+
+									if(IsFemale(flagholder))
+										gi.sound(ent, CHAN_VOICE, gi.soundindex("chick/Chkpain1.wav"), 1, ATTN_NORM, 0);
+									else
+										gi.sound(ent, CHAN_VOICE, gi.soundindex("mutant/step2.wav"), 1, ATTN_NORM, 0);
+								}
+								else
+								{
+									flagholder->client->bonus_alpha = 0.25;
+
+									if(heavyflag->value)
+										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/menu1.wav"), 1, ATTN_NORM, 0);
+									else
+										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+								}
 
 								if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 								{
 									g_edicts[i].client->resp.score += 1;
-									gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n",  flagholder->client->pers.netname);
+									gi.bprintf (PRINT_HIGH, "%s gets a Flag possession bonus\n",  flagholder->client->pers.netname);
 								}
 								else
 								{
@@ -619,7 +653,7 @@ void G_RunFrame (void)
 											}
 										}
 									}
-									gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n",  flagholder->client->pers.netname);
+									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag possession bonus\n",  flagholder->client->pers.netname);
 								}
 							}
 
@@ -678,7 +712,9 @@ void G_RunFrame (void)
 			if(zflag_stall == (ZIGRESET - 1))
 			{
 				zf_warn = true;
-				gi.bprintf (PRINT_HIGH, "Flag bounce in %d seconds ...\n", (int) (FRAMETIME * ZIGTICK));
+				sprintf(buffer,"Flag will bounce in %d seconds\n", (int)(FRAMETIME * ZIGTICK));
+				HighlightStr(hitxt, buffer, MAX_TEXT);
+				gi.bprintf (PRINT_HIGH, "%s", hitxt);
 			}
 
 			if(zflag_stall >= ZIGRESET)
@@ -703,7 +739,8 @@ void G_RunFrame (void)
 				ZIGBounce_Flag(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);
 				zflag_ent->solid = SOLID_TRIGGER;
-				gi.bprintf (PRINT_HIGH, "Flag bounced ...\n");
+				HighlightStr(hitxt, "Flag bounced\n", MAX_TEXT);
+				gi.bprintf (PRINT_HIGH, "%s", hitxt);
 			}
 		}
 

@@ -701,6 +701,9 @@ void Weapon_Generic2 (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST
 //ZOID
 				CTFApplyHasteSound(ent);
 //ZOID
+				if(Get_KindWeapon(ent->client->pers.weapon) != WEAP_BLASTER)
+					ent->last_fire_time = level.time;
+
 				fire (ent);
 				break;
 			}
@@ -801,6 +804,8 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 
 	if (ent->health <= 0)
 		return;
+
+	ent->last_fire_time = level.time;
 
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
 	{

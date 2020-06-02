@@ -937,6 +937,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	int			i;
 	float		skill_level;
 
+	char		netname[MAX_NAME];
+
 	int			laser = 0;
 //ponko
 	memset(mpindex,0,sizeof(mpindex));	//target item index
@@ -966,7 +968,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	// set client fields on player ents
 	for (i=0 ; i<game.maxclients ; i++) {
 		g_edicts[i+1].client = game.clients + i;
-		gi.configstring(CS_PLAYERNAMES + i, g_edicts[i+1].client->pers.netname);
+		HighlightStr(netname, g_edicts[i+1].client->pers.netname, MAX_NAME);
+		gi.configstring(CS_PLAYERNAMES + i, netname);
 	}
 
 	ent = NULL;

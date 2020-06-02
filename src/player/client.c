@@ -241,6 +241,9 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		case MOD_BRAINTENTACLE:
 			message = "that's gotta hurt";
 			break;
+		case MOD_FLAG:
+			message = "finds the heavy Flag a burden";
+			break;
 		}
 		if (attacker == self)
 		{
@@ -1431,8 +1434,7 @@ void PutClientInServer (edict_t *ent)
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags &= ~FL_NO_KNOCKBACK;
-	ent->svflags &= ~SVF_DEADMONSTER;
-	ent->svflags &= ~SVF_MONSTER;
+	ent->svflags = 0;
 //ponko
 	ent->client->zc.aiming = 0;	
 	ent->client->zc.distance = 90;
@@ -1677,7 +1679,8 @@ The game can override any of the settings in place
 void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 {
 	char	*s;
-	int		playernum;
+	int	playernum;
+	char	netname[MAX_NAME];
 
 	// check for malformed or illegal info strings
 	if (!Info_Validate(userinfo))
@@ -1715,7 +1718,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	s = Info_ValueForKey (userinfo, "skin");
 
 	playernum = ent-g_edicts-1;
-	gi.configstring(CS_PLAYERNAMES + playernum, ent->client->pers.netname);
+	HighlightStr(netname, ent->client->pers.netname, MAX_NAME);
+	gi.configstring(CS_PLAYERNAMES + playernum, netname);
 
 	// combine name and skin into a configstring
 //ZOID

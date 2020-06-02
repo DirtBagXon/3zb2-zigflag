@@ -1,7 +1,8 @@
-diff -ru a/Makefile b/Makefile
---- a/Makefile	2020-05-24 16:23:44.722134311 +0100
-+++ b/Makefile	2020-05-25 12:04:17.000000000 +0100
-@@ -79,7 +79,7 @@
+diff --git a/Makefile b/Makefile
+index ac62468..d9bcf86 100644
+--- a/Makefile
++++ b/Makefile
+@@ -79,7 +79,7 @@ CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
  		  -Wall -pipe -g -fwrapv -arch i386 -arch x86_64
  else
  CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
@@ -10,10 +11,11 @@ diff -ru a/Makefile b/Makefile
  endif
  
  # ----------
-diff -ru a/src/bot/func.c b/src/bot/func.c
---- a/src/bot/func.c	2020-05-24 16:23:44.742134897 +0100
-+++ b/src/bot/func.c	2020-05-25 12:41:19.000000000 +0100
-@@ -85,8 +85,7 @@
+diff --git a/src/bot/func.c b/src/bot/func.c
+index 9da4a1e..5a833ac 100644
+--- a/src/bot/func.c
++++ b/src/bot/func.c
+@@ -86,8 +86,7 @@ void Load_BotInfo()
  	gamepath = gi.cvar ("game", "0", CVAR_NOSET);
  
  	//load info
@@ -23,10 +25,11 @@ diff -ru a/src/bot/func.c b/src/bot/func.c
  	fp = fopen(Buff,"rt");
  	if(fp == NULL)
  	{
-diff -ru a/src/g_ctf.c b/src/g_ctf.c
---- a/src/g_ctf.c	2020-05-24 16:23:44.742134897 +0100
-+++ b//src/g_ctf.c	2020-05-25 12:41:34.000000000 +0100
-@@ -3012,11 +3012,8 @@
+diff --git a/src/g_ctf.c b/src/g_ctf.c
+index f6b3e19..a05e418 100644
+--- a/src/g_ctf.c
++++ b/src/g_ctf.c
+@@ -3012,11 +3012,8 @@ void CTFSetupNavSpawn()
  
  	if(ctf->value) gi.dprintf("We are in CTF mode.\n");
  
@@ -40,10 +43,11 @@ diff -ru a/src/g_ctf.c b/src/g_ctf.c
  
  	fpout = fopen(name,"rb");
  	if(fpout == NULL)
-diff -ru a/src/g_main.c b/src/g_main.c
---- a/src/g_main.c	2020-05-24 16:23:44.742134897 +0100
-+++ b/src/g_main.c	2020-05-25 12:41:48.000000000 +0100
-@@ -217,8 +217,8 @@
+diff --git a/src/g_main.c b/src/g_main.c
+index 9a68929..1fdcebb 100644
+--- a/src/g_main.c
++++ b/src/g_main.c
+@@ -221,8 +221,8 @@ void Get_NextMap()
  	
  	if(!maplist->string) return;
  
@@ -54,10 +58,11 @@ diff -ru a/src/g_main.c b/src/g_main.c
  	fp = fopen(Buff,"r");
  	if(fp == NULL) return;
  	
-diff -ru a/src/g_svcmds.c b/src/g_svcmds.c
---- a/src/g_svcmds.c	2020-05-24 16:23:44.742134897 +0100
-+++ b/src/g_svcmds.c	2020-05-25 12:42:33.000000000 +0100
-@@ -312,12 +312,8 @@
+diff --git a/src/g_svcmds.c b/src/g_svcmds.c
+index c694cd5..7955ffc 100644
+--- a/src/g_svcmds.c
++++ b/src/g_svcmds.c
+@@ -312,12 +312,8 @@ void SaveChain()
  		return;
  	}
  
@@ -72,10 +77,11 @@ diff -ru a/src/g_svcmds.c b/src/g_svcmds.c
  
  	fpout = fopen(name,"wb");
  	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);
-diff -ru a/src/header/local.h b/src/header/local.h
---- a/src/header/local.h	2020-05-24 16:23:44.742134897 +0100
-+++ b/src/header/local.h	2020-05-25 12:18:01.000000000 +0100
-@@ -550,10 +550,10 @@
+diff --git a/src/header/local.h b/src/header/local.h
+index 4b89cff..ddfae04 100644
+--- a/src/header/local.h
++++ b/src/header/local.h
+@@ -560,10 +560,10 @@ extern	int	meansOfDeath;
  
  extern	edict_t			*g_edicts;
  
@@ -90,3 +96,9 @@ diff -ru a/src/header/local.h b/src/header/local.h
  
  #define random()	((rand () & 0x7fff) / ((float)0x7fff))
  #define crandom()	(2.0 * (random() - 0.5))
+diff --git a/windows/gamex86.dll b/windows/gamex86.dll
+old mode 100644
+new mode 100755
+diff --git a/windows/gamex86_64.dll b/windows/gamex86_64.dll
+old mode 100644
+new mode 100755
