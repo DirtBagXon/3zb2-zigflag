@@ -625,9 +625,9 @@ void G_RunFrame (void)
 											continue;
 									}
 
+									flagholder->client->damage_blood = 1;
 									flagholder->client->damage_alpha = 0.2;
 									flagholder->client->damage_knockback = 10;
-									flagholder->client->damage_armor = 1;
 									flagholder->pain_debounce_time = level.time + 1;;
 
 									if(IsFemale(flagholder))
@@ -637,7 +637,7 @@ void G_RunFrame (void)
 								}
 								else
 								{
-									flagholder->client->bonus_alpha = 0.25;
+									flagholder->client->bonus_alpha = 0.2;
 
 									if(heavyflag->value)
 										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/menu1.wav"), 1, ATTN_NORM, 0);
