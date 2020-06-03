@@ -595,7 +595,7 @@ void G_RunFrame (void)
 							}
 							else
 							{
-								char pants[14] = "\0";
+								char pants[24] = "\0";
 
 								if(sedative->value && !strncmp(ent->client->pers.netname, SEDATIVE, sizeof(ent->client->pers.netname)))
 								{
@@ -610,7 +610,7 @@ void G_RunFrame (void)
 								if(heavyflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / 2)
 								{
 
-									strcpy(pants, "while panting");
+									strcpy(pants, "while panting heavily");
 
 									if(flagholder->health > FLAG_HEALTH + 1)
 										flagholder->health -= FLAG_HEALTH;
