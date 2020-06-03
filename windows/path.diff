@@ -44,10 +44,10 @@ index f6b3e19..a05e418 100644
  	fpout = fopen(name,"rb");
  	if(fpout == NULL)
 diff --git a/src/g_main.c b/src/g_main.c
-index 9a68929..1fdcebb 100644
+index 4f61a7d..a24e9bc 100644
 --- a/src/g_main.c
 +++ b/src/g_main.c
-@@ -221,8 +221,8 @@ void Get_NextMap()
+@@ -223,8 +223,8 @@ void Get_NextMap()
  	
  	if(!maplist->string) return;
  
@@ -78,10 +78,10 @@ index c694cd5..7955ffc 100644
  	fpout = fopen(name,"wb");
  	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);
 diff --git a/src/header/local.h b/src/header/local.h
-index 4b89cff..ddfae04 100644
+index 39d4a15..10c823c 100644
 --- a/src/header/local.h
 +++ b/src/header/local.h
-@@ -560,10 +560,10 @@ extern	int	meansOfDeath;
+@@ -563,10 +563,10 @@ extern	int	meansOfDeath;
  
  extern	edict_t			*g_edicts;
  
@@ -99,6 +99,10 @@ index 4b89cff..ddfae04 100644
 diff --git a/windows/gamex86.dll b/windows/gamex86.dll
 old mode 100644
 new mode 100755
+index 3d09876..fb57db9
+Binary files a/windows/gamex86.dll and b/windows/gamex86.dll differ
 diff --git a/windows/gamex86_64.dll b/windows/gamex86_64.dll
 old mode 100644
 new mode 100755
+index d8f3000..2bb91be
+Binary files a/windows/gamex86_64.dll and b/windows/gamex86_64.dll differ
