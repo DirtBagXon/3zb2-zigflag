@@ -96,13 +96,3 @@ index 39d4a15..10c823c 100644
  
  #define random()	((rand () & 0x7fff) / ((float)0x7fff))
  #define crandom()	(2.0 * (random() - 0.5))
-diff --git a/windows/gamex86.dll b/windows/gamex86.dll
-old mode 100644
-new mode 100755
-index 3d09876..fb57db9
-Binary files a/windows/gamex86.dll and b/windows/gamex86.dll differ
-diff --git a/windows/gamex86_64.dll b/windows/gamex86_64.dll
-old mode 100644
-new mode 100755
-index d8f3000..2bb91be
-Binary files a/windows/gamex86_64.dll and b/windows/gamex86_64.dll differ
