@@ -68,7 +68,7 @@ cvar_t	*zigmode;
 cvar_t	*zigspawn;
 cvar_t	*zigkiller;
 cvar_t	*spawnbotfar;
-cvar_t	*heavyflag;
+cvar_t	*killerflag;
 cvar_t	*sedative;
 cvar_t	*respawn_protection;
 float	spawncycle;
@@ -93,7 +93,7 @@ void G_RunFrame (void);
 void SetBotFlag1(edict_t *ent);	//チーム1の旗
 void SetBotFlag2(edict_t *ent);  //チーム2の旗
 void Flag_Msg(char *response, size_t length);
-qboolean HeavyFlagCheck(edict_t *ent);
+qboolean KillerFlagCheck(edict_t *ent);
 
 //===================================================================
 
@@ -604,16 +604,16 @@ void G_RunFrame (void)
 									ent->health = 1;
 									ent->client->resp.score = 1;
 
-									if(HeavyFlagCheck(ent))
+									if(KillerFlagCheck(ent))
 									{
 										lastholder = NULL;
 										continue;
 									}
 								}
 
-								if(heavyflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / HFRATIO)
+								if(killerflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / HFRATIO)
 								{
-									if(HeavyFlagCheck(flagholder))
+									if(KillerFlagCheck(flagholder))
 									{
 										lastholder = NULL;
 										continue;
@@ -626,7 +626,7 @@ void G_RunFrame (void)
 									flagholder->flag_penalty = 0;
 									flagholder->client->bonus_alpha = 0.2;
 
-									if(heavyflag->value)
+									if(killerflag->value)
 										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/menu1.wav"), 1, ATTN_NORM, 0);
 									else
 										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);

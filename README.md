@@ -60,7 +60,7 @@ set zigkiller 1
 set ctf 0
 set aimfix 1
 set spawnbotfar 1
-set heavyflag 1
+set killerflag 1
 set fixflaws 1
 set playerid 1
 set playerid_alt 0
@@ -205,7 +205,7 @@ Fix noted Quake 2 gameplay flaws (opentdm), enable `1` (default) or disable `0` 
 
 Flag takes health from a subdued holder, anti-camping, enable `1` or disable `0` (default):
 
-    heavyflag 1
+    killerflag 1
 
 **Stay-in-the-fray** to avoid penalty.
 

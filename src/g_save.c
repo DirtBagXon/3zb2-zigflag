@@ -206,7 +206,7 @@ void InitGame (void)
 	// enhancements
 	fixflaws = gi.cvar("fixflaws", "1", CVAR_ARCHIVE);
 	aimfix = gi.cvar("aimfix", "1", CVAR_ARCHIVE);
-	heavyflag = gi.cvar("heavyflag", "0", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	killerflag = gi.cvar("killerflag", "0", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	playerid = gi.cvar("playerid", "0", CVAR_ARCHIVE);
 	playerid_alt = gi.cvar("playerid_alt", "0", CVAR_ARCHIVE);
 	spawnbotfar = gi.cvar("spawnbotfar", "0", CVAR_ARCHIVE);

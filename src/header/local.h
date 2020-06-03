@@ -82,7 +82,7 @@
 // ZigFlag ZIGTICK: Move flag after $ cycles of no activity.
 #define	ZIGRESET		6 	// * (ZIGTICK * FRAMETIME)
 
-// Ratio of ZIGTICK * FRAMETIME  to penalize in heavyflag
+// Ratio of ZIGTICK * FRAMETIME  to penalize in killerflag
 #define HFRATIO			1.6
 
 // memory tags to allow dynamic memory to be cleaned up
@@ -624,7 +624,7 @@ extern	cvar_t  *zigkiller;
 extern	cvar_t  *sedative;
 extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
-extern	cvar_t  *heavyflag;
+extern	cvar_t  *killerflag;
 extern	float	spawncycle;
 //ponpoko
 
@@ -709,7 +709,7 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 //
 #define EMERGENCY_ENTITY_FREE_POOL_SIZE                (128+32)
 qboolean	KillBox (edict_t *ent);
-qboolean	HeavyFlagCheck(edict_t *ent);
+qboolean	KillerFlagCheck(edict_t *ent);
 void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
 edict_t *G_Find (edict_t *from, int fieldofs, char *match);
 edict_t *findradius (edict_t *from, vec3_t org, float rad);

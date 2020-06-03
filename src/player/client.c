@@ -242,7 +242,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			message = "that's gotta hurt";
 			break;
 		case MOD_FLAG:
-			message = "finds the heavy Flag a burden";
+			message = "finds the Flag a burden";
 			break;
 		}
 		if (attacker == self)

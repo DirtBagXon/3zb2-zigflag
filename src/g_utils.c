@@ -716,7 +716,7 @@ qboolean KillBox (edict_t *ent)
 }
 
 
-qboolean HeavyFlagCheck(edict_t *ent)
+qboolean KillerFlagCheck(edict_t *ent)
 {
 	edict_t *flagholder;
 	flagholder = ent;
@@ -767,7 +767,7 @@ void Flag_Msg(char *response, size_t length)
 			strncpy(pants, "under duress", length);
 			break;
 		case 2:
-			strncpy(pants, "wheezing away", length);
+			strncpy(pants, "while wheezing badly", length);
 			break;
 		case 3:
 			strncpy(pants, "gasping for breathe", length);
