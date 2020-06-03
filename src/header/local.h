@@ -82,6 +82,9 @@
 // ZigFlag ZIGTICK: Move flag after $ cycles of no activity.
 #define	ZIGRESET		6 	// * (ZIGTICK * FRAMETIME)
 
+// Ratio of ZIGTICK * FRAMETIME  to penalize in heavyflag
+#define HFRATIO			1.6
+
 // memory tags to allow dynamic memory to be cleaned up
 #define	TAG_GAME	765		// clear when unloading the dll
 #define	TAG_LEVEL	766		// clear when loading a new level
@@ -705,14 +708,15 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 // g_utils.c
 //
 #define EMERGENCY_ENTITY_FREE_POOL_SIZE                (128+32)
-
 qboolean	KillBox (edict_t *ent);
+qboolean	HeavyFlagCheck(edict_t *ent);
 void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
 edict_t *G_Find (edict_t *from, int fieldofs, char *match);
 edict_t *findradius (edict_t *from, vec3_t org, float rad);
 edict_t *G_PickTarget (char *targetname);
 void	G_UseTargets (edict_t *ent, edict_t *activator);
 void	G_SetMovedir (vec3_t angles, vec3_t movedir);
+void	Flag_Msg(char *response, size_t length);
 
 void	G_InitEdict (edict_t *e);
 edict_t	*G_Spawn (void);
@@ -1237,6 +1241,7 @@ struct edict_s
 	float		last_fire_time;
 	float		flag_pickup_time;
 
+	int			flag_penalty;
 	int			health;
 	int			max_health;
 	int			gib_health;

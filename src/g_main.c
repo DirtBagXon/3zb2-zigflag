@@ -92,6 +92,8 @@ void G_RunFrame (void);
 
 void SetBotFlag1(edict_t *ent);	//チーム1の旗
 void SetBotFlag2(edict_t *ent);  //チーム2の旗
+void Flag_Msg(char *response, size_t length);
+qboolean HeavyFlagCheck(edict_t *ent);
 
 //===================================================================
 
@@ -595,48 +597,33 @@ void G_RunFrame (void)
 							}
 							else
 							{
-								char pants[16] = "\0";
+								char weary[24] = "\0";
 
 								if(sedative->value && !strncmp(ent->client->pers.netname, SEDATIVE, sizeof(ent->client->pers.netname)))
 								{
-									ent->client->resp.score = 0;
-									ent->deadflag = DEAD_DEAD;
-									ent->health = -100;
-									player_die (ent, ent, ent, 100000, vec3_origin);
-									lastholder = NULL;
-									continue;
+									ent->health = 1;
+									ent->client->resp.score = 1;
+
+									if(HeavyFlagCheck(ent))
+									{
+										lastholder = NULL;
+										continue;
+									}
 								}
 
-								if(heavyflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / 2)
+								if(heavyflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / HFRATIO)
 								{
-
-									strcpy(pants, "while wheezing");
-
-									if(flagholder->health > FLAG_HEALTH + 1)
-										flagholder->health -= FLAG_HEALTH;
-									else
-										flagholder->health -= 1;
-
-									if(flagholder->health <= 0)
+									if(HeavyFlagCheck(flagholder))
 									{
-											lastholder = NULL;
-											meansOfDeath = MOD_FLAG;
-											player_die (flagholder, zflag_ent, zflag_ent, FLAG_HEALTH, vec3_origin);
-											continue;
+										lastholder = NULL;
+										continue;
 									}
-
-									flagholder->client->damage_blood = 1;
-									flagholder->client->damage_alpha = 0.2;
-									flagholder->client->damage_knockback = 10;
-									flagholder->pain_debounce_time = level.time + 1;;
-
-									if(IsFemale(flagholder))
-										gi.sound(ent, CHAN_VOICE, gi.soundindex("chick/Chkpain1.wav"), 1, ATTN_NORM, 0);
 									else
-										gi.sound(ent, CHAN_VOICE, gi.soundindex("mutant/step2.wav"), 1, ATTN_NORM, 0);
+										Flag_Msg(weary, sizeof weary - 1);
 								}
 								else
 								{
+									flagholder->flag_penalty = 0;
 									flagholder->client->bonus_alpha = 0.2;
 
 									if(heavyflag->value)
@@ -648,7 +635,7 @@ void G_RunFrame (void)
 								if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 								{
 									g_edicts[i].client->resp.score += 1;
-									gi.bprintf (PRINT_HIGH, "%s gets a Flag possession bonus %s\n",  flagholder->client->pers.netname, pants);
+									gi.bprintf (PRINT_HIGH, "%s gets a Flag bonus %s\n",  flagholder->client->pers.netname, weary);
 								}
 								else
 								{
@@ -661,7 +648,7 @@ void G_RunFrame (void)
 											}
 										}
 									}
-									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag possession bonus %s\n",  flagholder->client->pers.netname, pants);
+									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag bonus %s\n",  flagholder->client->pers.netname, weary);
 								}
 							}
 

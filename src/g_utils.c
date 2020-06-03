@@ -714,3 +714,69 @@ qboolean KillBox (edict_t *ent)
 
 	return true;		// all clear
 }
+
+
+qboolean HeavyFlagCheck(edict_t *ent)
+{
+	edict_t *flagholder;
+	flagholder = ent;
+
+	if(flagholder->health > FLAG_HEALTH + 1)
+	{
+		flagholder->flag_penalty += 1;
+		flagholder->health -= FLAG_HEALTH * flagholder->flag_penalty;
+	}
+	else
+		flagholder->health -= 1;
+
+	if(flagholder->health <= 0)
+	{
+		meansOfDeath = MOD_FLAG;
+		flagholder->flag_penalty = 0;
+		player_die (flagholder, NULL, NULL, FLAG_HEALTH, vec3_origin);
+		return true;
+	}
+
+	flagholder->client->damage_blood = 1;
+	flagholder->client->damage_alpha = 0.2;
+	flagholder->client->damage_knockback = 10;
+	flagholder->pain_debounce_time = level.time + 1;;
+
+	if(IsFemale(flagholder))
+		gi.sound(ent, CHAN_VOICE, gi.soundindex("chick/Chkpain1.wav"), 1, ATTN_NORM, 0);
+	else
+		gi.sound(ent, CHAN_VOICE, gi.soundindex("mutant/step2.wav"), 1, ATTN_NORM, 0);
+
+	return false;
+}
+
+
+void Flag_Msg(char *response, size_t length)
+{
+	srand(time(0));
+	char pants[length];
+	int x = rand() % 4;
+	int i = 0;
+
+	switch(x)
+	{
+		case 0:
+			strncpy(pants, "panting like a dog", length);
+			break;
+		case 1:
+			strncpy(pants, "under duress", length);
+			break;
+		case 2:
+			strncpy(pants, "wheezing away", length);
+			break;
+		case 3:
+			strncpy(pants, "gasping for breathe", length);
+			break;
+	}
+
+	while (length-- > 0) {
+		*response++ = pants[i];
+		i++;
+	}
+	*response = '\0';
+}
