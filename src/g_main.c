@@ -595,6 +595,8 @@ void G_RunFrame (void)
 							}
 							else
 							{
+								char pants[14] = "\0";
+
 								if(sedative->value && !strncmp(ent->client->pers.netname, SEDATIVE, sizeof(ent->client->pers.netname)))
 								{
 									ent->client->resp.score = 0;
@@ -607,6 +609,9 @@ void G_RunFrame (void)
 
 								if(heavyflag->value && (level.time - flagholder->last_fire_time) > (FRAMETIME * ZIGTICK) / 2)
 								{
+
+									strcpy(pants, "while panting");
+
 									if(flagholder->health > FLAG_HEALTH + 1)
 										flagholder->health -= FLAG_HEALTH;
 									else
@@ -640,7 +645,7 @@ void G_RunFrame (void)
 								if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 								{
 									g_edicts[i].client->resp.score += 1;
-									gi.bprintf (PRINT_HIGH, "%s gets a Flag possession bonus\n",  flagholder->client->pers.netname);
+									gi.bprintf (PRINT_HIGH, "%s gets a Flag possession bonus %s\n",  flagholder->client->pers.netname, pants);
 								}
 								else
 								{
@@ -653,7 +658,7 @@ void G_RunFrame (void)
 											}
 										}
 									}
-									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag possession bonus\n",  flagholder->client->pers.netname);
+									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag possession bonus %s\n",  flagholder->client->pers.netname, pants);
 								}
 							}
 
