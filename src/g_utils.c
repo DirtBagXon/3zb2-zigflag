@@ -682,7 +682,6 @@ qboolean KillBox (edict_t *ent)
 
 		for (i = 0; i < count; i++)
 		{
-
 			if (touch[i] == ent)
 				continue;
 

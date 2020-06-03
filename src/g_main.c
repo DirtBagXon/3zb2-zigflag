@@ -626,6 +626,9 @@ void G_RunFrame (void)
 									}
 
 									flagholder->client->damage_alpha = 0.2;
+									flagholder->client->damage_knockback = 10;
+									flagholder->client->damage_armor = 1;
+									flagholder->pain_debounce_time = level.time + 1;;
 
 									if(IsFemale(flagholder))
 										gi.sound(ent, CHAN_VOICE, gi.soundindex("chick/Chkpain1.wav"), 1, ATTN_NORM, 0);
