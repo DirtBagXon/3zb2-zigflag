@@ -761,16 +761,16 @@ void Flag_Msg(char *response, size_t length)
 	switch(x)
 	{
 		case 0:
-			strncpy(pants, "panting like a dog", length);
+			strncpy(pants, "while taking damage", length);
 			break;
 		case 1:
-			strncpy(pants, "under duress", length);
+			strncpy(pants, "while under duress", length);
 			break;
 		case 2:
-			strncpy(pants, "while wheezing badly", length);
+			strncpy(pants, "with killer flag", length);
 			break;
 		case 3:
-			strncpy(pants, "gasping for breathe", length);
+			strncpy(pants, "with flag damage", length);
 			break;
 	}
 

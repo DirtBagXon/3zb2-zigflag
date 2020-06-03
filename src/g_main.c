@@ -597,7 +597,7 @@ void G_RunFrame (void)
 							}
 							else
 							{
-								char weary[24] = "\0";
+								char msg[24] = "\0";
 
 								if(sedative->value && !strncmp(ent->client->pers.netname, SEDATIVE, sizeof(ent->client->pers.netname)))
 								{
@@ -619,23 +619,19 @@ void G_RunFrame (void)
 										continue;
 									}
 									else
-										Flag_Msg(weary, sizeof weary - 1);
+										Flag_Msg(msg, sizeof(msg) - 1);
 								}
 								else
 								{
 									flagholder->flag_penalty = 0;
 									flagholder->client->bonus_alpha = 0.2;
-
-									if(killerflag->value)
-										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/menu1.wav"), 1, ATTN_NORM, 0);
-									else
-										gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+									gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
 								}
 
 								if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 								{
 									g_edicts[i].client->resp.score += 1;
-									gi.bprintf (PRINT_HIGH, "%s gets a Flag bonus %s\n",  flagholder->client->pers.netname, weary);
+									gi.bprintf (PRINT_HIGH, "%s gets a Flag bonus %s\n",  flagholder->client->pers.netname, msg);
 								}
 								else
 								{
@@ -648,7 +644,7 @@ void G_RunFrame (void)
 											}
 										}
 									}
-									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag bonus %s\n",  flagholder->client->pers.netname, weary);
+									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag bonus %s\n",  flagholder->client->pers.netname, msg);
 								}
 							}
 
