@@ -241,6 +241,9 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		case MOD_BRAINTENTACLE:
 			message = "that's gotta hurt";
 			break;
+		case MOD_FLAG:
+			message = "finds the Killer Flag a burden";
+			break;
 		}
 		if (attacker == self)
 		{
@@ -411,7 +414,7 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 										attacker->client->pers.netname, message2, self->client->pers.netname);
 
 							attacker->client->resp.score++;
-
+							attacker->client->resp.assassin++;
 						}
 
 						fk = true;
@@ -639,7 +642,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	if (self->health < -40)
 	{	// gib
 		gi.sound (self, CHAN_BODY, gi.soundindex ("misc/udeath.wav"), 1, ATTN_NORM, 0);
-		for (n= 0; n < 4; n++)
+		for (n= 0; n < 5; n++)
 			ThrowGib (self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		ThrowClientHead (self, damage);
 //ZOID
@@ -801,6 +804,12 @@ void FetchClientEntData (edict_t *ent)
 		ent->flags |= FL_POWER_ARMOR;
 	if (coop->value)
 		ent->client->resp.score = ent->client->pers.score;
+}
+
+void StoreFlagData (edict_t *ent)
+{
+	ent->possession = ent->client->resp.possession;
+	ent->assassin = ent->client->resp.assassin;
 }
 
 
@@ -1412,6 +1421,9 @@ void PutClientInServer (edict_t *ent)
 	// copy some data from the client to the entity
 	FetchClientEntData (ent);
 
+	// store new scoreboard data over the level
+	StoreFlagData (ent);
+
 	// clear entity values
 	ent->groundentity = NULL;
 	ent->client = &game.clients[index];
@@ -1431,8 +1443,8 @@ void PutClientInServer (edict_t *ent)
 	ent->waterlevel = 0;
 	ent->watertype = 0;
 	ent->flags &= ~FL_NO_KNOCKBACK;
-	ent->svflags &= ~SVF_DEADMONSTER;
-	ent->svflags &= ~SVF_MONSTER;
+	ent->penalty = 0;
+	ent->svflags = 0;
 //ponko
 	ent->client->zc.aiming = 0;	
 	ent->client->zc.distance = 90;
@@ -1517,11 +1529,20 @@ void PutClientInServer (edict_t *ent)
 	}*/
 //ponpoko
 
+	// restore scoreboard data
+	ent->client->resp.possession = ent->possession;
+	ent->client->resp.assassin = ent->assassin;
+
+        // we must link before killbox since it uses absmin/absmax
+	if(fixflaws->value)
+		gi.linkentity (ent);
+
 	if (!KillBox (ent))
 	{	// could't spawn in?
 	}
 
-	gi.linkentity (ent);
+        if(!fixflaws->value)
+		gi.linkentity (ent);
 
 	// force the current weapon up
 	client->newweapon = client->pers.weapon;
@@ -1677,7 +1698,8 @@ The game can override any of the settings in place
 void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 {
 	char	*s;
-	int		playernum;
+	int	playernum;
+	char	netname[MAX_NAME];
 
 	// check for malformed or illegal info strings
 	if (!Info_Validate(userinfo))
@@ -1715,7 +1737,8 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 	s = Info_ValueForKey (userinfo, "skin");
 
 	playernum = ent-g_edicts-1;
-	gi.configstring(CS_PLAYERNAMES + playernum, ent->client->pers.netname);
+	HighlightStr(netname, ent->client->pers.netname, MAX_NAME);
+	gi.configstring(CS_PLAYERNAMES + playernum, netname);
 
 	// combine name and skin into a configstring
 //ZOID

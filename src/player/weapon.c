@@ -117,7 +117,7 @@ void PlayerNoise(edict_t *who, vec3_t where, int type)
 void ShowGun(edict_t *ent);
 qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 {
-	int			index,i;
+	int			index,i,j;
 	gitem_t		*ammo,*item;
 
 	index = ITEM_INDEX(ent->item);
@@ -172,12 +172,19 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		}
 	}
 
-	if (other->client->pers.weapon != ent->item && 
-		(other->client->pers.inventory[index] == 1) &&
-		( !deathmatch->value || other->client->pers.weapon == Fdi_BLASTER/*FindItem("blaster")*/ ) )
+
+	if (other->client->pers.weapon != ent->item && (other->client->pers.inventory[index] == 1))
 	{
-		if(other->svflags & SVF_MONSTER) ent->item->use(other,ent->item);
-		else other->client->newweapon = ent->item;
+		j = ITEM_INDEX(other->client->pers.weapon);
+
+		if(weaponswap->value && (index > j || other->client->pers.weapon == Fdi_GRENADES) &&
+				deathmatch->value && !ENT_IS_BOT(other))
+			other->client->newweapon = ent->item;
+		else if (!deathmatch->value || other->client->pers.weapon == Fdi_BLASTER)
+		{
+			if(other->svflags & SVF_MONSTER) ent->item->use(other,ent->item);
+			else other->client->newweapon = ent->item;
+		}
 	}
 
 	if(other->svflags & SVF_MONSTER 
@@ -701,6 +708,9 @@ void Weapon_Generic2 (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST
 //ZOID
 				CTFApplyHasteSound(ent);
 //ZOID
+				if(Get_KindWeapon(ent->client->pers.weapon) != WEAP_BLASTER)
+					ent->last_action_time = level.time;
+
 				fire (ent);
 				break;
 			}
@@ -801,6 +811,8 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 
 	if (ent->health <= 0)
 		return;
+
+	ent->last_action_time = level.time;
 
 	if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
 	{

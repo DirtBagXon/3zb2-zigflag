@@ -621,7 +621,30 @@ void	G_TouchSolids (edict_t *ent)
 	}
 }
 
+/*
+============
+HighlightStr
 
+Highlight text
+============
+*/
+size_t HighlightStr(char *dst, const char *src, size_t size)
+{
+	size_t ret = strlen(src);
+
+	if (size) {
+		size_t i;
+		for (i = 0; i < min(ret, size - 1); i++)
+			if(src[i] == 13)
+				dst[i] = 32;
+			else if(src[i] == 10)
+				dst[i] = src[i];
+			else
+				dst[i] = src[i] | 0x80;
+		dst[i] = 0;
+	}
+	return ret;
+}
 
 
 /*
@@ -683,4 +706,20 @@ qboolean KillBox (edict_t *ent)
 	}
 
 	return true;		// all clear
+}
+
+/*
+===================================
+
+Print repeat chars on bprintf()
+
+===================================
+*/
+void CPRepeat (char input , int count)
+{
+	char * out = malloc(count+1);
+	memset(out, input, count);
+	out[count] = '\0';
+	gi.bprintf(PRINT_HIGH, "%s\n", out);
+	free(out);
 }

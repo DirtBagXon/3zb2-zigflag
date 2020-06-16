@@ -937,6 +937,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	int			i;
 	float		skill_level;
 
+	char		netname[MAX_NAME];
+
 	int			laser = 0;
 //ponko
 	memset(mpindex,0,sizeof(mpindex));	//target item index
@@ -966,7 +968,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	// set client fields on player ents
 	for (i=0 ; i<game.maxclients ; i++) {
 		g_edicts[i+1].client = game.clients + i;
-		gi.configstring(CS_PLAYERNAMES + i, g_edicts[i+1].client->pers.netname);
+		HighlightStr(netname, g_edicts[i+1].client->pers.netname, MAX_NAME);
+		gi.configstring(CS_PLAYERNAMES + i, netname);
 	}
 
 	ent = NULL;
@@ -1217,22 +1220,6 @@ char *dm_statusbar =
 "yt 2 "
 "num 3 14 "
 
-// view id1
-"if 29 "
-  "xv 100 "
-  "yb -80 "
-  "string \"Target:\" "
-  "xv 165 "
-  "stat_string 29 "
-"endif "
-
-// view id2
-"if 30 "
-  "xv 160 "
-  "yb -245 "
-  "stat_string 30 "
-"endif "
-
 //sight
 "if 31 "
 "   xv 96 "
@@ -1307,30 +1294,42 @@ char *zig_statusbar =
 "if 16 "
   "xv 0 "
   "yb -48 "
-  "string \"Viewing:\" "
-  "xv 74 "
+  "xl 260 "
+  "string \"Chasing:\" "
+  "xv 170 "
   "stat_string 16 "
 "endif "
 
-// view id1
+// rank
+"if 28"
+  "xr -50 "
+  "yt 58 "
+  "string \"  Rank\" "
+  "xr	-50 "
+  "yt 70 "
+  "num 3 28 "
+"endif "
+
+// view id
 "if 29 "
-  "xv 100 "
+  "xv 90 "
   "yb -80 "
   "string \"Target:\" "
-  "xv 165 "
+  "xv 155 "
   "stat_string 29 "
 "endif "
 
-// view id2
-"if 30 "
-  "xv 160 "
-  "yb -245 "
+// countdown
+"if 30"
+  "xr -50 "
+  "yb -60 "
+  "xv 105 "
   "stat_string 30 "
 "endif "
 
 // Flagalert
 "if 31 "
-"   yt 26 "
+"   yt 28 "
 "   xr -24 "
 "   pic 31 "
 "endif"

@@ -368,9 +368,10 @@ retry:
 
 	if (trace.plane.type != 2)
 	{
-		// Limit the fix to gibs, debris and dead monsters.
+		// Limit the fix to gibs, debris, dead monsters and flags.
 		if (((strncmp(ent->classname, "monster_", 8) == 0) && ent->health < 1) ||
-			(strcmp(ent->classname, "debris") == 0) || (ent->s.effects & EF_GIB))
+			(strcmp(ent->classname, "debris") == 0) || (ent->s.effects & EF_GIB) ||
+			(strncmp(ent->classname, "item_flag_", 10) == 0))
 		{
 			// Push slightly away from non-horizontal surfaces
 			VectorAdd(ent->s.origin, trace.plane.normal, ent->s.origin);

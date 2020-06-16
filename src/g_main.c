@@ -54,7 +54,9 @@ cvar_t	*sv_cheats;
 cvar_t	*aimfix;
 cvar_t	*fixflaws;
 cvar_t	*playerid;
-cvar_t	*playerid_alt;
+cvar_t	*combathud;
+cvar_t	*killerflag;
+cvar_t	*weaponswap;
 
 //ponpoko
 cvar_t	*basepath;
@@ -68,8 +70,8 @@ cvar_t	*zigmode;
 cvar_t	*zigspawn;
 cvar_t	*zigkiller;
 cvar_t	*spawnbotfar;
-cvar_t	*sedative;
 cvar_t	*respawn_protection;
+int	flagbounce;
 float	spawncycle;
 float	ctfjob_update;
 //ponpoko
@@ -91,6 +93,8 @@ void G_RunFrame (void);
 
 void SetBotFlag1(edict_t *ent);	//チーム1の旗
 void SetBotFlag2(edict_t *ent);  //チーム2の旗
+void Flag_Msg(char *response, size_t length);
+qboolean KillerFlagCheck(edict_t *ent);
 
 //===================================================================
 
@@ -264,7 +268,7 @@ void Get_NextMap()
 			else goto NONEXTMAP;
 		}
 
-		if(Buff[0] == '\n') continue;
+		if(Buff[0] == 10 || Buff[0] == 13) continue;
 
 		sscanf(Buff,"%s",nextmap);
 
@@ -300,7 +304,7 @@ void Get_NextMap()
 			else goto NONEXTMAP;
 		}
 
-		if (Buff[0] == '\n' || strlen(Buff) == 2 || feof(fp)) continue;
+		if (Buff[0] == 10 || Buff[0] == 13 || feof(fp)) continue;
 
 		sscanf(Buff,"%s",nextmap);
 		break;
@@ -351,6 +355,7 @@ void EndDMLevel (void)
 		}
 	}
 
+	G_SendRanks ();
 	BeginIntermission (ent);
 
 //PONKO
@@ -486,11 +491,14 @@ void G_RunFrame (void)
 {
 	int		i,j;
 	static unsigned short	zflag_stall = 0;
+	static unsigned short	zflag_bounce = 0;
 	static float	next_fragadd = 0;
 	static qboolean	zf_warn = false;
 	static qboolean	zf_move = false;
 	static edict_t	*flagholder = NULL;
 	static edict_t	*lastholder = NULL;
+	char   buffer[MAX_TEXT];
+	char   hitxt[MAX_TEXT];
 	edict_t	*ent;
 
 	vec3_t	v,vv;
@@ -498,6 +506,12 @@ void G_RunFrame (void)
 
 	level.framenum++;
 	level.time = level.framenum*FRAMETIME;
+
+	if(combathud->value && timelimit->value > 0 && !level.intermissiontime)
+	{
+		int remaining = timelimit->value * 60 - level.time;
+		G_WriteTime(remaining);
+	}
 
 	// choose a client for monsters to target this frame
 //	AI_SetSightClient ();
@@ -511,6 +525,7 @@ void G_RunFrame (void)
 		flagholder = NULL;
 		lastholder = NULL;
 		zflag_stall = 0;
+		zflag_bounce = 0;
 		zf_warn = false;
 		zf_move = false;
 		return;
@@ -578,6 +593,9 @@ void G_RunFrame (void)
 			{
 				if(g_edicts[i].client)
 				{
+					if(combathud->value && (level.framenum & 8) && !ENT_IS_BOT(ent))
+						ent->client->pers.rank = G_GetRank(ent);
+
 					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
 					{
 						flagholder = ent;
@@ -592,21 +610,31 @@ void G_RunFrame (void)
 							}
 							else
 							{
-								if(sedative->value && !strncmp(ent->client->pers.netname, SEDATIVE, sizeof(ent->client->pers.netname)))
-								{
-									ent->client->resp.score = 0;
-									ent->deadflag = DEAD_DEAD;
-									ent->health = -100;
-									player_die (ent, ent, ent, 100000, vec3_origin);
-									continue;
-								}
+								char msg[28] = "\0";
 
-								gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+								if(killerflag->value && (level.time - flagholder->last_action_time)
+										> (FRAMETIME * ZIGTICK * PENRATIO))
+								{
+									if(KillerFlagCheck(flagholder))
+									{
+										lastholder = NULL;
+										continue;
+									}
+									else
+										Flag_Msg(msg, sizeof(msg) - 1);
+								}
+								else
+								{
+									flagholder->penalty = 0;
+									flagholder->client->bonus_alpha = 0.2;
+									gi.sound(ent, CHAN_VOICE, gi.soundindex("misc/secret.wav"), 1, ATTN_NORM, 0);
+								}
 
 								if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 								{
 									g_edicts[i].client->resp.score += 1;
-									gi.bprintf (PRINT_HIGH, "%s gets Flag possession bonus\n",  flagholder->client->pers.netname);
+									g_edicts[i].client->resp.possession += 1;
+									gi.bprintf (PRINT_HIGH, "%s gets a Flag bonus %s\n",  flagholder->client->pers.netname, msg);
 								}
 								else
 								{
@@ -616,10 +644,11 @@ void G_RunFrame (void)
 										{
 											if(OnSameTeam(&g_edicts[i],&g_edicts[j])) {
 												g_edicts[j].client->resp.score += 1;
+												g_edicts[j].client->resp.possession += 1;
 											}
 										}
 									}
-									gi.bprintf (PRINT_HIGH, "%s's team gets Flag possession bonus\n",  flagholder->client->pers.netname);
+									gi.bprintf (PRINT_HIGH, "%s's team gets a Flag bonus %s\n",  flagholder->client->pers.netname, msg);
 								}
 							}
 
@@ -678,7 +707,9 @@ void G_RunFrame (void)
 			if(zflag_stall == (ZIGRESET - 1))
 			{
 				zf_warn = true;
-				gi.bprintf (PRINT_HIGH, "Flag bounce in %d seconds ...\n", (int) (FRAMETIME * ZIGTICK));
+				sprintf(buffer,"Flag will bounce in %d seconds\n", (int)(FRAMETIME * ZIGTICK));
+				HighlightStr(hitxt, buffer, MAX_TEXT);
+				gi.bprintf (PRINT_HIGH, "%s", hitxt);
 			}
 
 			if(zflag_stall >= ZIGRESET)
@@ -699,11 +730,14 @@ void G_RunFrame (void)
 				}
 				zf_move = true;
 				zflag_stall = 0;
+				zflag_bounce++;
 				SelectFlagSpawnPoint (ent, v, vv);
 				ZIGBounce_Flag(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);
+				flagbounce = zflag_bounce;
 				zflag_ent->solid = SOLID_TRIGGER;
-				gi.bprintf (PRINT_HIGH, "Flag bounced ...\n");
+				HighlightStr(hitxt, "Flag bounced\n", MAX_TEXT);
+				gi.bprintf (PRINT_HIGH, "%s", hitxt);
 			}
 		}
 
@@ -717,6 +751,7 @@ void G_RunFrame (void)
 		}
 		next_fragadd = level.time + (FRAMETIME * ZIGTICK);
 	}
+
 
 	// see if it is time to end a deathmatch
 	CheckDMRules ();

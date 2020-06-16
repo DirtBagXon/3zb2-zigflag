@@ -150,11 +150,15 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	int		i, j, k;
 	int		sorted[MAX_CLIENTS];
 	int		sortedscores[MAX_CLIENTS];
-	int		score, total;
+	int		score, total, rtotal;
 	int		x, y;
 	gclient_t	*cl;
 	edict_t		*cl_ent;
-	char	*tag;
+	char		*tag, *mark;
+
+	// protect bprintf() against SZ_Getspace error
+	int		broadcast = 16;
+	int		topresult = 6;
 
 //ZOID
 	if (ctf->value) {
@@ -185,11 +189,40 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		sortedscores[j] = score;
 		total++;
 	}
+	rtotal = total;
 
 	// print level name and exit rules
 	string[0] = 0;
 
 	stringlength = strlen(string);
+
+	if(level.intermissiontime && ent == &g_edicts[1])
+	{
+		if(zigmode->value && zigspawn->value && flagbounce > 0)
+		{
+			CPRepeat('-', strlen(level.mapname) + 11);
+			gi.bprintf(PRINT_HIGH, "| %s | ~ %02d |\n", level.mapname, flagbounce);
+		}
+		else
+		{
+			CPRepeat('-', strlen(level.mapname) + 4);
+			gi.bprintf(PRINT_HIGH, "| %s |\n", level.mapname);
+		}
+
+		if(rtotal <= broadcast) {
+			CPRepeat('-', 54);
+			gi.bprintf(PRINT_HIGH, "| X | Player%-10s ", " ");
+			gi.bprintf(PRINT_HIGH, "|  S  |  P  |  T  |  F  |  A  |\n");
+			CPRepeat('-', 54);
+		}
+		else
+		{
+			CPRepeat('-', 37);
+			gi.bprintf(PRINT_HIGH, "| Will not broadcast to +%d players |\n",
+					broadcast);
+			CPRepeat('-', 37);
+		}
+	}
 
 	// add the clients in sorted order
 	if (total > 12)
@@ -199,6 +232,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	{
 		cl = &game.clients[sorted[i]];
 		cl_ent = g_edicts + 1 + sorted[i];
+		mark = " ";
 
 		x = (i>=6) ? 160 : 0;
 		y = 32 + 32 * (i%6);
@@ -229,6 +263,19 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			stringlength += j;
 		}
 
+		if(level.intermissiontime && ent == &g_edicts[1] && rtotal <= broadcast && i < topresult)
+		{
+			if(tag && strcmp(tag, "zigtag") == 0)
+				mark = "F";
+			else if(i == 0)
+				mark = "*";
+
+			gi.bprintf(PRINT_HIGH, "| %s | %-16s | %-3d | %-3d | %-3d | +%-2d | +%-2d |\n",
+				mark, cl_ent->client->pers.netname,
+				cl->resp.score, cl->ping, (level.framenum - cl->resp.enterframe)/600,
+				cl_ent->client->resp.possession, cl_ent->client->resp.assassin);
+		}
+
 		// send the layout
 		Com_sprintf (entry, sizeof(entry),
 			"client %i %i %i %i %i %i ",
@@ -242,6 +289,9 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 
 	gi.WriteByte (svc_layout);
 	gi.WriteString (string);
+
+	if(level.intermissiontime && ent == &g_edicts[1] && rtotal <= broadcast)
+		CPRepeat('-', 54);
 }
 
 
@@ -532,6 +582,39 @@ int G_GetPlayerIdView(edict_t *ent)
     return CS_PLAYERNAMES + (target - g_edicts) - 1;
 }
 
+void G_WriteTime(int remaining)
+{
+	char buffer[16];
+	char message[32];
+	char end[4];
+	char Highlight[MAX_STRING_CHARS];
+	int sec = remaining % 60;
+	int min = remaining / 60;
+	int i;
+
+	sprintf(message, "[ Time:");
+	sprintf(end, " ]");
+
+	if(remaining < 0)
+		sprintf(buffer, " 0:00");
+	else
+	{
+		sprintf(buffer, "%2d:%02d", min, sec);
+
+		if (remaining <= 30 && (sec & 1) == 0) {
+			for (i = 0; buffer[i]; i++) {
+				buffer[i] |= 128;
+			}
+		}
+	}
+
+	HighlightStr(Highlight, buffer, MAX_STRING_CHARS);
+	strcat(message, Highlight);
+	strcat(message, end);
+	gi.configstring(CS_TIME, message);
+}
+
+
 //=======================================================================
 
 /*
@@ -544,7 +627,6 @@ void G_SetStats (edict_t *ent)
 	gitem_t		*item;
 	int			index, cells;
 	int			power_armor_type;
-	qboolean		view_id = false;
 
 	//
 	// health
@@ -578,7 +660,7 @@ void G_SetStats (edict_t *ent)
 		{	// ran out of cells for power armor
 			ent->flags &= ~FL_POWER_ARMOR;
 			gi.sound(ent, CHAN_ITEM, gi.soundindex("misc/power2.wav"), 1, ATTN_NORM, 0);
-			power_armor_type = 0;;
+			power_armor_type = 0;
 		}
 	}
 
@@ -660,22 +742,10 @@ void G_SetStats (edict_t *ent)
 
 	// targeting_id
 
-	if(playerid->value && !playerid_alt->value) {
-		ent->client->ps.stats[STAT_VIEWID1] = G_GetPlayerIdView(ent);
-		ent->client->ps.stats[STAT_VIEWID2] = 0;
-		view_id = true;
-	}
-
-	if(playerid_alt->value) {
-		ent->client->ps.stats[STAT_VIEWID1] = 0;
-		ent->client->ps.stats[STAT_VIEWID2] = G_GetPlayerIdView(ent);
-		view_id = true;
-	}
-
-	if (!view_id) {
-		ent->client->ps.stats[STAT_VIEWID1] = 0;
-		ent->client->ps.stats[STAT_VIEWID2] = 0;
-	}
+	if(playerid->value)
+		ent->client->ps.stats[STAT_VIEWID] = G_GetPlayerIdView(ent);
+	else
+		ent->client->ps.stats[STAT_VIEWID] = 0;
 
 	//
 	// layouts
@@ -687,8 +757,8 @@ void G_SetStats (edict_t *ent)
 		if (ent->client->pers.health <= 0 || level.intermissiontime
 			|| ent->client->showscores) {
 			ent->client->ps.stats[STAT_LAYOUTS] |= 1;
-			ent->client->ps.stats[STAT_VIEWID1] = 0;
-			ent->client->ps.stats[STAT_VIEWID2] = 0;
+			ent->client->ps.stats[STAT_VIEWID] = 0;
+			ent->client->ps.stats[STAT_CHASE] = 0;
 		}
 
 		if (ent->client->showinventory && ent->client->pers.health > 0)
@@ -706,6 +776,18 @@ void G_SetStats (edict_t *ent)
 	// frags
 	//
 	ent->client->ps.stats[STAT_FRAGS] = ent->client->resp.score;
+
+	//
+	// rank and time
+	//
+	if(zigmode->value && combathud->value && (level.framenum&8)
+			&& !ent->client->pers.spectator && !level.intermissiontime)
+	{
+		ent->client->ps.stats[STAT_RANK] = ent->client->pers.rank;
+
+		if(timelimit->value > 0)
+			ent->client->ps.stats[STAT_TIME] = CS_TIME;
+	}
 
 	//
 	// help icon / current weapon if not shown
@@ -776,6 +858,7 @@ void G_SetSpectatorStats (edict_t *ent)
 		G_SetStats (ent);
 
 	cl->ps.stats[STAT_SPECTATOR] = 1;
+	cl->ps.stats[STAT_VIEWID] = 0;
 
 	// layouts are independant in spectator
 	cl->ps.stats[STAT_LAYOUTS] = 0;
@@ -785,8 +868,121 @@ void G_SetSpectatorStats (edict_t *ent)
 		cl->ps.stats[STAT_LAYOUTS] |= 2;
 
 	if (cl->chase_target && cl->chase_target->inuse)
-		cl->ps.stats[STAT_CHASE] = CS_PLAYERSKINS + 
+		cl->ps.stats[STAT_CHASE] = CS_PLAYERNAMES +
 			(cl->chase_target - g_edicts) - 1;
 	else
 		cl->ps.stats[STAT_CHASE] = 0;
+}
+
+/*
+======================================================================
+
+Get Player Ranking in HUD
+
+======================================================================
+*/
+
+int G_GetRank(edict_t *ent)
+{
+	edict_t	*cl_ent;
+	int	i,j,k;
+	int	score, total;
+	int	sorted[MAX_CLIENTS];
+	int	sortedscores[MAX_CLIENTS];
+
+	total = 0;
+        for (i=0 ; i<game.maxclients ; i++)
+        {
+                cl_ent = g_edicts + 1 + i;
+
+                if (!cl_ent->inuse)
+                        continue;
+
+                score = game.clients[i].resp.score;
+
+                for (j=0 ; j<total ; j++)
+                {
+                        if (score > sortedscores[j])
+                                break;
+                }
+
+                for (k=total ; k>j ; k--)
+                {
+                        sorted[k] = sorted[k-1];
+			sortedscores[k] = sortedscores[k-1];
+                }
+
+                sorted[j] = i;
+		sortedscores[j] = score;
+		total++;
+        }
+
+	for (i=0 ; i<total ; i++)
+	{
+		cl_ent = g_edicts + 1 + sorted[i];
+
+		if(cl_ent == ent)
+			return i + 1;
+	}
+	return 0;
+}
+
+
+/*
+=====================================================
+
+Push the latest ranking
+
+=====================================================
+*/
+void G_SendRanks (void)
+{
+	edict_t         *cl_ent;
+	int             i;
+
+	if(combathud->value)
+	{
+		for (i=0 ; i<game.maxclients ; i++)
+		{
+			cl_ent = g_edicts + 1 + i;
+			if(cl_ent->client && !ENT_IS_BOT(cl_ent))
+				cl_ent->client->ps.stats[STAT_RANK] =  G_GetRank(cl_ent);
+		}
+	}
+}
+
+/*
+=====================================================
+
+Killer Flag messages
+
+=====================================================
+*/
+void Flag_Msg(char *response, size_t length)
+{
+	char pants[length];
+	int x = rand() % 4;
+	int i = 0;
+
+	switch(x)
+	{
+		case 0:
+			strncpy(pants, "with a vampirical tendency", length);
+			break;
+		case 1:
+			strncpy(pants, "that's slaying stamina", length);
+			break;
+		case 2:
+			strncpy(pants, "while slaughtering health", length);
+			break;
+		case 3:
+			strncpy(pants, "drawing their life blood", length);
+			break;
+	}
+
+	while (length-- > 0) {
+		*response++ = pants[i];
+		i++;
+	}
+	*response = '\0';
 }

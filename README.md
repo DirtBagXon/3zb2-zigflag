@@ -3,7 +3,7 @@
 This is a custom port of the 3rd Zigock Bot II to Quake II - Yamagi Quake II is recommended.  \
 All warnings (up to GCC9) and unused variables have been addressed in the original source. \
 The code also has handpicked backport fixes, enhancements and features applied from various \
-sources: `TSmod`, `yquake2`, `OpenTDM` and custom.
+sources: `tastyspleen`, `yquake2`, `OpenTDM`, `OpenFFA` and custom.
 
 This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
 There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
@@ -25,14 +25,18 @@ The original `zigmode` was released belated, buggy and only half implemented, I 
 more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and whistles.
 
 * Simple HUD enhancements.
+* Autospawn bots at level start.
+* Visual/Audio notifications to Flagholder.
+* Flagholder dogtag displayed on scoreboard.
 * Optional Flag respawn feature.
 * Optional Flagholder frag bonus.
+* Optional Flag sucks health from subdued holder.
+* Optional auto weapon switching on upgrade.
+* Optional identified generic gameplay fixes.
 * Optional respawn protection.
-* Spawn bots at a distance.
-* Autospawn bots at level start.
-* Visual/audio notifications to Flagholder.
-* HUD Identification of player in the crosshair.
-* Flagholder dogtag displayed on scoreboard.
+* Optional spawn bots at distance.
+* Optional HUD playerid.
+* Optional enhanced HUD.
 
 ..and many bugfixes was the final outcome of playing around with the code.
 
@@ -41,7 +45,7 @@ The mod also supports skin and model teams with appropriate bonuses and penaltie
 The changes subtly alter the game dynamics and improve on the original zigmode game element, IMHO. \
 The original gameplay, with bugfixes, can still be enabled by disabling the new elements via cvars.
 
-`Capture and Hold` plays best on smaller level maps with a couple of bots throw in.
+`Capture and Hold` plays best on smaller level maps with a timelimit, no fraglimit and a couple of bots.
 
 ### Pak file (Flag model) and Route Chaining files
 
@@ -57,9 +61,12 @@ set zigspawn 1
 set zigkiller 1
 set ctf 0
 set aimfix 1
+set combathud 1
 set spawnbotfar 1
+set killerflag 1
+set fixflaws 1
 set playerid 1
-set playerid_alt 0
+set weaponswap 1
 set botlist default
 set autospawn 3
 set vwep 1
@@ -199,17 +206,49 @@ Fix noted Quake 2 gameplay flaws (opentdm), enable `1` (default) or disable `0` 
 
     fixflaws 1
 
-Identify player in the crosshair, enable `1` or disable `0` (default) \
-Additional cvar for alternate positioning of the player_id label: `playerid_alt`:
+Flag takes health from a subdued holder, anti-camping, enable `1` (default) or disable `0`:
+
+    killerflag 1
+
+**Stay-in-the-fray** to avoid penalty.
+
+Identify player in the crosshair, enable `1` or disable `0` (default)
 
     playerid 1
-    playerid_alt 1
+
+Display extra (rank, timer) information in HUD:
+
+    combathud 1
+
+Auto switch to upgraded weapon on pickup, enable `1` or disable `0` (default):
+
+    weaponswap 1
 
 `Capture and Hold (ZigFlag)` mode for Deathmatch/Team games:
 
     zigmode 1
     zigspawn 1
     zigkiller 1
+
+Broadcast the summary of the top six players, in console, at level intermission:
+
+    ----------------
+    | q2dm1 | ~ 02 |
+    ------------------------------------------------------
+    | X | Player           |  S  |  P  |  T  |  F  |  A  |
+    ------------------------------------------------------
+    | * | [BOT]Batty       | 30  | 0   | 8   | +8  | +0  |
+    |   | [BOT]Chews       | 26  | 0   | 8   | +0  | +2  |
+    | F | [BOT]Lupin       | 21  | 0   | 8   | +3  | +2  |
+    |   | _GONZO_          | 6   | 19  | 8   | +6  | +0  |
+    ------------------------------------------------------
+
+**S** - *Score* \
+**P** - *Ping* \
+**T** - *Time* \
+**F** - *Flag Possession bonuses* \
+**A** - *Assassinations of Flagholder* \
+**~** - *Flag bounce occurrences*
 
 ## Errata
 
@@ -224,8 +263,8 @@ Use on the following errors:
     3ZB CFG: file not found: ./3zb2/3zbconfig.cfg
     Chaining: file 3zb2/chdtm/q2dm1.chn not found.
 
-The mod has a random issues in `SV_RunThink()`, resulting in a segfault, during bot tracing \
-when the *lightweight* `gamemap` command is used for level change. Use the `map` command which \
+The mod has a random issues using `gamemap`, resulting in a lockup or segfault. Bot tracing in \
+`SV_RunThink()` seems to be the related area, but I have yet to track down. Use the `map` command which \
 causes a full level reset to overcome the issue. Note: **Q2Pro** attempts to enforce the use of \
 `gamemap`, use `sv_allow_map 1` in Q2Pro to overcome this:
 
@@ -234,4 +273,5 @@ causes a full level reset to overcome the issue. Note: **Q2Pro** attempts to enf
 
 ## 獄
 
-![captureandhold](https://raw.githubusercontent.com/DirtBagXon/3zb2/master/screenshot.png)
+![captureandhold](https://raw.githubusercontent.com/DirtBagXon/3zb2/master/screenshot/screenshot.png)
+![captureandhold](https://raw.githubusercontent.com/DirtBagXon/3zb2/master/screenshot/screenshot2.png)

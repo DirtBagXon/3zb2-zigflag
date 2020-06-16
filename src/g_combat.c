@@ -553,3 +553,39 @@ void T_RadiusDamage (edict_t *inflictor, edict_t *attacker, float damage, edict_
 		}
 	}
 }
+
+qboolean KillerFlagCheck(edict_t *ent)
+{
+	edict_t *flagholder;
+	flagholder = ent;
+
+	if(!(flagholder->flags & FL_GODMODE))
+	{
+		if(flagholder->health > FLAG_HEALTH + 1)
+		{
+			flagholder->penalty += 1;
+			flagholder->health -= FLAG_HEALTH * flagholder->penalty;
+		}
+		else
+			flagholder->health -= 1;
+	}
+
+	if(flagholder->health <= 0)
+	{
+		meansOfDeath = MOD_FLAG;
+		player_die (flagholder, NULL, NULL, FLAG_HEALTH, vec3_origin);
+		return true;
+	}
+
+	flagholder->client->damage_blood = 1 * flagholder->penalty;
+	flagholder->client->damage_alpha = 0.1 * flagholder->penalty;
+	flagholder->client->damage_knockback = 10 ;
+	flagholder->pain_debounce_time = level.time + 1;;
+
+	if(IsFemale(flagholder))
+		gi.sound(ent, CHAN_VOICE, gi.soundindex("chick/Chkpain1.wav"), 1, ATTN_NORM, 0);
+	else
+		gi.sound(ent, CHAN_VOICE, gi.soundindex("mutant/step2.wav"), 1, ATTN_NORM, 0);
+
+	return false;
+}

@@ -23,10 +23,13 @@
 #define	GAMEVERSION	"baseq2"
 
 // Sedative name
-#define	SEDATIVE	"_GONZO_"
+#define	SEDATIVE	"BOZO"
+
+// Timer
+#define CS_TIME	(CS_GENERAL + 1)
 
 // Player ID
-#define CS_PLAYERNAMES	(CS_GENERAL + 1)
+#define CS_PLAYERNAMES	(CS_GENERAL + 2)
 
 // Immune on respawn (n * FRAMETIME) sec
 #define	SPAWNPROTECT	10
@@ -69,7 +72,10 @@
 #define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
 #define FL_RESPAWN				0x80000000	// used for item respawning
 
+#define	FLAG_HEALTH		5
 #define	MAX_SPAWNS		64
+#define	MAX_TEXT		64
+#define	MAX_NAME		16
 
 #define	FRAMETIME		0.1
 
@@ -78,6 +84,9 @@
 
 // ZigFlag ZIGTICK: Move flag after $ cycles of no activity.
 #define	ZIGRESET		6 	// * (ZIGTICK * FRAMETIME)
+
+// Ratio of ZIGTICK * FRAMETIME to penalize in killerflag
+#define PENRATIO			0.75
 
 // memory tags to allow dynamic memory to be cleaned up
 #define	TAG_GAME	765		// clear when unloading the dll
@@ -548,6 +557,7 @@ extern	int	body_armor_index;
 #define MOD_BLASTOFF		38
 #define MOD_GEKK			39
 #define MOD_TRAP			40
+#define MOD_FLAG			41
 // END 14-APR-98
 #define MOD_FRIENDLY_FIRE	0x8000000
 
@@ -599,9 +609,9 @@ extern	cvar_t	*maxspectators;
 extern	cvar_t	*filterban;
 
 extern  cvar_t  *aimfix;
+extern  cvar_t  *combathud;
 extern	cvar_t  *fixflaws;
 extern	cvar_t  *playerid;
-extern	cvar_t  *playerid_alt;
 
 //ponpoko
 extern	cvar_t	*basepath;
@@ -614,10 +624,12 @@ extern	cvar_t	*autospawn;
 extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
 extern	cvar_t  *zigkiller;
-extern	cvar_t  *sedative;
 extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
+extern	cvar_t  *killerflag;
+extern	cvar_t  *weaponswap;
 extern	float	spawncycle;
+extern	int	flagbounce;
 //ponpoko
 
 //ZOID
@@ -700,7 +712,6 @@ void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf
 // g_utils.c
 //
 #define EMERGENCY_ENTITY_FREE_POOL_SIZE                (128+32)
-
 qboolean	KillBox (edict_t *ent);
 void	G_ProjectSource (vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result);
 edict_t *G_Find (edict_t *from, int fieldofs, char *match);
@@ -708,6 +719,8 @@ edict_t *findradius (edict_t *from, vec3_t org, float rad);
 edict_t *G_PickTarget (char *targetname);
 void	G_UseTargets (edict_t *ent, edict_t *activator);
 void	G_SetMovedir (vec3_t angles, vec3_t movedir);
+void	CPRepeat (char input , int count );
+
 
 void	G_InitEdict (edict_t *e);
 edict_t	*G_Spawn (void);
@@ -726,9 +739,12 @@ char	*vtos (vec3_t v);
 float vectoyaw (vec3_t vec);
 void vectoangles (vec3_t vec, vec3_t angles);
 
+size_t HighlightStr(char *dst, const char *src, size_t size);
+
 //
 // g_combat.c
 //
+qboolean KillerFlagCheck(edict_t *ent);
 qboolean OnSameTeam (edict_t *ent1, edict_t *ent2);
 qboolean CanDamage (edict_t *targ, edict_t *inflictor);
 qboolean CheckTeamDamage (edict_t *targ, edict_t *attacker);
@@ -843,6 +859,7 @@ void ClientBeginServerFrame (edict_t *ent);
 //
 // g_player.c
 //
+qboolean IsFemale (edict_t *ent);
 void player_pain (edict_t *self, edict_t *other, float kick, int damage);
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point);
 
@@ -860,12 +877,16 @@ void ClientEndServerFrame (edict_t *ent);
 //
 // p_hud.c
 //
+int G_GetRank(edict_t *ent);
+void G_SendRanks (void);
+void G_WriteTime(int remaining);
 void MoveClientToIntermission (edict_t *client);
 void G_SetStats (edict_t *ent);
 void G_SetSpectatorStats (edict_t *ent);
 void G_CheckChaseStats (edict_t *ent);
 void ValidateSelectedItem (edict_t *ent);
 void DeathmatchScoreboardMessage (edict_t *client, edict_t *killer);
+void Flag_Msg(char *response, size_t length);
 
 //
 // g_pweapon.c
@@ -933,6 +954,8 @@ typedef struct
 
 	int			selected_item;
 	int			inventory[MAX_ITEMS];
+
+	int			rank;
 
 	// ammo capacities
 	int			max_bullets;
@@ -1014,6 +1037,8 @@ typedef struct
 	int			spawnframe;			// level.framenum the client last spawned
 	int			flagsound;			// span out flag possession sound
 	int			score;				// frags, etc
+	int			possession;			// flag possession count
+	int			assassin;			// assassination of flagholder
 //ZOID
 	int			ctf_team;			// CTF team
 	int			ctf_state;
@@ -1226,8 +1251,12 @@ struct edict_s
 	float		damage_debounce_time;
 	float		fly_sound_debounce_time;	//move to clientinfo
 	float		last_move_time;
+	float		last_action_time;
 	float		flag_pickup_time;
 
+	int			penalty;
+	int			possession;
+	int			assassin;
 	int			health;
 	int			max_health;
 	int			gib_health;

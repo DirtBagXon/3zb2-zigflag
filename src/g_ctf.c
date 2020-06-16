@@ -2931,12 +2931,17 @@ static void old_teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane
 	AngleVectors (other->client->v_angle, forward, NULL, NULL);
 	VectorScale(forward, 200, other->velocity);
 
+	// we must link before killbox since it uses absmin/absmax
+	if(fixflaws->value)
+		gi.linkentity (other);
+
 	// kill anything at the destination
 	if (!KillBox (other))
 	{
 	}
 
-	gi.linkentity (other);
+	if(!fixflaws->value)
+		gi.linkentity (other);
 }
 
 /*QUAKED trigger_teleport (0.5 0.5 0.5) ?

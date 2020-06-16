@@ -720,6 +720,9 @@ qboolean Pickup_Ammo (edict_t *ent, edict_t *other)
 
 	if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) && (deathmatch->value))
 		SetRespawn (ent, 30);
+
+	other->last_action_time = level.time;
+
 	return true;
 }
 
@@ -913,6 +916,8 @@ qboolean Pickup_Armor (edict_t *ent, edict_t *other)
 //ponko			
 		}
 	}
+
+	other->last_action_time = level.time;
 
 	if (!(ent->spawnflags & DROPPED_ITEM) && (deathmatch->value))
 		SetRespawn (ent, 20);

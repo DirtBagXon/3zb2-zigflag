@@ -2198,7 +2198,13 @@ Kills everything inside when fired, irrespective of protection.
 */
 void use_killbox (edict_t *self, edict_t *other, edict_t *activator)
 {
+	if(fixflaws->value)
+		gi.linkentity (self);
+
 	KillBox (self);
+
+	if(fixflaws->value)
+		gi.unlinkentity (self);
 }
 
 void SP_func_killbox (edict_t *ent)

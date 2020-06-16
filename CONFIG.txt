@@ -55,12 +55,14 @@ zigkiller		ZigFlag holder kill gives bonus frag (default on = 1, off = 0)
 botlist			Set the botlist section name (default = "default")
 ctf			CTF mode on/off (default off = 0, on = 1)
 aimfix			Enable more accurate aiming (default on = 1, off = 0)
+combathud		Display extra information in HUD (default on = 1, off = 0)
 respawn_protection	Enable brief immunity on respawn (default off = 0, on = 1)
 spawnbotfar		Spawn bots on farthest spawn points (default off = 0, on = 1)
+killerflag		Flag takes health from a subdued holder (default on = 1, off = 0)
 basepath		Specify mod basedir path to 'quake2' directory (default = ".")
-fixflaws		Fix some noted Quake 2 gameplay flaws (opentdm) (default on = 1, off = 0)
+fixflaws		Fix some noted Quake 2 gameplay flaws (default on = 1, off = 0)
 playerid		Indentify player in the crosshair (default off = 0, on = 1)
-playerid_alt		Additional cvar for alternate positioning of the player_id label.
+weaponswap		Auto switch to upgraded weapon on pickup (default off = 0, on = 1)
 
 2. Modification of this values will activate during the game is running
 

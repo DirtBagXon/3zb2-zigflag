@@ -661,10 +661,19 @@ START_ON		only valid for TRIGGER_SPAWN walls
 
 void func_wall_use (edict_t *self, edict_t *other, edict_t *activator)
 {
+
+	qboolean fixflaw = false;
+
 	if (self->solid == SOLID_NOT)
 	{
 		self->solid = SOLID_BSP;
 		self->svflags &= ~SVF_NOCLIENT;
+
+		if(fixflaws->value) {
+			gi.linkentity (self);
+			fixflaw = true;
+		}
+
 		KillBox (self);
 	}
 	else
@@ -672,7 +681,9 @@ void func_wall_use (edict_t *self, edict_t *other, edict_t *activator)
 		self->solid = SOLID_NOT;
 		self->svflags |= SVF_NOCLIENT;
 	}
-	gi.linkentity (self);
+
+	if(!fixflaw)
+		gi.linkentity (self);
 
 	if (!(self->spawnflags & 2))
 		self->use = NULL;
@@ -1961,10 +1972,15 @@ void teleporter_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_
 	VectorClear (other->client->ps.viewangles);
 	VectorClear (other->client->v_angle);
 
+        // we must link before killbox since it uses absmin/absmax
+	if(fixflaws->value)
+		gi.linkentity (other);
+
 	// kill anything at the destination
 	KillBox (other);
 
-	gi.linkentity (other);
+	if(!fixflaws->value)
+		gi.linkentity (other);
 
 	if(zigmode->value && !ENT_IS_BOT(other)) {
 		gi.WriteByte (svc_muzzleflash);

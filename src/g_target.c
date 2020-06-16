@@ -370,9 +370,15 @@ void use_target_spawner (edict_t *self, edict_t *other, edict_t *activator)
 	VectorCopy (self->s.origin, ent->s.origin);
 	VectorCopy (self->s.angles, ent->s.angles);
 	ED_CallSpawn (ent);
-	gi.unlinkentity (ent);
+
+	if(!fixflaws->value)
+		gi.unlinkentity (ent);
+
 	KillBox (ent);
-	gi.linkentity (ent);
+
+	if(!fixflaws->value)
+		gi.linkentity (ent);
+
 	if (self->speed)
 		VectorCopy (self->movedir, ent->velocity);
 }

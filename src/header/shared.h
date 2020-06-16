@@ -126,6 +126,8 @@ extern vec3_t vec3_origin;
 
 #define	IS_NAN(x) (((*(int *)&x)&nanmask)==nanmask)
 
+#define	min(a,b) ((a)<(b)?(a):(b))
+
 // microsoft's fabs seems to be ungodly slow...
 //float Q_fabs (float f);
 //#define	fabs(f) Q_fabs(f)
@@ -1000,8 +1002,9 @@ typedef enum
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
 
-#define STAT_VIEWID1			29
-#define STAT_VIEWID2			30
+#define STAT_RANK			28
+#define STAT_VIEWID			29
+#define STAT_TIME			30
 
 #define STAT_SIGHT_PIC			31
 #define	MAX_STATS			32
