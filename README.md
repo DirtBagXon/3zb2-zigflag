@@ -35,6 +35,7 @@ more refined, just for fun. I was trying to keep the look and feel of the origin
 * Optional identified generic gameplay fixes.
 * Optional respawn protection.
 * Optional spawn bots at distance.
+* Optional grapple.
 * Optional HUD playerid.
 * Optional enhanced HUD.
 
@@ -59,6 +60,7 @@ exec addbot.cfg
 set zigmode 1
 set zigspawn 1
 set zigkiller 1
+set zigrapple 0
 set ctf 0
 set aimfix 1
 set combathud 1
@@ -223,6 +225,10 @@ Display extra (rank, timer) information in HUD:
 Auto switch to upgraded weapon on pickup, enable `1` or disable `0` (default):
 
     weaponswap 1
+
+Option to add grapple to the fray - CTF `pak0.pak` required.
+
+    zigrapple 1
 
 `Capture and Hold (ZigFlag)` mode for Deathmatch/Team games:
 

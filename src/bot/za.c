@@ -405,6 +405,10 @@ void Bot_SearchItems (edict_t *ent)
 
 	j = 0;
 	q = false;//rocket jump needed
+
+	if(zigrapple->value)
+		if( ent->client->ctf_grapple != NULL) j = -1;
+
 	//search Items
 	if(ctf->value)
 	{

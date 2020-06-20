@@ -615,10 +615,15 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 //ZOID
 
 		TossClientWeapon (self);
+
+		if(zigrapple->value)
+			CTFPlayerResetGrapple(self);
 //ZOID
 		if(ctf->value)
 		{
-			CTFPlayerResetGrapple(self);
+			if(!zigrapple->value)
+				CTFPlayerResetGrapple(self);
+
 			CTFDeadDropFlag(self);
 			CTFDeadDropTech(self);
 		}
@@ -726,7 +731,8 @@ void InitClientPersistant (gclient_t *client)
 
 //ZOID
 	item = FindItem("Grapple");
-	if(ctf->value)	client->pers.inventory[ITEM_INDEX(item)] = 1; //ponpoko
+	if(ctf->value || zigrapple->value)
+		client->pers.inventory[ITEM_INDEX(item)] = 1; //ponpoko
 //ZOID
 
 	client->pers.health			= 100;

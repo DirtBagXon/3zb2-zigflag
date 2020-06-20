@@ -624,6 +624,7 @@ extern	cvar_t	*autospawn;
 extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
 extern	cvar_t  *zigkiller;
+extern	cvar_t  *zigrapple;
 extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
 extern	cvar_t  *killerflag;

@@ -12,7 +12,7 @@ index ac62468..d9bcf86 100644
  
  # ----------
 diff --git a/src/bot/func.c b/src/bot/func.c
-index c3cacca..98b7273 100644
+index 22b8d6c..0beb853 100644
 --- a/src/bot/func.c
 +++ b/src/bot/func.c
 @@ -86,8 +86,7 @@ void Load_BotInfo()
@@ -44,10 +44,10 @@ index 7da1da0..b7583d9 100644
  	fpout = fopen(name,"rb");
  	if(fpout == NULL)
 diff --git a/src/g_main.c b/src/g_main.c
-index 60648ab..23e22c4 100644
+index e5b32f7..d1bea09 100644
 --- a/src/g_main.c
 +++ b/src/g_main.c
-@@ -224,8 +224,8 @@ void Get_NextMap()
+@@ -225,8 +225,8 @@ void Get_NextMap()
  	
  	if(!maplist->string) return;
  
@@ -78,7 +78,7 @@ index c694cd5..7955ffc 100644
  	fpout = fopen(name,"wb");
  	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);
 diff --git a/src/header/local.h b/src/header/local.h
-index 876e3f6..de3e09a 100644
+index 0c711f7..8a70923 100644
 --- a/src/header/local.h
 +++ b/src/header/local.h
 @@ -566,10 +566,10 @@ extern	int	meansOfDeath;

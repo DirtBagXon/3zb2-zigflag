@@ -69,6 +69,7 @@ cvar_t	*autospawn;
 cvar_t	*zigmode;
 cvar_t	*zigspawn;
 cvar_t	*zigkiller;
+cvar_t	*zigrapple;
 cvar_t	*spawnbotfar;
 cvar_t	*respawn_protection;
 int	flagbounce;

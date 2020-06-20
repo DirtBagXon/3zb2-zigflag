@@ -36,6 +36,18 @@ void SP_func_areaportal (edict_t *ent)
 Misc functions
 =================
 */
+void VelocityForHead (int damage, vec3_t v)
+{
+	if(damage > 50)
+		damage = 50;
+
+	v[0] = damage * 10.0 * crandom();
+	v[1] = damage * 10.0 * crandom();
+	v[2] = 400.0 * crandom();
+
+	VectorScale (v, 0.7, v);
+}
+
 void VelocityForDamage (int damage, vec3_t v)
 {
 	v[0] = 100.0 * crandom();
@@ -200,7 +212,17 @@ void ThrowHead (edict_t *self, char *gibname, int damage, int type)
 		vscale = 1.0;
 	}
 
-	VelocityForDamage (damage, vd);
+	if(fixflaws->value)
+	{
+		// Reduce floating heads in new physics
+		self->clipmask = MASK_SOLID;
+		self->groundentity = NULL;
+		self->gravity = 2.0;
+		VelocityForHead (damage, vd);
+	}
+	else
+		VelocityForDamage (damage, vd);
+
 	VectorMA (self->velocity, vscale, vd, self->velocity);
 	ClipGibVelocity (self);
 
@@ -294,7 +316,18 @@ void ThrowClientHead (edict_t *self, int damage)
 	self->flags |= FL_NO_KNOCKBACK;
 
 	self->movetype = MOVETYPE_BOUNCE;
-	VelocityForDamage (damage, vd);
+
+	if(fixflaws->value)
+	{
+		// Reduce floating heads in new physics
+		self->clipmask = MASK_SOLID;
+		self->groundentity = NULL;
+		self->gravity = 2.0;
+		VelocityForHead (damage, vd);
+	}
+	else
+		VelocityForDamage (damage, vd);
+
 	VectorAdd (self->velocity, vd, self->velocity);
 
 	if (self->client)	// bodies in the queue don't have a client anymore
@@ -765,7 +798,15 @@ void func_object_use (edict_t *self, edict_t *other, edict_t *activator)
 	self->solid = SOLID_BSP;
 	self->svflags &= ~SVF_NOCLIENT;
 	self->use = NULL;
+
+	if(fixflaws->value)
+		gi.linkentity (self);
+
 	KillBox (self);
+
+	if(fixflaws->value)
+		gi.unlinkentity (self);
+
 	func_object_release (self);
 }
 
@@ -896,8 +937,14 @@ void func_explosive_spawn (edict_t *self, edict_t *other, edict_t *activator)
 	self->solid = SOLID_BSP;
 	self->svflags &= ~SVF_NOCLIENT;
 	self->use = NULL;
+
+	if(fixflaws->value)
+		gi.linkentity (self);
+
 	KillBox (self);
-	gi.linkentity (self);
+
+	if(!fixflaws->value)
+		gi.linkentity (self);
 }
 
 void SP_func_explosive (edict_t *self)

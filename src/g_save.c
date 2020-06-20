@@ -213,6 +213,7 @@ void InitGame (void)
 	spawnbotfar = gi.cvar("spawnbotfar", "0", CVAR_ARCHIVE);
 	zigspawn = gi.cvar("zigspawn", "1", CVAR_ARCHIVE);
 	zigkiller = gi.cvar("zigkiller", "1", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	zigrapple = gi.cvar("zigrapple", "0", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	basepath = gi.cvar("basepath", ".", CVAR_NOSET);
 	respawn_protection = gi.cvar("respawn_protection", "0", CVAR_ARCHIVE);
 

@@ -444,7 +444,8 @@ void PutBotInServer (edict_t *ent)
 	client->ctf_grapple = NULL;
 
 	item = FindItem("Grapple");
-	if(ctf->value)	client->pers.inventory[ITEM_INDEX(item)] = 1; //ponpoko
+	if(ctf->value || zigrapple->value)
+		client->pers.inventory[ITEM_INDEX(item)] = 1; //ponpoko
 //ZOID
 
 	// clear entity values
@@ -572,9 +573,14 @@ void PutBotInServer (edict_t *ent)
 		gi.multicast (ent->s.origin, MULTICAST_PVS);
 	}
 
+
+	if(zigrapple->value)
+		CTFPlayerResetGrapple(ent);
+
 	if(ctf->value)
 	{
-		CTFPlayerResetGrapple(ent);
+		if(!zigrapple->value)
+			CTFPlayerResetGrapple(ent);
 		client->zc.ctfstate = CTFS_OFFENCER;
 	}
 
@@ -807,8 +813,14 @@ void RemoveBot()
 				e->s.modelindex = 0;
 				e->solid = SOLID_NOT;
 
-				if(ctf->value) {
+				if(zigrapple->value)
 					CTFPlayerResetGrapple(e);
+
+				if(ctf->value) {
+
+					if(!zigrapple->value)
+						CTFPlayerResetGrapple(e);
+
 					CTFDeadDropFlag(e);
 					CTFDeadDropTech(e);
 				}
