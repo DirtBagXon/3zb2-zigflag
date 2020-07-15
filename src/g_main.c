@@ -66,10 +66,12 @@ cvar_t	*vwep;
 cvar_t	*maplist;
 cvar_t	*botlist;
 cvar_t	*autospawn;
+cvar_t	*autobot;
 cvar_t	*zigmode;
 cvar_t	*zigspawn;
 cvar_t	*zigkiller;
 cvar_t	*zigrapple;
+cvar_t	*zigintro;
 cvar_t	*spawnbotfar;
 cvar_t	*respawn_protection;
 int	flagbounce;
@@ -397,7 +399,7 @@ CheckDMRules
 */
 void CheckDMRules (void)
 {
-	int			i;
+	int		i;
 	gclient_t	*cl;
 
 	if (level.intermissiontime)
@@ -753,6 +755,10 @@ void G_RunFrame (void)
 		next_fragadd = level.time + (FRAMETIME * ZIGTICK);
 	}
 
+
+	// autobot control
+	if(autobot->value && autospawn->value && level.framenum & 8)
+		AutoBot ();
 
 	// see if it is time to end a deathmatch
 	CheckDMRules ();

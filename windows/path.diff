@@ -44,10 +44,10 @@ index 7da1da0..b7583d9 100644
  	fpout = fopen(name,"rb");
  	if(fpout == NULL)
 diff --git a/src/g_main.c b/src/g_main.c
-index e5b32f7..d1bea09 100644
+index 48f558a..edb5a21 100644
 --- a/src/g_main.c
 +++ b/src/g_main.c
-@@ -225,8 +225,8 @@ void Get_NextMap()
+@@ -227,8 +227,8 @@ void Get_NextMap()
  	
  	if(!maplist->string) return;
  
@@ -78,10 +78,10 @@ index c694cd5..7955ffc 100644
  	fpout = fopen(name,"wb");
  	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);
 diff --git a/src/header/local.h b/src/header/local.h
-index 0c711f7..8a70923 100644
+index f976a2a..b86ccd8 100644
 --- a/src/header/local.h
 +++ b/src/header/local.h
-@@ -566,10 +566,10 @@ extern	int	meansOfDeath;
+@@ -570,10 +570,10 @@ extern	int	meansOfDeath;
  
  extern	edict_t			*g_edicts;
  

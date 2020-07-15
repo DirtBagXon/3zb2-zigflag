@@ -3,7 +3,7 @@
 This is a custom port of the 3rd Zigock Bot II to Quake II - Yamagi Quake II is recommended.  \
 All warnings (up to GCC9) and unused variables have been addressed in the original source. \
 The code also has handpicked backport fixes, enhancements and features applied from various \
-sources: `tastyspleen`, `yquake2`, `OpenTDM`, `OpenFFA` and custom.
+sources: `tastyspleen`, `yquake2`, `OpenTDM`, `OpenFFA` and many custom.
 
 This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
 There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
@@ -17,17 +17,19 @@ On global linux installs, **e.g.** `/usr/share/games`, you may need to specify `
 
 Bot chaining routes are supplied, further routes can be (re)created via the mod command `chedit` (See `CONFIG.txt`)
 
-### ZigMode ZigFlag (Capture and Hold)
+### ZigMode ZigFlag (Capture and Hold) - https://zigflag.net
 
 The premise is simple: **Get the flag and keep it** - *plays on standard Deathmatch maps*.
 
 The original `zigmode` was released belated, buggy and only half implemented, I attempted to make this feature a little \
-more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and whistles.
+more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and \
+whistles. However `zigflag` turned into a fairly customised game.
 
 * Simple HUD enhancements.
+* Automatic bot control.
 * Autospawn bots at level start.
 * Visual/Audio notifications to Flagholder.
-* Flagholder dogtag displayed on scoreboard.
+* Customised dogtags displayed on scoreboard.
 * Optional Flag respawn feature.
 * Optional Flagholder frag bonus.
 * Optional Flag sucks health from subdued holder.
@@ -40,6 +42,8 @@ more refined, just for fun. I was trying to keep the look and feel of the origin
 * Optional enhanced HUD.
 
 ..and many bugfixes was the final outcome of playing around with the code.
+
+A ZigFlag server can sometimes be found running at `quake2://quake.zigflag.net:27910` 
 
 The mod also supports skin and model teams with appropriate bonuses and penalties on Flag possession and `FRIENDLY_FIRE`.
 
@@ -61,6 +65,7 @@ set zigmode 1
 set zigspawn 1
 set zigkiller 1
 set zigrapple 0
+set zigintro 0
 set ctf 0
 set aimfix 1
 set combathud 1
@@ -71,6 +76,7 @@ set playerid 1
 set weaponswap 1
 set botlist default
 set autospawn 3
+set autobot 0
 set vwep 1
 set maxclients 16
 set respawn_protection 1
@@ -157,6 +163,9 @@ sudo cp release/game.so /usr/share/games/quake2/3zb2
 To start `$` bots automatically, append:
 
     +set autospawn $
+    +set autobot $
+
+`autobot` will automatically **remove/add** `autospawn` number of bots dependant on `autobot` value of real clients connected
 
 ### Spawn bots at the farthest point
 
@@ -229,6 +238,10 @@ Auto switch to upgraded weapon on pickup, enable `1` or disable `0` (default):
 Option to add grapple to the fray - CTF `pak0.pak` required.
 
     zigrapple 1
+
+Add spectator mode to game start (server mode)
+
+    zigintro 1
 
 `Capture and Hold (ZigFlag)` mode for Deathmatch/Team games:
 

@@ -573,6 +573,12 @@ void Cmd_InvUse_f (edict_t *ent)
 {
 	gitem_t		*it;
 
+	if (ent->client->resp.spectator && !ent->client->pers.joined) {
+		ent->client->pers.joined = true;
+		spectator_respawn(ent);
+		return;
+	}
+
 //ZOID
 	if (ent->client->menu) {
 		PMenu_Select(ent);

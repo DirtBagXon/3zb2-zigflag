@@ -68,6 +68,7 @@ void Get_WaterState(edict_t *ent);
 void Bot_Think (edict_t *self);
 void PutBotInServer (edict_t *ent);
 void SpawnBotReserving2(int *red,int *blue);
+void AutoBot();
 
 //Combat AI
 void Combat_Level0(edict_t *ent,int foundedenemy,int enewep,float aim,float distance,int skill);

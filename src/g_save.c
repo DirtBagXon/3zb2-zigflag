@@ -166,12 +166,16 @@ void InitGame (void)
 	maplist = gi.cvar ("maplist", "default", CVAR_SERVERINFO | CVAR_LATCH);
 	//autospawn
 	autospawn = gi.cvar ("autospawn", "0", CVAR_SERVERINFO | CVAR_LATCH);
+	//autobot
+	autobot = gi.cvar ("autobot", "0", CVAR_SERVERINFO | CVAR_LATCH);
 	//chain edit flag
 	chedit = gi.cvar ("chedit", "0", CVAR_LATCH);
 	//vwep support
 	vwep = gi.cvar ("vwep", "1", CVAR_LATCH);
 	//game mode
 	zigmode = gi.cvar ("zigmode", "0", CVAR_SERVERINFO| CVAR_LATCH);
+	//game setup
+	zigintro = gi.cvar ("zigintro", "0", CVAR_LATCH);
 //ZOID
 //This game.dll only supports deathmatch
 	if (!deathmatch->value) {

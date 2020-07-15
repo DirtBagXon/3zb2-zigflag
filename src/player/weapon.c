@@ -608,7 +608,12 @@ void Weapon_Generic2 (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST
 	if ((ent->client->newweapon) && (ent->client->weaponstate != WEAPON_FIRING))
 	{
 		ent->client->weaponstate = WEAPON_DROPPING;
-		ent->client->ps.gunframe = FRAME_DEACTIVATE_FIRST;
+
+		if(weaponswap->value)
+			ent->client->ps.gunframe = FRAME_DEACTIVATE_LAST;
+		else
+			ent->client->ps.gunframe = FRAME_DEACTIVATE_FIRST;
+
 		// ### Hentai ### BEGIN
 		if((FRAME_DEACTIVATE_LAST - FRAME_DEACTIVATE_FIRST) < 4)
 		{

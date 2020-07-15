@@ -307,6 +307,27 @@ spawn_t	spawns[] = {
 
 /*
 ===============
+Set the Observe mode string
+===============
+*/
+void CSObserve()
+{
+	char observe[32];
+	char tab[4];
+	char end[16];
+	char Highlight[MAX_STRING_CHARS];
+
+	sprintf(observe, "[");
+	sprintf(tab, "ENT");
+	sprintf(end, "] to Join");
+	HighlightStr(Highlight, tab, MAX_STRING_CHARS);
+	strcat(observe, Highlight);
+	strcat(observe, end);
+	gi.configstring(CS_OBSERVE, observe);
+}
+
+/*
+===============
 ED_CallSpawn
 
 Finds the spawn function for the entity and calls it
@@ -1052,6 +1073,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	CTFSetupNavSpawn();	//ナビの設置
 	if(!chedit->value) G_FindItemLink();	//アイテムのリンク(通常時のみ)
 
+	CSObserve();
 	G_SpawnRouteLink();
 
 	if(zigmode->value == 1) zigflag_spawn = 1;
@@ -1293,10 +1315,10 @@ char *zig_statusbar =
 // Chase Cam
 "if 16 "
   "xv 0 "
-  "yb -48 "
-  "xl 260 "
-  "string \"Chasing:\" "
-  "xv 170 "
+  "yb -80 "
+  "xl 230 "
+  "string \"Observing:\" "
+  "xv 160 "
   "stat_string 16 "
 "endif "
 
@@ -1322,7 +1344,7 @@ char *zig_statusbar =
 // countdown
 "if 30"
   "xr -50 "
-  "yb -60 "
+  "yb -65 "
   "xv 105 "
   "stat_string 30 "
 "endif "
@@ -1418,6 +1440,7 @@ void SP_worldspawn (edict_t *ent)
 			gi.configstring (CS_STATUSBAR, zig_statusbar);
 			gi.imageindex("i_zig");
 			gi.imageindex("zigtag");
+			gi.imageindex("spectag");
 
 		} else {
 			gi.configstring (CS_STATUSBAR, dm_statusbar);

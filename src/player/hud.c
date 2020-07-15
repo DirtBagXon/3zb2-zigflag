@@ -151,10 +151,12 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	int		sorted[MAX_CLIENTS];
 	int		sortedscores[MAX_CLIENTS];
 	int		score, total, rtotal;
+	int		inuse = 1;
 	int		x, y;
 	gclient_t	*cl;
 	edict_t		*cl_ent;
 	char		*tag, *mark;
+	static qboolean	done = false;
 
 	// protect bprintf() against SZ_Getspace error
 	int		broadcast = 16;
@@ -174,6 +176,8 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		cl_ent = g_edicts + 1 + i;
 		if (!cl_ent->inuse)
 			continue;
+		if (cl_ent->client->pers.connected && !ENT_IS_BOT(cl_ent))
+			inuse = i + 1;
 		score = game.clients[i].resp.score;
 		for (j=0 ; j<total ; j++)
 		{
@@ -196,7 +200,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 
 	stringlength = strlen(string);
 
-	if(level.intermissiontime && ent == &g_edicts[1])
+	if(level.intermissiontime && !done && ent == &g_edicts[inuse])
 	{
 		if(zigmode->value && zigspawn->value && flagbounce > 0)
 		{
@@ -248,6 +252,9 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		else
 			tag = NULL;
 
+		if (zigintro->value && !ENT_IS_BOT(cl_ent) && !cl_ent->client->pers.joined)
+			tag = "spectag";
+
 		if(zigmode->value)
 			if(killer != NULL && cl_ent == killer)
 				tag = "zigtag";
@@ -263,7 +270,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			stringlength += j;
 		}
 
-		if(level.intermissiontime && ent == &g_edicts[1] && rtotal <= broadcast && i < topresult)
+		if(level.intermissiontime && !done && ent == &g_edicts[inuse] && rtotal <= broadcast && i < topresult)
 		{
 			if(tag && strcmp(tag, "zigtag") == 0)
 				mark = "F";
@@ -290,8 +297,13 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	gi.WriteByte (svc_layout);
 	gi.WriteString (string);
 
-	if(level.intermissiontime && ent == &g_edicts[1] && rtotal <= broadcast)
+	if(level.intermissiontime && !done && ent == &g_edicts[inuse] && rtotal <= broadcast)
 		CPRepeat('-', 54);
+
+	if(level.intermissiontime)
+		done = true;
+	else
+		done = false;
 }
 
 
@@ -592,7 +604,7 @@ void G_WriteTime(int remaining)
 	int min = remaining / 60;
 	int i;
 
-	sprintf(message, "[ Time:");
+	sprintf(message, "[ Time: ");
 	sprintf(end, " ]");
 
 	if(remaining < 0)
@@ -781,7 +793,7 @@ void G_SetStats (edict_t *ent)
 	// rank and time
 	//
 	if(zigmode->value && combathud->value && (level.framenum&8)
-			&& !ent->client->pers.spectator && !level.intermissiontime)
+			&& !level.intermissiontime)
 	{
 		ent->client->ps.stats[STAT_RANK] = ent->client->pers.rank;
 
@@ -859,6 +871,12 @@ void G_SetSpectatorStats (edict_t *ent)
 
 	cl->ps.stats[STAT_SPECTATOR] = 1;
 	cl->ps.stats[STAT_VIEWID] = 0;
+	cl->ps.stats[STAT_RANK] = 0;
+
+	if(combathud->value)
+		cl->ps.stats[STAT_TIME] = CS_TIME;
+	else
+		cl->ps.stats[STAT_TIME] = 0;
 
 	// layouts are independant in spectator
 	cl->ps.stats[STAT_LAYOUTS] = 0;
@@ -871,7 +889,7 @@ void G_SetSpectatorStats (edict_t *ent)
 		cl->ps.stats[STAT_CHASE] = CS_PLAYERNAMES +
 			(cl->chase_target - g_edicts) - 1;
 	else
-		cl->ps.stats[STAT_CHASE] = 0;
+		cl->ps.stats[STAT_CHASE] = CS_OBSERVE;
 }
 
 /*

@@ -43,9 +43,9 @@ void VelocityForHead (int damage, vec3_t v)
 
 	v[0] = damage * 10.0 * crandom();
 	v[1] = damage * 10.0 * crandom();
-	v[2] = 400.0 * crandom();
+	v[2] = 100.0 * random();
 
-	VectorScale (v, 0.7, v);
+	VectorScale (v, 0.35, v);
 }
 
 void VelocityForDamage (int damage, vec3_t v)

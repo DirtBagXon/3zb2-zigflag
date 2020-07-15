@@ -884,7 +884,7 @@ void Bot_LevelChange()
 
 	SpawnWaitingBots = k;
 
-	if (autospawn->value > 0) {
+	if (autospawn->value > 0 && !autobot->value) {
 		int delta = autospawn->value - SpawnWaitingBots;
 		while (delta-- > 0) {
 			SpawnBotReserving();
@@ -1147,3 +1147,101 @@ void Cmd_AirStrike(edict_t *ent)
 	gi.linkentity (viper);
 }
 
+/*
+===================================
+
+Return the number of real clients
+           No BOTS
+
+===================================
+*/
+int RealClients ()
+{
+	int i;
+	int realclients = 0;
+	edict_t *ent;
+
+	for (i = 0; i < maxclients->value; i++)
+	{
+		ent = g_edicts + 1 + i;
+
+		if (!ent->inuse)
+			continue;
+
+		if (ent->client && !(ent->svflags & SVF_MONSTER))
+		{
+			if(zigintro->value) {
+				if(ent->client->pers.joined)
+					realclients++;
+			}
+			else
+				realclients++;
+		}
+	}
+	return realclients;
+}
+
+/*
+===================================
+
+Return the number of BOT clients
+
+===================================
+*/
+int BotClients ()
+{
+	int i;
+	int botclients = 0;
+	edict_t *ent;
+
+	for (i = 0; i < maxclients->value; i++)
+	{
+		ent = g_edicts + 1 + i;
+
+		if (!ent->inuse)
+			continue;
+
+		if (ent->client && (ent->svflags & SVF_MONSTER))
+			botclients++;
+	}
+	return botclients;
+}
+
+/*
+===================================
+
+Control Bots in 'autobot'
+
+===================================
+*/
+void AutoBot ()
+{
+	int     clients,bots,i;
+	int     delay = 300;
+	int     buffer = 10 * autospawn->value;
+	int     remaining = timelimit->value * 60 - level.time;
+	float   startup = 15.0f;
+
+	clients = RealClients();
+	bots = BotClients();
+
+	if(level.time < startup)
+		delay = 100;
+
+	if(clients > autobot->value && bots > 0 && level.time > startup
+		&& remaining > 10) {
+			level.autobotframe = level.framenum;
+			for (i=0 ; i < bots ; i++)
+				RemoveBot();
+	}
+
+	if(clients <= autobot->value && bots == 0 && remaining > buffer
+		&& (level.framenum - level.autobotframe) > delay && !level.intermissiontime) {
+			for (i=0 ; i < autospawn->value ; i++) {
+				int delta = autospawn->value - SpawnWaitingBots;
+				while (delta-- > 0) {
+					SpawnBotReserving();
+				}
+			}
+	}
+}

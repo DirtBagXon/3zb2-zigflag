@@ -28,8 +28,11 @@
 // Timer
 #define CS_TIME	(CS_GENERAL + 1)
 
+// Observer notice
+#define CS_OBSERVE	(CS_GENERAL + 2)
+
 // Player ID
-#define CS_PLAYERNAMES	(CS_GENERAL + 2)
+#define CS_PLAYERNAMES	(CS_GENERAL + 3)
 
 // Immune on respawn (n * FRAMETIME) sec
 #define	SPAWNPROTECT	10
@@ -350,6 +353,7 @@ typedef struct
 typedef struct
 {
 	int			framenum;
+	int			autobotframe;
 	float		time;
 
 	char		level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
@@ -621,10 +625,12 @@ extern	cvar_t	*vwep;
 extern	cvar_t	*maplist;
 extern	cvar_t	*botlist;
 extern	cvar_t	*autospawn;
+extern	cvar_t	*autobot;
 extern	cvar_t	*zigmode;
 extern	cvar_t  *zigspawn;
 extern	cvar_t  *zigkiller;
 extern	cvar_t  *zigrapple;
+extern	cvar_t  *zigintro;
 extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
 extern	cvar_t  *killerflag;
@@ -721,7 +727,6 @@ edict_t *G_PickTarget (char *targetname);
 void	G_UseTargets (edict_t *ent, edict_t *activator);
 void	G_SetMovedir (vec3_t angles, vec3_t movedir);
 void	CPRepeat (char input , int count );
-
 
 void	G_InitEdict (edict_t *e);
 edict_t	*G_Spawn (void);
@@ -850,6 +855,7 @@ edict_t	*PlayerTrail_LastSpot (void);
 // g_client.c
 //
 void respawn (edict_t *ent);
+void spectator_respawn (edict_t *ent);
 void BeginIntermission (edict_t *targ);
 void PutClientInServer (edict_t *ent);
 void InitClientPersistant (gclient_t *client);
@@ -978,6 +984,7 @@ typedef struct
 	int			game_helpchanged;
 	int			helpchanged;
 
+	qboolean	joined;				// client has joined the game
 	qboolean	spectator;			// client is a spectator
 } client_persistant_t;
 
@@ -1157,6 +1164,7 @@ struct gclient_s
 	qboolean	update_chase;
 //ZOID
 	zgcl_t		zc;					//zigock client info
+	qboolean	joined;
 };
 
 
@@ -1262,7 +1270,7 @@ struct edict_s
 	int			max_health;
 	int			gib_health;
 	int			deadflag;
-	qboolean	show_hostile;
+	qboolean		show_hostile;
 
 	float		powerarmor_time;
 

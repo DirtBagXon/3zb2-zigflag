@@ -734,6 +734,8 @@ void InitClientPersistant (gclient_t *client)
 	if(ctf->value || zigrapple->value)
 		client->pers.inventory[ITEM_INDEX(item)] = 1; //ponpoko
 //ZOID
+	if(client->joined)
+		client->pers.joined		= true;
 
 	client->pers.health			= 100;
 	client->pers.max_health		= 100;
@@ -1261,6 +1263,23 @@ void respawn (edict_t *self)
 	gi.AddCommandString ("menu_loadgame\n");
 }
 
+/*
+ * called on zigintro
+ */
+void check_spectator_limit(edict_t *ent)
+{
+	int i, numspec;
+
+	for (i = 1, numspec = 0; i <= maxclients->value; i++)
+		if (g_edicts[i].inuse && g_edicts[i].client->pers.spectator)
+			numspec++;
+
+	if (numspec >= maxspectators->value) {
+		gi.cprintf(ent, PRINT_HIGH, "Spectator limit is full, dropping into game.\n");
+		ent->client->pers.spectator = false;
+	}
+}
+
 /* 
  * only called when pers.spectator changes
  * note that resp.spectator should be the opposite of pers.spectator here
@@ -1335,7 +1354,7 @@ void spectator_respawn (edict_t *ent)
 
 	ent->client->respawn_time = level.time;
 
-	if (ent->client->pers.spectator) 
+	if (ent->client->pers.spectator)
 		gi.bprintf (PRINT_HIGH, "%s has moved to the sidelines\n", ent->client->pers.netname);
 	else
 		gi.bprintf (PRINT_HIGH, "%s joined the game\n", ent->client->pers.netname);
@@ -1381,6 +1400,9 @@ void PutClientInServer (edict_t *ent)
 	index = ent-g_edicts-1;
 	client = ent->client;
 
+	if(zigintro->value && client->pers.joined)
+		client->joined = client->pers.joined;
+
 	// deathmatch wipes most client data every spawn
 	if (deathmatch->value)
 	{
@@ -1412,6 +1434,11 @@ void PutClientInServer (edict_t *ent)
 	else
 	{
 		memset (&resp, 0, sizeof(resp));
+	}
+
+	if(zigintro->value && !client->joined) {
+		client->pers.spectator = true;
+		check_spectator_limit(ent);
 	}
 
 	// clear everything but the persistant data
@@ -1738,6 +1765,14 @@ void ClientUserinfoChanged (edict_t *ent, char *userinfo)
 		ent->client->pers.spectator = true;
 	else
 		ent->client->pers.spectator = false;
+
+	if(ent->client->pers.joined)
+	{
+		if(*s && strcmp(s, "0"))
+			ent->client->pers.spectator = true;
+		else
+			ent->client->pers.spectator = false;
+	}
 
 	// set skin
 	s = Info_ValueForKey (userinfo, "skin");
@@ -2582,6 +2617,10 @@ void ClientBeginServerFrame (edict_t *ent)
 	if (deathmatch->value &&
 		client->pers.spectator != client->resp.spectator &&
 		(level.time - client->respawn_time) >= 5) {
+
+		if(zigintro->value && !client->pers.joined)
+			return;
+
 		spectator_respawn(ent);
 		return;
 	}
