@@ -151,12 +151,10 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	int		sorted[MAX_CLIENTS];
 	int		sortedscores[MAX_CLIENTS];
 	int		score, total, rtotal;
-	int		inuse = 1;
 	int		x, y;
 	gclient_t	*cl;
 	edict_t		*cl_ent;
 	char		*tag, *mark;
-	static qboolean	done = false;
 
 	// protect bprintf() against SZ_Getspace error
 	int		broadcast = 16;
@@ -176,8 +174,6 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		cl_ent = g_edicts + 1 + i;
 		if (!cl_ent->inuse)
 			continue;
-		if (cl_ent->client->pers.connected && !ENT_IS_BOT(cl_ent))
-			inuse = i + 1;
 		score = game.clients[i].resp.score;
 		for (j=0 ; j<total ; j++)
 		{
@@ -200,7 +196,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 
 	stringlength = strlen(string);
 
-	if(level.intermissiontime && !done && ent == &g_edicts[inuse])
+	if(level.intermissiontime && ent == &g_edicts[1])
 	{
 		if(zigmode->value && zigspawn->value && flagbounce > 0)
 		{
@@ -270,10 +266,12 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			stringlength += j;
 		}
 
-		if(level.intermissiontime && !done && ent == &g_edicts[inuse] && rtotal <= broadcast && i < topresult)
+		if(level.intermissiontime && ent == &g_edicts[1] && rtotal <= broadcast && i < topresult)
 		{
 			if(tag && strcmp(tag, "zigtag") == 0)
 				mark = "F";
+			else if (zigintro->value && !cl->pers.joined && !ENT_IS_BOT(cl_ent))
+				mark = "S";
 			else if(i == 0)
 				mark = "*";
 
@@ -297,13 +295,8 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	gi.WriteByte (svc_layout);
 	gi.WriteString (string);
 
-	if(level.intermissiontime && !done && ent == &g_edicts[inuse] && rtotal <= broadcast)
+	if(level.intermissiontime && ent == &g_edicts[1] && rtotal <= broadcast)
 		CPRepeat('-', 54);
-
-	if(level.intermissiontime)
-		done = true;
-	else
-		done = false;
 }
 
 
