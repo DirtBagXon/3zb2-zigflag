@@ -92,9 +92,10 @@ See `CONFIG.txt` for further details.
 
 ## Windows Installation
 
-A Windows `game.dll` file has been provided in the `windows` subdirectory. Paths for config, maplist and chaining files have \
-been made unixoid in the main source. `git grep BASEPATH` will provide concerned locations for future compilations.  I have \
-also provided a small patch file to switch these paths with ease. This is also included in the `windows` subdirectory.
+A Windows `game.dll` file has been provided in the `windows` subdirectory. Paths for config, maplist and chaining \
+files have been made unixoid in the main source. `git grep BASEPATH` will provide concerned locations for future \
+compilations.  I have also provided a small patch file to switch these paths with ease. This is also included in \
+the `windows` subdirectory.
 
 Install the `.dll` in the *3zb2* folder:
 
@@ -105,7 +106,8 @@ Move the *3zb2* directory in the main Quake II installation folder, alongside *b
 
     move 3zb2 C:\Program Files\Quake2\
 
-Adjust the `zig.cfg` (see above) in the *3zb2* directory if required, then create a `.bat` file using the below arguments as a minimum:
+Adjust the `zig.cfg` (see above) in the *3zb2* directory if required, then create a `.bat` file using the below\
+arguments as a minimum:
 
     quake2.exe +set game 3zb2 +set deathmatch 1 +exec zig.cfg
 
