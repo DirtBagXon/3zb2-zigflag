@@ -5,6 +5,8 @@ All warnings (up to GCC9) and unused variables have been addressed in the origin
 The code also has handpicked backport fixes, enhancements and features applied from various \
 sources: `tastyspleen`, `yquake2`, `OpenTDM`, `OpenFFA` and many custom.
 
+Also works with Vulkan Quake II (vkQuake2): https://github.com/kondrak/vkQuake2/issues/103
+
 This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
 There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
 the original game deathmatch, but allows a multiplayer experience with some of the best bots for the Quake II\
@@ -97,10 +99,14 @@ files have been made unixoid in the main source. `git grep BASEPATH` will provid
 compilations.  I have also provided a small patch file to switch these paths with ease. This is also included in \
 the `windows` subdirectory.
 
-Install the `.dll` in the *3zb2* folder:
+Install the `.dll` in the *3zb2* folder (Check your engine requirements for **32** or **64bit** dll names):
 
     copy .\windows\gamex86.dll .\3zb2\game.dll
     copy .\windows\gamex86.dll .\3zb2\gamex86.dll
+
+    copy .\windows\gamex86_64.dll .\3zb2\game.dll
+    copy .\windows\gamex86_64.dll .\3zb2\gamex64.dll
+    copy .\windows\gamex86_64.dll .\3zb2\gamex86_64.dll
 
 Move the *3zb2* directory in the main Quake II installation folder, alongside *baseq2*.
 
@@ -157,7 +163,9 @@ make[1]: Entering directory '/home/user/3zb2'
 ===> LD release/game.so
 make[1]: Leaving directory '/home/user/3zb2'
 
-sudo cp release/game.so /usr/share/games/quake2/3zb2
+sudo cp release/game.so /usr/share/games/quake2/3zb2/game.so
+sudo cp release/game.so /usr/share/games/quake2/3zb2/gamex86.so
+sudo cp release/game.so /usr/share/games/quake2/3zb2/gamex64.so
 ```
 
 ## Running bots
