@@ -45,45 +45,45 @@ typedef enum {false, true}	qboolean;
 #endif
 
 // angle indexes
-#define	PITCH				0		// up / down
-#define	YAW					1		// left / right
-#define	ROLL				2		// fall over
+#define	PITCH			0		// up / down
+#define	YAW			1		// left / right
+#define	ROLL			2		// fall over
 
-#define	MAX_STRING_CHARS	1024	// max length of a string passed to Cmd_TokenizeString
+#define	MAX_STRING_CHARS	1024		// max length of a string passed to Cmd_TokenizeString
 #define	MAX_STRING_TOKENS	80		// max tokens resulting from Cmd_TokenizeString
 #define	MAX_TOKEN_CHARS		128		// max length of an individual token
 
-#define	MAX_QPATH			64		// max length of a quake game pathname
-#define	MAX_OSPATH			128		// max length of a filesystem pathname
+#define	MAX_QPATH		64		// max length of a quake game pathname
+#define	MAX_OSPATH		128		// max length of a filesystem pathname
 
 //
 // per-level limits
 //
-#define	MAX_CLIENTS			256		// absolute limit
-#define	MAX_EDICTS			1024	// must change protocol to increase more
+#define	MAX_CLIENTS		256		// absolute limit
+#define	MAX_EDICTS		1024		// must change protocol to increase more
 #define	MAX_LIGHTSTYLES		256
-#define	MAX_MODELS			256		// these are sent over the net as bytes
-#define	MAX_SOUNDS			256		// so they cannot be blindly increased
-#define	MAX_IMAGES			256
-#define	MAX_ITEMS			256
-#define MAX_GENERAL			(MAX_CLIENTS*2)	// general config strings
+#define	MAX_MODELS		256		// these are sent over the net as bytes
+#define	MAX_SOUNDS		256		// so they cannot be blindly increased
+#define	MAX_IMAGES		256
+#define	MAX_ITEMS		256
+#define MAX_GENERAL		(MAX_CLIENTS*2)	// general config strings
 
 
 // game print flags
-#define	PRINT_LOW			0		// pickup messages
+#define	PRINT_LOW		0		// pickup messages
 #define	PRINT_MEDIUM		1		// death messages
-#define	PRINT_HIGH			2		// critical messages
-#define	PRINT_CHAT			3		// chat messages
+#define	PRINT_HIGH		2		// critical messages
+#define	PRINT_CHAT		3		// chat messages
 
 
 
-#define	ERR_FATAL			0		// exit the entire game with a popup window
-#define	ERR_DROP			1		// print to console and disconnect from game
+#define	ERR_FATAL		0		// exit the entire game with a popup window
+#define	ERR_DROP		1		// print to console and disconnect from game
 #define	ERR_DISCONNECT		2		// don't kill server
 
-#define	PRINT_ALL			0
+#define	PRINT_ALL		0
 #define PRINT_DEVELOPER		1		// only print when "developer 1"
-#define PRINT_ALERT			2		
+#define PRINT_ALERT		2
 
 
 // destination class for gi.multicast()
@@ -137,12 +137,12 @@ extern long Q_ftol( float f );
 #define Q_ftol( f ) ( long ) (f)
 #endif
 
-#define DotProduct(x,y)			(x[0]*y[0]+x[1]*y[1]+x[2]*y[2])
+#define DotProduct(x,y)		(x[0]*y[0]+x[1]*y[1]+x[2]*y[2])
 #define VectorSubtract(a,b,c)	(c[0]=a[0]-b[0],c[1]=a[1]-b[1],c[2]=a[2]-b[2])
-#define VectorAdd(a,b,c)		(c[0]=a[0]+b[0],c[1]=a[1]+b[1],c[2]=a[2]+b[2])
-#define VectorCopy(a,b)			(b[0]=a[0],b[1]=a[1],b[2]=a[2])
-#define VectorClear(a)			(a[0]=a[1]=a[2]=0)
-#define VectorNegate(a,b)		(b[0]=-a[0],b[1]=-a[1],b[2]=-a[2])
+#define VectorAdd(a,b,c)	(c[0]=a[0]+b[0],c[1]=a[1]+b[1],c[2]=a[2]+b[2])
+#define VectorCopy(a,b)		(b[0]=a[0],b[1]=a[1],b[2]=a[2])
+#define VectorClear(a)		(a[0]=a[1]=a[2]=0)
+#define VectorNegate(a,b)	(b[0]=-a[0],b[1]=-a[1],b[2]=-a[2])
 #define VectorSet(v, x, y, z)	(v[0]=(x), v[1]=(y), v[2]=(z))
 
 void VectorMA (vec3_t veca, float scale, vec3_t vecb, vec3_t vecc);
@@ -330,42 +330,42 @@ COLLISION DETECTION
 #define	CONTENTS_SLIME			16
 #define	CONTENTS_WATER			32
 #define	CONTENTS_MIST			64
-#define	LAST_VISIBLE_CONTENTS	64
+#define	LAST_VISIBLE_CONTENTS		64
 
 // remaining contents are non-visible, and don't eat brushes
 
 #define	CONTENTS_AREAPORTAL		0x8000
 
 #define	CONTENTS_PLAYERCLIP		0x10000
-#define	CONTENTS_MONSTERCLIP	0x20000
+#define	CONTENTS_MONSTERCLIP		0x20000
 
 // currents can be added to any other contents, and may be mixed
 #define	CONTENTS_CURRENT_0		0x40000
 #define	CONTENTS_CURRENT_90		0x80000
-#define	CONTENTS_CURRENT_180	0x100000
-#define	CONTENTS_CURRENT_270	0x200000
+#define	CONTENTS_CURRENT_180		0x100000
+#define	CONTENTS_CURRENT_270		0x200000
 #define	CONTENTS_CURRENT_UP		0x400000
-#define	CONTENTS_CURRENT_DOWN	0x800000
+#define	CONTENTS_CURRENT_DOWN		0x800000
 
 #define	CONTENTS_ORIGIN			0x1000000	// removed before bsping an entity
 
 #define	CONTENTS_MONSTER		0x2000000	// should never be on a brush, only in game
-#define	CONTENTS_DEADMONSTER	0x4000000
+#define	CONTENTS_DEADMONSTER		0x4000000
 #define	CONTENTS_DETAIL			0x8000000	// brushes to be added after vis leafs
-#define	CONTENTS_TRANSLUCENT	0x10000000	// auto set if any surface has trans
+#define	CONTENTS_TRANSLUCENT		0x10000000	// auto set if any surface has trans
 #define	CONTENTS_LADDER			0x20000000
 
 
 
-#define	SURF_LIGHT		0x1		// value will hold the light strength
+#define	SURF_LIGHT		0x1	// value will hold the light strength
 
-#define	SURF_SLICK		0x2		// effects game physics
+#define	SURF_SLICK		0x2	// effects game physics
 
-#define	SURF_SKY		0x4		// don't draw, but add to skybox
-#define	SURF_WARP		0x8		// turbulent water warp
-#define	SURF_TRANS33	0x10
-#define	SURF_TRANS66	0x20
-#define	SURF_FLOWING	0x40	// scroll towards angle
+#define	SURF_SKY		0x4	// don't draw, but add to skybox
+#define	SURF_WARP		0x8	// turbulent water warp
+#define	SURF_TRANS33		0x10
+#define	SURF_TRANS66		0x20
+#define	SURF_FLOWING		0x40	// scroll towards angle
 #define	SURF_NODRAW		0x80	// don't bother referencing the texture
 
 
@@ -406,11 +406,11 @@ typedef struct cplane_s
 #define CPLANE_NORMAL_X			0
 #define CPLANE_NORMAL_Y			4
 #define CPLANE_NORMAL_Z			8
-#define CPLANE_DIST				12
-#define CPLANE_TYPE				16
+#define CPLANE_DIST			12
+#define CPLANE_TYPE			16
 #define CPLANE_SIGNBITS			17
-#define CPLANE_PAD0				18
-#define CPLANE_PAD1				19
+#define CPLANE_PAD0			18
+#define CPLANE_PAD1			19
 
 typedef struct cmodel_s
 {
@@ -449,7 +449,7 @@ typedef struct
 
 // pmove_state_t is the information necessary for client side movement
 // prediction
-typedef enum 
+typedef enum
 {
 	// can accelerate and turn
 	PM_NORMAL,
@@ -461,7 +461,7 @@ typedef enum
 } pmtype_t;
 
 // pmove->pm_flags
-#define	PMF_DUCKED			1
+#define	PMF_DUCKED		1
 #define	PMF_JUMP_HELD		2
 #define	PMF_ON_GROUND		4
 #define	PMF_TIME_WATERJUMP	8	// pm_time is waterjump
@@ -492,8 +492,8 @@ typedef struct
 // button bits
 //
 #define	BUTTON_ATTACK		1
-#define	BUTTON_USE			2
-#define	BUTTON_ANY			128			// any key whatsoever
+#define	BUTTON_USE		2
+#define	BUTTON_ANY		128			// any key whatsoever
 
 
 // usercmd_t is sent to the server each client frame
@@ -542,53 +542,53 @@ typedef struct
 // that happen constantly on the given entity.
 // An entity that has effects will be sent to the client
 // even if it has a zero index model.
-#define	EF_ROTATE			0x00000001		// rotate (bonus items)
-#define	EF_GIB				0x00000002		// leave a trail
-#define	EF_BLASTER			0x00000008		// redlight + trail
-#define	EF_ROCKET			0x00000010		// redlight + trail
-#define	EF_GRENADE			0x00000020
+#define	EF_ROTATE		0x00000001		// rotate (bonus items)
+#define	EF_GIB			0x00000002		// leave a trail
+#define	EF_BLASTER		0x00000008		// redlight + trail
+#define	EF_ROCKET		0x00000010		// redlight + trail
+#define	EF_GRENADE		0x00000020
 #define	EF_HYPERBLASTER		0x00000040
-#define	EF_BFG				0x00000080
+#define	EF_BFG			0x00000080
 #define EF_COLOR_SHELL		0x00000100
 #define EF_POWERSCREEN		0x00000200
-#define	EF_ANIM01			0x00000400		// automatically cycle between frames 0 and 1 at 2 hz
-#define	EF_ANIM23			0x00000800		// automatically cycle between frames 2 and 3 at 2 hz
-#define EF_ANIM_ALL			0x00001000		// automatically cycle through all frames at 2hz
+#define	EF_ANIM01		0x00000400		// automatically cycle between frames 0 and 1 at 2 hz
+#define	EF_ANIM23		0x00000800		// automatically cycle between frames 2 and 3 at 2 hz
+#define EF_ANIM_ALL		0x00001000		// automatically cycle through all frames at 2hz
 #define EF_ANIM_ALLFAST		0x00002000		// automatically cycle through all frames at 10hz
-#define	EF_FLIES			0x00004000
-#define	EF_QUAD				0x00008000
-#define	EF_PENT				0x00010000
+#define	EF_FLIES		0x00004000
+#define	EF_QUAD			0x00008000
+#define	EF_PENT			0x00010000
 #define	EF_TELEPORTER		0x00020000		// particle fountain
-#define EF_FLAG1			0x00040000
-#define EF_FLAG2			0x00080000
+#define	EF_FLAG1		0x00040000
+#define	EF_FLAG2		0x00080000
 // RAFAEL
-#define EF_IONRIPPER		0x00100000
-#define EF_GREENGIB			0x00200000
-#define	EF_BLUEHYPERBLASTER 0x00400000
-#define EF_SPINNINGLIGHTS	0x00800000
-#define EF_PLASMA			0x01000000
-#define EF_TRAP				0x02000000
+#define	EF_IONRIPPER		0x00100000
+#define	EF_GREENGIB		0x00200000
+#define	EF_BLUEHYPERBLASTER	0x00400000
+#define	EF_SPINNINGLIGHTS	0x00800000
+#define	EF_PLASMA		0x01000000
+#define	EF_TRAP			0x02000000
 
 //ROGUE
-#define EF_TRACKER			0x04000000
-#define	EF_DOUBLE			0x08000000
+#define	EF_TRACKER		0x04000000
+#define	EF_DOUBLE		0x08000000
 #define	EF_SPHERETRANS		0x10000000
-#define EF_TAGTRAIL			0x20000000
-#define EF_HALF_DAMAGE		0x40000000
-#define EF_TRACKERTRAIL		0x80000000
+#define	EF_TAGTRAIL		0x20000000
+#define	EF_HALF_DAMAGE		0x40000000
+#define	EF_TRACKERTRAIL		0x80000000
 //ROGUE
 
 // entity_state_t->renderfx flags
-#define	RF_MINLIGHT			1		// allways have some light (viewmodel)
+#define	RF_MINLIGHT		1		// allways have some light (viewmodel)
 #define	RF_VIEWERMODEL		2		// don't draw through eyes, only mirrors
 #define	RF_WEAPONMODEL		4		// only draw through eyes
 #define	RF_FULLBRIGHT		8		// allways draw full intensity
 #define	RF_DEPTHHACK		16		// for view weapon Z crunching
 #define	RF_TRANSLUCENT		32
 #define	RF_FRAMELERP		64
-#define RF_BEAM				128
+#define	RF_BEAM			128
 #define	RF_CUSTOMSKIN		256		// skin is an index in image_precache
-#define	RF_GLOW				512		// pulse lighting for bonus items
+#define	RF_GLOW			512		// pulse lighting for bonus items
 #define RF_SHELL_RED		1024
 #define	RF_SHELL_GREEN		2048
 #define RF_SHELL_BLUE		4096
@@ -612,273 +612,273 @@ typedef struct
 //
 // muzzle flashes / player effects
 //
-#define	MZ_BLASTER			0
+#define	MZ_BLASTER		0
 #define MZ_MACHINEGUN		1
-#define	MZ_SHOTGUN			2
+#define	MZ_SHOTGUN		2
 #define	MZ_CHAINGUN1		3
 #define	MZ_CHAINGUN2		4
 #define	MZ_CHAINGUN3		5
-#define	MZ_RAILGUN			6
-#define	MZ_ROCKET			7
-#define	MZ_GRENADE			8
-#define	MZ_LOGIN			9
-#define	MZ_LOGOUT			10
-#define	MZ_RESPAWN			11
-#define	MZ_BFG				12
-#define	MZ_SSHOTGUN			13
+#define	MZ_RAILGUN		6
+#define	MZ_ROCKET		7
+#define	MZ_GRENADE		8
+#define	MZ_LOGIN		9
+#define	MZ_LOGOUT		10
+#define	MZ_RESPAWN		11
+#define	MZ_BFG			12
+#define	MZ_SSHOTGUN		13
 #define	MZ_HYPERBLASTER		14
 #define	MZ_ITEMRESPAWN		15
 // RAFAEL
-#define MZ_IONRIPPER		16
-#define MZ_BLUEHYPERBLASTER 17
-#define MZ_PHALANX			18
-#define MZ_SILENCED			128		// bit flag ORed with one of the above numbers
+#define	MZ_IONRIPPER		16
+#define	MZ_BLUEHYPERBLASTER	17
+#define	MZ_PHALANX		18
+#define	MZ_SILENCED		128		// bit flag ORed with one of the above numbers
 
 //ROGUE
-#define MZ_ETF_RIFLE		30
-#define MZ_UNUSED			31
-#define MZ_SHOTGUN2			32
-#define MZ_HEATBEAM			33
-#define MZ_BLASTER2			34
-#define	MZ_TRACKER			35
-#define	MZ_NUKE1			36
-#define	MZ_NUKE2			37
-#define	MZ_NUKE4			38
-#define	MZ_NUKE8			39
+#define	MZ_ETF_RIFLE		30
+#define	MZ_UNUSED		31
+#define	MZ_SHOTGUN2		32
+#define	MZ_HEATBEAM		33
+#define	MZ_BLASTER2		34
+#define	MZ_TRACKER		35
+#define	MZ_NUKE1		36
+#define	MZ_NUKE2		37
+#define	MZ_NUKE4		38
+#define	MZ_NUKE8		39
 //ROGUE
 
-#define MZ_SILENCED			128		// bit flag ORed with one of the above numbers
+#define	MZ_SILENCED		128		// bit flag ORed with one of the above numbers
 
 //
 // monster muzzle flashes
 //
-#define MZ2_TANK_BLASTER_1				1
-#define MZ2_TANK_BLASTER_2				2
-#define MZ2_TANK_BLASTER_3				3
-#define MZ2_TANK_MACHINEGUN_1			4
-#define MZ2_TANK_MACHINEGUN_2			5
-#define MZ2_TANK_MACHINEGUN_3			6
-#define MZ2_TANK_MACHINEGUN_4			7
-#define MZ2_TANK_MACHINEGUN_5			8
-#define MZ2_TANK_MACHINEGUN_6			9
-#define MZ2_TANK_MACHINEGUN_7			10
-#define MZ2_TANK_MACHINEGUN_8			11
-#define MZ2_TANK_MACHINEGUN_9			12
-#define MZ2_TANK_MACHINEGUN_10			13
-#define MZ2_TANK_MACHINEGUN_11			14
-#define MZ2_TANK_MACHINEGUN_12			15
-#define MZ2_TANK_MACHINEGUN_13			16
-#define MZ2_TANK_MACHINEGUN_14			17
-#define MZ2_TANK_MACHINEGUN_15			18
-#define MZ2_TANK_MACHINEGUN_16			19
-#define MZ2_TANK_MACHINEGUN_17			20
-#define MZ2_TANK_MACHINEGUN_18			21
-#define MZ2_TANK_MACHINEGUN_19			22
-#define MZ2_TANK_ROCKET_1				23
-#define MZ2_TANK_ROCKET_2				24
-#define MZ2_TANK_ROCKET_3				25
+#define	MZ2_TANK_BLASTER_1		1
+#define	MZ2_TANK_BLASTER_2		2
+#define	MZ2_TANK_BLASTER_3		3
+#define	MZ2_TANK_MACHINEGUN_1		4
+#define	MZ2_TANK_MACHINEGUN_2		5
+#define	MZ2_TANK_MACHINEGUN_3		6
+#define	MZ2_TANK_MACHINEGUN_4		7
+#define	MZ2_TANK_MACHINEGUN_5		8
+#define	MZ2_TANK_MACHINEGUN_6		9
+#define	MZ2_TANK_MACHINEGUN_7		10
+#define	MZ2_TANK_MACHINEGUN_8		11
+#define	MZ2_TANK_MACHINEGUN_9		12
+#define	MZ2_TANK_MACHINEGUN_10		13
+#define	MZ2_TANK_MACHINEGUN_11		14
+#define	MZ2_TANK_MACHINEGUN_12		15
+#define	MZ2_TANK_MACHINEGUN_13		16
+#define	MZ2_TANK_MACHINEGUN_14		17
+#define	MZ2_TANK_MACHINEGUN_15		18
+#define	MZ2_TANK_MACHINEGUN_16		19
+#define	MZ2_TANK_MACHINEGUN_17		20
+#define	MZ2_TANK_MACHINEGUN_18		21
+#define	MZ2_TANK_MACHINEGUN_19		22
+#define	MZ2_TANK_ROCKET_1		23
+#define	MZ2_TANK_ROCKET_2		24
+#define	MZ2_TANK_ROCKET_3		25
 
-#define MZ2_INFANTRY_MACHINEGUN_1		26
-#define MZ2_INFANTRY_MACHINEGUN_2		27
-#define MZ2_INFANTRY_MACHINEGUN_3		28
-#define MZ2_INFANTRY_MACHINEGUN_4		29
-#define MZ2_INFANTRY_MACHINEGUN_5		30
-#define MZ2_INFANTRY_MACHINEGUN_6		31
-#define MZ2_INFANTRY_MACHINEGUN_7		32
-#define MZ2_INFANTRY_MACHINEGUN_8		33
-#define MZ2_INFANTRY_MACHINEGUN_9		34
-#define MZ2_INFANTRY_MACHINEGUN_10		35
-#define MZ2_INFANTRY_MACHINEGUN_11		36
-#define MZ2_INFANTRY_MACHINEGUN_12		37
-#define MZ2_INFANTRY_MACHINEGUN_13		38
+#define	MZ2_INFANTRY_MACHINEGUN_1	26
+#define	MZ2_INFANTRY_MACHINEGUN_2	27
+#define	MZ2_INFANTRY_MACHINEGUN_3	28
+#define	MZ2_INFANTRY_MACHINEGUN_4	29
+#define	MZ2_INFANTRY_MACHINEGUN_5	30
+#define	MZ2_INFANTRY_MACHINEGUN_6	31
+#define	MZ2_INFANTRY_MACHINEGUN_7	32
+#define	MZ2_INFANTRY_MACHINEGUN_8	33
+#define	MZ2_INFANTRY_MACHINEGUN_9	34
+#define	MZ2_INFANTRY_MACHINEGUN_10	35
+#define	MZ2_INFANTRY_MACHINEGUN_11	36
+#define	MZ2_INFANTRY_MACHINEGUN_12	37
+#define	MZ2_INFANTRY_MACHINEGUN_13	38
 
-#define MZ2_SOLDIER_BLASTER_1			39
-#define MZ2_SOLDIER_BLASTER_2			40
-#define MZ2_SOLDIER_SHOTGUN_1			41
-#define MZ2_SOLDIER_SHOTGUN_2			42
-#define MZ2_SOLDIER_MACHINEGUN_1		43
-#define MZ2_SOLDIER_MACHINEGUN_2		44
+#define	MZ2_SOLDIER_BLASTER_1		39
+#define	MZ2_SOLDIER_BLASTER_2		40
+#define	MZ2_SOLDIER_SHOTGUN_1		41
+#define	MZ2_SOLDIER_SHOTGUN_2		42
+#define	MZ2_SOLDIER_MACHINEGUN_1	43
+#define	MZ2_SOLDIER_MACHINEGUN_2	44
 
-#define MZ2_GUNNER_MACHINEGUN_1			45
-#define MZ2_GUNNER_MACHINEGUN_2			46
-#define MZ2_GUNNER_MACHINEGUN_3			47
-#define MZ2_GUNNER_MACHINEGUN_4			48
-#define MZ2_GUNNER_MACHINEGUN_5			49
-#define MZ2_GUNNER_MACHINEGUN_6			50
-#define MZ2_GUNNER_MACHINEGUN_7			51
-#define MZ2_GUNNER_MACHINEGUN_8			52
-#define MZ2_GUNNER_GRENADE_1			53
-#define MZ2_GUNNER_GRENADE_2			54
-#define MZ2_GUNNER_GRENADE_3			55
-#define MZ2_GUNNER_GRENADE_4			56
+#define	MZ2_GUNNER_MACHINEGUN_1		45
+#define	MZ2_GUNNER_MACHINEGUN_2		46
+#define	MZ2_GUNNER_MACHINEGUN_3		47
+#define	MZ2_GUNNER_MACHINEGUN_4		48
+#define	MZ2_GUNNER_MACHINEGUN_5		49
+#define	MZ2_GUNNER_MACHINEGUN_6		50
+#define	MZ2_GUNNER_MACHINEGUN_7		51
+#define	MZ2_GUNNER_MACHINEGUN_8		52
+#define	MZ2_GUNNER_GRENADE_1		53
+#define	MZ2_GUNNER_GRENADE_2		54
+#define	MZ2_GUNNER_GRENADE_3		55
+#define	MZ2_GUNNER_GRENADE_4		56
 
-#define MZ2_CHICK_ROCKET_1				57
+#define	MZ2_CHICK_ROCKET_1		57
 
-#define MZ2_FLYER_BLASTER_1				58
-#define MZ2_FLYER_BLASTER_2				59
+#define	MZ2_FLYER_BLASTER_1		58
+#define	MZ2_FLYER_BLASTER_2		59
 
-#define MZ2_MEDIC_BLASTER_1				60
+#define	MZ2_MEDIC_BLASTER_1		60
 
-#define MZ2_GLADIATOR_RAILGUN_1			61
+#define	MZ2_GLADIATOR_RAILGUN_1		61
 
-#define MZ2_HOVER_BLASTER_1				62
+#define	MZ2_HOVER_BLASTER_1		62
 
-#define MZ2_ACTOR_MACHINEGUN_1			63
+#define	MZ2_ACTOR_MACHINEGUN_1		63
 
-#define MZ2_SUPERTANK_MACHINEGUN_1		64
-#define MZ2_SUPERTANK_MACHINEGUN_2		65
-#define MZ2_SUPERTANK_MACHINEGUN_3		66
-#define MZ2_SUPERTANK_MACHINEGUN_4		67
-#define MZ2_SUPERTANK_MACHINEGUN_5		68
-#define MZ2_SUPERTANK_MACHINEGUN_6		69
-#define MZ2_SUPERTANK_ROCKET_1			70
-#define MZ2_SUPERTANK_ROCKET_2			71
-#define MZ2_SUPERTANK_ROCKET_3			72
+#define	MZ2_SUPERTANK_MACHINEGUN_1	64
+#define	MZ2_SUPERTANK_MACHINEGUN_2	65
+#define	MZ2_SUPERTANK_MACHINEGUN_3	66
+#define	MZ2_SUPERTANK_MACHINEGUN_4	67
+#define	MZ2_SUPERTANK_MACHINEGUN_5	68
+#define	MZ2_SUPERTANK_MACHINEGUN_6	69
+#define	MZ2_SUPERTANK_ROCKET_1		70
+#define	MZ2_SUPERTANK_ROCKET_2		71
+#define	MZ2_SUPERTANK_ROCKET_3		72
 
-#define MZ2_BOSS2_MACHINEGUN_L1			73
-#define MZ2_BOSS2_MACHINEGUN_L2			74
-#define MZ2_BOSS2_MACHINEGUN_L3			75
-#define MZ2_BOSS2_MACHINEGUN_L4			76
-#define MZ2_BOSS2_MACHINEGUN_L5			77
-#define MZ2_BOSS2_ROCKET_1				78
-#define MZ2_BOSS2_ROCKET_2				79
-#define MZ2_BOSS2_ROCKET_3				80
-#define MZ2_BOSS2_ROCKET_4				81
+#define	MZ2_BOSS2_MACHINEGUN_L1		73
+#define	MZ2_BOSS2_MACHINEGUN_L2		74
+#define	MZ2_BOSS2_MACHINEGUN_L3		75
+#define	MZ2_BOSS2_MACHINEGUN_L4		76
+#define	MZ2_BOSS2_MACHINEGUN_L5		77
+#define	MZ2_BOSS2_ROCKET_1		78
+#define	MZ2_BOSS2_ROCKET_2		79
+#define	MZ2_BOSS2_ROCKET_3		80
+#define	MZ2_BOSS2_ROCKET_4		81
 
-#define MZ2_FLOAT_BLASTER_1				82
+#define	MZ2_FLOAT_BLASTER_1		82
 
-#define MZ2_SOLDIER_BLASTER_3			83
-#define MZ2_SOLDIER_SHOTGUN_3			84
-#define MZ2_SOLDIER_MACHINEGUN_3		85
-#define MZ2_SOLDIER_BLASTER_4			86
-#define MZ2_SOLDIER_SHOTGUN_4			87
-#define MZ2_SOLDIER_MACHINEGUN_4		88
-#define MZ2_SOLDIER_BLASTER_5			89
-#define MZ2_SOLDIER_SHOTGUN_5			90
-#define MZ2_SOLDIER_MACHINEGUN_5		91
-#define MZ2_SOLDIER_BLASTER_6			92
-#define MZ2_SOLDIER_SHOTGUN_6			93
-#define MZ2_SOLDIER_MACHINEGUN_6		94
-#define MZ2_SOLDIER_BLASTER_7			95
-#define MZ2_SOLDIER_SHOTGUN_7			96
-#define MZ2_SOLDIER_MACHINEGUN_7		97
-#define MZ2_SOLDIER_BLASTER_8			98
-#define MZ2_SOLDIER_SHOTGUN_8			99
-#define MZ2_SOLDIER_MACHINEGUN_8		100
+#define	MZ2_SOLDIER_BLASTER_3		83
+#define	MZ2_SOLDIER_SHOTGUN_3		84
+#define	MZ2_SOLDIER_MACHINEGUN_3	85
+#define	MZ2_SOLDIER_BLASTER_4		86
+#define	MZ2_SOLDIER_SHOTGUN_4		87
+#define	MZ2_SOLDIER_MACHINEGUN_4	88
+#define	MZ2_SOLDIER_BLASTER_5		89
+#define	MZ2_SOLDIER_SHOTGUN_5		90
+#define	MZ2_SOLDIER_MACHINEGUN_5	91
+#define	MZ2_SOLDIER_BLASTER_6		92
+#define	MZ2_SOLDIER_SHOTGUN_6		93
+#define	MZ2_SOLDIER_MACHINEGUN_6	94
+#define	MZ2_SOLDIER_BLASTER_7		95
+#define	MZ2_SOLDIER_SHOTGUN_7		96
+#define	MZ2_SOLDIER_MACHINEGUN_7	97
+#define	MZ2_SOLDIER_BLASTER_8		98
+#define	MZ2_SOLDIER_SHOTGUN_8		99
+#define	MZ2_SOLDIER_MACHINEGUN_8	100
 
 // --- Xian shit below ---
-#define	MZ2_MAKRON_BFG					101
-#define MZ2_MAKRON_BLASTER_1			102
-#define MZ2_MAKRON_BLASTER_2			103
-#define MZ2_MAKRON_BLASTER_3			104
-#define MZ2_MAKRON_BLASTER_4			105
-#define MZ2_MAKRON_BLASTER_5			106
-#define MZ2_MAKRON_BLASTER_6			107
-#define MZ2_MAKRON_BLASTER_7			108
-#define MZ2_MAKRON_BLASTER_8			109
-#define MZ2_MAKRON_BLASTER_9			110
-#define MZ2_MAKRON_BLASTER_10			111
-#define MZ2_MAKRON_BLASTER_11			112
-#define MZ2_MAKRON_BLASTER_12			113
-#define MZ2_MAKRON_BLASTER_13			114
-#define MZ2_MAKRON_BLASTER_14			115
-#define MZ2_MAKRON_BLASTER_15			116
-#define MZ2_MAKRON_BLASTER_16			117
-#define MZ2_MAKRON_BLASTER_17			118
-#define MZ2_MAKRON_RAILGUN_1			119
-#define	MZ2_JORG_MACHINEGUN_L1			120
-#define	MZ2_JORG_MACHINEGUN_L2			121
-#define	MZ2_JORG_MACHINEGUN_L3			122
-#define	MZ2_JORG_MACHINEGUN_L4			123
-#define	MZ2_JORG_MACHINEGUN_L5			124
-#define	MZ2_JORG_MACHINEGUN_L6			125
-#define	MZ2_JORG_MACHINEGUN_R1			126
-#define	MZ2_JORG_MACHINEGUN_R2			127
-#define	MZ2_JORG_MACHINEGUN_R3			128
-#define	MZ2_JORG_MACHINEGUN_R4			129
-#define MZ2_JORG_MACHINEGUN_R5			130
-#define	MZ2_JORG_MACHINEGUN_R6			131
-#define MZ2_JORG_BFG_1					132
-#define MZ2_BOSS2_MACHINEGUN_R1			133
-#define MZ2_BOSS2_MACHINEGUN_R2			134
-#define MZ2_BOSS2_MACHINEGUN_R3			135
-#define MZ2_BOSS2_MACHINEGUN_R4			136
-#define MZ2_BOSS2_MACHINEGUN_R5			137
+#define	MZ2_MAKRON_BFG			101
+#define	MZ2_MAKRON_BLASTER_1		102
+#define	MZ2_MAKRON_BLASTER_2		103
+#define	MZ2_MAKRON_BLASTER_3		104
+#define	MZ2_MAKRON_BLASTER_4		105
+#define	MZ2_MAKRON_BLASTER_5		106
+#define	MZ2_MAKRON_BLASTER_6		107
+#define	MZ2_MAKRON_BLASTER_7		108
+#define	MZ2_MAKRON_BLASTER_8		109
+#define	MZ2_MAKRON_BLASTER_9		110
+#define	MZ2_MAKRON_BLASTER_10		111
+#define	MZ2_MAKRON_BLASTER_11		112
+#define	MZ2_MAKRON_BLASTER_12		113
+#define	MZ2_MAKRON_BLASTER_13		114
+#define	MZ2_MAKRON_BLASTER_14		115
+#define	MZ2_MAKRON_BLASTER_15		116
+#define	MZ2_MAKRON_BLASTER_16		117
+#define	MZ2_MAKRON_BLASTER_17		118
+#define	MZ2_MAKRON_RAILGUN_1		119
+#define	MZ2_JORG_MACHINEGUN_L1		120
+#define	MZ2_JORG_MACHINEGUN_L2		121
+#define	MZ2_JORG_MACHINEGUN_L3		122
+#define	MZ2_JORG_MACHINEGUN_L4		123
+#define	MZ2_JORG_MACHINEGUN_L5		124
+#define	MZ2_JORG_MACHINEGUN_L6		125
+#define	MZ2_JORG_MACHINEGUN_R1		126
+#define	MZ2_JORG_MACHINEGUN_R2		127
+#define	MZ2_JORG_MACHINEGUN_R3		128
+#define	MZ2_JORG_MACHINEGUN_R4		129
+#define	MZ2_JORG_MACHINEGUN_R5		130
+#define	MZ2_JORG_MACHINEGUN_R6		131
+#define	MZ2_JORG_BFG_1			132
+#define	MZ2_BOSS2_MACHINEGUN_R1		133
+#define	MZ2_BOSS2_MACHINEGUN_R2		134
+#define	MZ2_BOSS2_MACHINEGUN_R3		135
+#define	MZ2_BOSS2_MACHINEGUN_R4		136
+#define	MZ2_BOSS2_MACHINEGUN_R5		137
 
 //ROGUE
-#define	MZ2_CARRIER_MACHINEGUN_L1		138
-#define	MZ2_CARRIER_MACHINEGUN_R1		139
-#define	MZ2_CARRIER_GRENADE				140
-#define MZ2_TURRET_MACHINEGUN			141
-#define MZ2_TURRET_ROCKET				142
-#define MZ2_TURRET_BLASTER				143
-#define MZ2_STALKER_BLASTER				144
-#define MZ2_DAEDALUS_BLASTER			145
-#define MZ2_MEDIC_BLASTER_2				146
-#define	MZ2_CARRIER_RAILGUN				147
-#define	MZ2_WIDOW_DISRUPTOR				148
-#define	MZ2_WIDOW_BLASTER				149
-#define	MZ2_WIDOW_RAIL					150
-#define	MZ2_WIDOW_PLASMABEAM			151		// PMM - not used
-#define	MZ2_CARRIER_MACHINEGUN_L2		152
-#define	MZ2_CARRIER_MACHINEGUN_R2		153
-#define	MZ2_WIDOW_RAIL_LEFT				154
-#define	MZ2_WIDOW_RAIL_RIGHT			155
-#define	MZ2_WIDOW_BLASTER_SWEEP1		156
-#define	MZ2_WIDOW_BLASTER_SWEEP2		157
-#define	MZ2_WIDOW_BLASTER_SWEEP3		158
-#define	MZ2_WIDOW_BLASTER_SWEEP4		159
-#define	MZ2_WIDOW_BLASTER_SWEEP5		160
-#define	MZ2_WIDOW_BLASTER_SWEEP6		161
-#define	MZ2_WIDOW_BLASTER_SWEEP7		162
-#define	MZ2_WIDOW_BLASTER_SWEEP8		163
-#define	MZ2_WIDOW_BLASTER_SWEEP9		164
-#define	MZ2_WIDOW_BLASTER_100			165
-#define	MZ2_WIDOW_BLASTER_90			166
-#define	MZ2_WIDOW_BLASTER_80			167
-#define	MZ2_WIDOW_BLASTER_70			168
-#define	MZ2_WIDOW_BLASTER_60			169
-#define	MZ2_WIDOW_BLASTER_50			170
-#define	MZ2_WIDOW_BLASTER_40			171
-#define	MZ2_WIDOW_BLASTER_30			172
-#define	MZ2_WIDOW_BLASTER_20			173
-#define	MZ2_WIDOW_BLASTER_10			174
-#define	MZ2_WIDOW_BLASTER_0				175
-#define	MZ2_WIDOW_BLASTER_10L			176
-#define	MZ2_WIDOW_BLASTER_20L			177
-#define	MZ2_WIDOW_BLASTER_30L			178
-#define	MZ2_WIDOW_BLASTER_40L			179
-#define	MZ2_WIDOW_BLASTER_50L			180
-#define	MZ2_WIDOW_BLASTER_60L			181
-#define	MZ2_WIDOW_BLASTER_70L			182
-#define	MZ2_WIDOW_RUN_1					183
-#define	MZ2_WIDOW_RUN_2					184
-#define	MZ2_WIDOW_RUN_3					185
-#define	MZ2_WIDOW_RUN_4					186
-#define	MZ2_WIDOW_RUN_5					187
-#define	MZ2_WIDOW_RUN_6					188
-#define	MZ2_WIDOW_RUN_7					189
-#define	MZ2_WIDOW_RUN_8					190
-#define	MZ2_CARRIER_ROCKET_1			191
-#define	MZ2_CARRIER_ROCKET_2			192
-#define	MZ2_CARRIER_ROCKET_3			193
-#define	MZ2_CARRIER_ROCKET_4			194
-#define	MZ2_WIDOW2_BEAMER_1				195
-#define	MZ2_WIDOW2_BEAMER_2				196
-#define	MZ2_WIDOW2_BEAMER_3				197
-#define	MZ2_WIDOW2_BEAMER_4				198
-#define	MZ2_WIDOW2_BEAMER_5				199
-#define	MZ2_WIDOW2_BEAM_SWEEP_1			200
-#define	MZ2_WIDOW2_BEAM_SWEEP_2			201
-#define	MZ2_WIDOW2_BEAM_SWEEP_3			202
-#define	MZ2_WIDOW2_BEAM_SWEEP_4			203
-#define	MZ2_WIDOW2_BEAM_SWEEP_5			204
-#define	MZ2_WIDOW2_BEAM_SWEEP_6			205
-#define	MZ2_WIDOW2_BEAM_SWEEP_7			206
-#define	MZ2_WIDOW2_BEAM_SWEEP_8			207
-#define	MZ2_WIDOW2_BEAM_SWEEP_9			208
-#define	MZ2_WIDOW2_BEAM_SWEEP_10		209
-#define	MZ2_WIDOW2_BEAM_SWEEP_11		210
+#define	MZ2_CARRIER_MACHINEGUN_L1	138
+#define	MZ2_CARRIER_MACHINEGUN_R1	139
+#define	MZ2_CARRIER_GRENADE		140
+#define	MZ2_TURRET_MACHINEGUN		141
+#define	MZ2_TURRET_ROCKET		142
+#define	MZ2_TURRET_BLASTER		143
+#define	MZ2_STALKER_BLASTER		144
+#define	MZ2_DAEDALUS_BLASTER		145
+#define	MZ2_MEDIC_BLASTER_2		146
+#define	MZ2_CARRIER_RAILGUN		147
+#define	MZ2_WIDOW_DISRUPTOR		148
+#define	MZ2_WIDOW_BLASTER		149
+#define	MZ2_WIDOW_RAIL			150
+#define	MZ2_WIDOW_PLASMABEAM		151		// PMM - not used
+#define	MZ2_CARRIER_MACHINEGUN_L2	152
+#define	MZ2_CARRIER_MACHINEGUN_R2	153
+#define	MZ2_WIDOW_RAIL_LEFT		154
+#define	MZ2_WIDOW_RAIL_RIGHT		155
+#define	MZ2_WIDOW_BLASTER_SWEEP1	156
+#define	MZ2_WIDOW_BLASTER_SWEEP2	157
+#define	MZ2_WIDOW_BLASTER_SWEEP3	158
+#define	MZ2_WIDOW_BLASTER_SWEEP4	159
+#define	MZ2_WIDOW_BLASTER_SWEEP5	160
+#define	MZ2_WIDOW_BLASTER_SWEEP6	161
+#define	MZ2_WIDOW_BLASTER_SWEEP7	162
+#define	MZ2_WIDOW_BLASTER_SWEEP8	163
+#define	MZ2_WIDOW_BLASTER_SWEEP9	164
+#define	MZ2_WIDOW_BLASTER_100		165
+#define	MZ2_WIDOW_BLASTER_90		166
+#define	MZ2_WIDOW_BLASTER_80		167
+#define	MZ2_WIDOW_BLASTER_70		168
+#define	MZ2_WIDOW_BLASTER_60		169
+#define	MZ2_WIDOW_BLASTER_50		170
+#define	MZ2_WIDOW_BLASTER_40		171
+#define	MZ2_WIDOW_BLASTER_30		172
+#define	MZ2_WIDOW_BLASTER_20		173
+#define	MZ2_WIDOW_BLASTER_10		174
+#define	MZ2_WIDOW_BLASTER_0		175
+#define	MZ2_WIDOW_BLASTER_10L		176
+#define	MZ2_WIDOW_BLASTER_20L		177
+#define	MZ2_WIDOW_BLASTER_30L		178
+#define	MZ2_WIDOW_BLASTER_40L		179
+#define	MZ2_WIDOW_BLASTER_50L		180
+#define	MZ2_WIDOW_BLASTER_60L		181
+#define	MZ2_WIDOW_BLASTER_70L		182
+#define	MZ2_WIDOW_RUN_1			183
+#define	MZ2_WIDOW_RUN_2			184
+#define	MZ2_WIDOW_RUN_3			185
+#define	MZ2_WIDOW_RUN_4			186
+#define	MZ2_WIDOW_RUN_5			187
+#define	MZ2_WIDOW_RUN_6			188
+#define	MZ2_WIDOW_RUN_7			189
+#define	MZ2_WIDOW_RUN_8			190
+#define	MZ2_CARRIER_ROCKET_1		191
+#define	MZ2_CARRIER_ROCKET_2		192
+#define	MZ2_CARRIER_ROCKET_3		193
+#define	MZ2_CARRIER_ROCKET_4		194
+#define	MZ2_WIDOW2_BEAMER_1		195
+#define	MZ2_WIDOW2_BEAMER_2		196
+#define	MZ2_WIDOW2_BEAMER_3		197
+#define	MZ2_WIDOW2_BEAMER_4		198
+#define	MZ2_WIDOW2_BEAMER_5		199
+#define	MZ2_WIDOW2_BEAM_SWEEP_1		200
+#define	MZ2_WIDOW2_BEAM_SWEEP_2		201
+#define	MZ2_WIDOW2_BEAM_SWEEP_3		202
+#define	MZ2_WIDOW2_BEAM_SWEEP_4		203
+#define	MZ2_WIDOW2_BEAM_SWEEP_5		204
+#define	MZ2_WIDOW2_BEAM_SWEEP_6		205
+#define	MZ2_WIDOW2_BEAM_SWEEP_7		206
+#define	MZ2_WIDOW2_BEAM_SWEEP_8		207
+#define	MZ2_WIDOW2_BEAM_SWEEP_9		208
+#define	MZ2_WIDOW2_BEAM_SWEEP_10	209
+#define	MZ2_WIDOW2_BEAM_SWEEP_11	210
 
 // ROGUE
 
@@ -958,7 +958,7 @@ typedef enum
 #define SPLASH_BLUE_WATER	2
 #define SPLASH_BROWN_WATER	3
 #define SPLASH_SLIME		4
-#define	SPLASH_LAVA			5
+#define	SPLASH_LAVA		5
 #define SPLASH_BLOOD		6
 
 
@@ -971,8 +971,8 @@ typedef enum
 #define	CHAN_ITEM               3
 #define	CHAN_BODY               4
 // modifier flags
-#define	CHAN_NO_PHS_ADD			8	// send to all clients, not just ones in PHS (ATTN 0 will also do this)
-#define	CHAN_RELIABLE			16	// send by reliable message, not datagram
+#define	CHAN_NO_PHS_ADD		8	// send to all clients, not just ones in PHS (ATTN 0 will also do this)
+#define	CHAN_RELIABLE		16	// send by reliable message, not datagram
 
 
 // sound attenuation values
@@ -984,22 +984,22 @@ typedef enum
 
 // player_state->stats[] indexes
 #define STAT_HEALTH_ICON		0
-#define	STAT_HEALTH				1
+#define	STAT_HEALTH			1
 #define	STAT_AMMO_ICON			2
-#define	STAT_AMMO				3
+#define	STAT_AMMO			3
 #define	STAT_ARMOR_ICON			4
-#define	STAT_ARMOR				5
+#define	STAT_ARMOR			5
 #define	STAT_SELECTED_ICON		6
 #define	STAT_PICKUP_ICON		7
 #define	STAT_PICKUP_STRING		8
 #define	STAT_TIMER_ICON			9
-#define	STAT_TIMER				10
+#define	STAT_TIMER			10
 #define	STAT_HELPICON			11
 #define	STAT_SELECTED_ITEM		12
 #define	STAT_LAYOUTS			13
-#define	STAT_FRAGS				14
+#define	STAT_FRAGS			14
 #define	STAT_FLASHES			15		// cleared each frame, 1 = health, 2 = armor
-#define STAT_CHASE				16
+#define STAT_CHASE			16
 #define STAT_SPECTATOR			17
 
 #define STAT_RANK			28
@@ -1012,7 +1012,7 @@ typedef enum
 
 // dmflags->value flags
 #define	DF_NO_HEALTH		0x00000001	// 1
-#define	DF_NO_ITEMS			0x00000002	// 2
+#define	DF_NO_ITEMS		0x00000002	// 2
 #define	DF_WEAPONS_STAY		0x00000004	// 4
 #define	DF_NO_FALLING		0x00000008	// 8
 #define	DF_INSTANT_ITEMS	0x00000010	// 16
@@ -1022,7 +1022,7 @@ typedef enum
 #define DF_NO_FRIENDLY_FIRE	0x00000100	// 256
 #define	DF_SPAWN_FARTHEST	0x00000200	// 512
 #define DF_FORCE_RESPAWN	0x00000400	// 1024
-#define DF_NO_ARMOR			0x00000800	// 2048
+#define DF_NO_ARMOR		0x00000800	// 2048
 #define DF_ALLOW_EXIT		0x00001000	// 4096
 #define DF_INFINITE_AMMO	0x00002000	// 8192
 #define DF_QUAD_DROP		0x00004000	// 16384
@@ -1032,12 +1032,12 @@ typedef enum
 #define	DF_QUADFIRE_DROP	0x00010000	// 65536
 
 //ROGUE
-#define DF_NO_MINES			0x00020000
+#define DF_NO_MINES		0x00020000
 #define DF_NO_STACK_DOUBLE	0x00040000
-#define DF_NO_NUKES			0x00080000
+#define DF_NO_NUKES		0x00080000
 #define DF_NO_SPHERES		0x00100000
 //ROGUE
-#define ROGUE_VERSION_ID		1278
+#define ROGUE_VERSION_ID	1278
 
 #define ROGUE_VERSION_STRING	"08/21/1998 Beta 2 for Ensemble"
 /*
@@ -1057,24 +1057,24 @@ typedef enum
 // the server to all connected clients.
 // Each config string can be at most MAX_QPATH characters.
 //
-#define	CS_NAME				0
-#define	CS_CDTRACK			1
-#define	CS_SKY				2
-#define	CS_SKYAXIS			3		// %f %f %f format
+#define	CS_NAME			0
+#define	CS_CDTRACK		1
+#define	CS_SKY			2
+#define	CS_SKYAXIS		3		// %f %f %f format
 #define	CS_SKYROTATE		4
 #define	CS_STATUSBAR		5		// display program string
 
-#define CS_AIRACCEL			29		// air acceleration control
+#define	CS_AIRACCEL		29		// air acceleration control
 #define	CS_MAXCLIENTS		30
 #define	CS_MAPCHECKSUM		31		// for catching cheater maps
 
-#define	CS_MODELS			32
-#define	CS_SOUNDS			(CS_MODELS+MAX_MODELS)
-#define	CS_IMAGES			(CS_SOUNDS+MAX_SOUNDS)
-#define	CS_LIGHTS			(CS_IMAGES+MAX_IMAGES)
-#define	CS_ITEMS			(CS_LIGHTS+MAX_LIGHTSTYLES)
+#define	CS_MODELS		32
+#define	CS_SOUNDS		(CS_MODELS+MAX_MODELS)
+#define	CS_IMAGES		(CS_SOUNDS+MAX_SOUNDS)
+#define	CS_LIGHTS		(CS_IMAGES+MAX_IMAGES)
+#define	CS_ITEMS		(CS_LIGHTS+MAX_LIGHTSTYLES)
 #define	CS_PLAYERSKINS		(CS_ITEMS+MAX_ITEMS)
-#define CS_GENERAL			(CS_PLAYERSKINS+MAX_CLIENTS)
+#define	CS_GENERAL		(CS_PLAYERSKINS+MAX_CLIENTS)
 #define	MAX_CONFIGSTRINGS	(CS_GENERAL+MAX_GENERAL)
 
 
@@ -1147,7 +1147,7 @@ typedef struct
 	int			gunframe;
 
 	float		blend[4];		// rgba full screen effect
-	
+
 	float		fov;			// horizontal field of view
 
 	int			rdflags;		// refdef flags
@@ -1156,9 +1156,9 @@ typedef struct
 } player_state_t;
 
 // ==================
-// PGM 
-#define VIDREF_GL		1
-#define VIDREF_SOFT		2
+// PGM
+#define VIDREF_GL	1
+#define VIDREF_SOFT	2
 #define VIDREF_OTHER	3
 
 extern int vidref_val;

@@ -1,306 +1,136 @@
-# ZigFlag - Custom 3rd Zigock Bot II for Quake II
+# 3zb2-zigflag
 
-This is a custom port of the 3rd Zigock Bot II to Quake II - Yamagi Quake II is recommended.  \
-All warnings (up to GCC9) and unused variables have been addressed in the original source. \
-The code also has handpicked backport fixes, enhancements and features applied from various \
-sources: `tastyspleen`, `yquake2`, `OpenTDM`, `OpenFFA` and many custom.
+A custom port of the **3rd Zigock Bot II** mod for Quake II, with the **ZigFlag (Capture and Hold)** game mode, bugfixes, and enhancements from various sources including `tastyspleen`, `yquake2`, `OpenTDM`, and `OpenFFA`.
 
-Also works with Vulkan Quake II (vkQuake2): https://github.com/kondrak/vkQuake2/issues/103
+Originally built for nostalgia of the 90's Quake II deathmatch servers, this mod keeps the look and feel of the original game while adding a polished multiplayer experience with some of the best bots available for the Quake II engine.
 
-This was modified for my own use and driven by nostalgia for the Quake II servers of the 90's. \
-There are many heavily modified versions of the Quake II engine, this mod tries to keep the look and feel of \
-the original game deathmatch, but allows a multiplayer experience with some of the best bots for the Quake II\
-engine. I couldn't locate any `Capture and Hold` servers on [q2servers](http://q2servers.com), so this offered the opportunity to rekindle \
-a firm favourite via the `zigmode` modification.
+> [Yamagi Quake II](https://github.com/yquake2/yquake2) is the recommended client. Also compatible with [vkQuake2](https://github.com/kondrak/vkQuake2) and [Q2Pro](https://github.com/q2pro/q2pro).
 
-Tip of the hat to `Ponpoko`, original mod author and bot creator.
+## Screenshots
 
-On global linux installs, **e.g.** `/usr/share/games`, you may need to specify `basepath` - See details below.
+![Capture and Hold](screenshot/screenshot.png)
+![Capture and Hold](screenshot/screenshot2.png)
 
-Bot chaining routes are supplied, further routes can be (re)created via the mod command `chedit` (See `CONFIG.txt`)
+## Features
 
-### ZigMode ZigFlag (Capture and Hold) - https://zigflag.net
+### ZigFlag (Capture and Hold)
 
-The premise is simple: **Get the flag and keep it** - *plays on standard Deathmatch maps*.
+The premise is simple: **get the flag and keep it**. Plays on standard Deathmatch maps.
 
-The original `zigmode` was released belated, buggy and only half implemented, I attempted to make this feature a little \
-more refined, just for fun. I was trying to keep the look and feel of the original deathmatch, but with a few bells and \
-whistles. However `zigflag` turned into a fairly customised game.
+- Simple HUD enhancements with optional combat HUD, player identification, and rank/timer display
+- Automatic bot control and autospawning at level start
+- Visual and audio notifications for flag holders
+- Customized dogtags on scoreboard
+- Optional flag respawn, frag bonus, and health drain from subdued holders
+- Optional auto weapon switching, respawn protection, and grapple
+- Skin and model teams with bonuses/penalties on flag possession and friendly fire
 
-* Simple HUD enhancements.
-* Automatic bot control.
-* Autospawn bots at level start.
-* Visual/Audio notifications to Flagholder.
-* Customised dogtags displayed on scoreboard.
-* Optional Flag respawn feature.
-* Optional Flagholder frag bonus.
-* Optional Flag sucks health from subdued holder.
-* Optional auto weapon switching on upgrade.
-* Optional identified generic gameplay fixes.
-* Optional respawn protection.
-* Optional spawn bots at distance.
-* Optional grapple.
-* Optional HUD playerid.
-* Optional enhanced HUD.
+### General
 
-..and many bugfixes was the final outcome of playing around with the code.
+- `store` / `recall` commands to save and restore player position (Jump mod style)
+- Remaining time display for all game modes
+- Basic Team Deathmatch support (`set tdm 1`)
+- Random player spawn points on map start
+- Fixed menu item selection
+- Improved aim (`aimfix`), Quake 2 gameplay flaw fixes (`fixflaws`)
 
-A ZigFlag server can sometimes be found running at `quake2://quake.zigflag.net:27910` 
+See [CONFIG.md](CONFIG.md) for full configuration details.
 
-The mod also supports skin and model teams with appropriate bonuses and penalties on Flag possession and `FRIENDLY_FIRE`.
+## Installation
 
-The changes subtly alter the game dynamics and improve on the original zigmode game element, IMHO. \
-The original gameplay, with bugfixes, can still be enabled by disabling the new elements via cvars.
+1. Download the latest release from [Releases](https://github.com/DirtBagXon/3zb2-zigflag/releases).
+2. Extract the mod files into your Quake II directory alongside other mods (e.g., `baseq2`, `ctf`).
+3. Some features require assets from the base game:
+   - **CTF / Grapple**: Copy `ctf/pak*.pak` into the `3zb2/` directory. Rename existing pak files to avoid conflicts (e.g., `pakX.pak`).
+   - **Mission Pack 1 (Reckoning)**: Copy `xatrix/pak0.pak` into `3zb2/`.
 
-`Capture and Hold` plays best on smaller level maps with a timelimit, no fraglimit and a couple of bots.
+### Quick Start
 
-### Pak file (Flag model) and Route Chaining files
+Place route chain files (`.chn`) in `3zb2/chdtm/` for bot navigation on your maps. Many popular maps are included. Additional routes can be created in-game via the `chedit` command (see [CONFIG.md](CONFIG.md)).
 
-`ZigMode` requires the included small `.pak` file, for the flag model, and route chaining files for the maps. \
-Many popular maps are included, further route chaining `.chn` files can be created via the mod `chedit` function.
+## Building from Source
 
-#### Example config file for ZigFlag:
+### Prerequisites
+
+```bash
+# Arch / CachyOS
+sudo pacman -S cmake gcc
+
+# Cross-compilation (Windows targets)
+sudo pacman -S \
+    mingw-w64-tools \
+    mingw-w64-binutils \
+    mingw-w64-crt \
+    mingw-w64-gcc \
+    mingw-w64-headers \
+    mingw-w64-winpthreads
+paru -S \
+    mingw-w64-zlib \
+    mingw-w64-zlib-ng \
+    mingw-w64-ffmpeg \
+    mingw-w64-pkg-config \
+    mingw-w64-libpng \
+    mingw-w64-libjpeg-turbo \
+    mingw-w64-openal \
+    mingw-w64-zstd
+```
+
+### Compilation
+
+Review build scripts before executing.
+
+```bash
+./build-lin64.sh
+
+./clean.sh
+./build-win32.sh
+
+./clean.sh
+./build-win64.sh
+```
+
+## Bot Commands
+
+Use `exec addbot.cfg` to load predefined bot configurations. Bots can then be spawned with commands like `spawn1` or `despawn1`.
+
+| Input | Action |
+|-------|--------|
+| `KP_PLUS` | Increase bot count |
+| `KP_MINUS` | Decrease bot count |
+| `KP_ENTER` | Spawn/remove bots |
+
+Console commands:
+
+```
+sv spb $    # Spawn $ bots
+sv rmb $    # Remove $ bots
+```
+
+## Common Configuration
+
+Example server config for ZigFlag:
 
 ```
 exec addbot.cfg
+exec configs-ctf.cfg
 set zigmode 1
 set zigspawn 1
 set zigkiller 1
-set zigrapple 0
-set zigintro 0
-set ctf 0
-set aimfix 1
-set combathud 1
-set spawnbotfar 1
-set killerflag 1
-set fixflaws 1
-set playerid 1
-set weaponswap 1
-set botlist default
-set autospawn 3
-set autobot 0
-set vwep 1
-set maxclients 16
-set respawn_protection 1
-//set basepath "/usr/share/games/quake2"   <- Check requirement in Windows
-set dmflags 16384
-set fraglimit 30
-set timelimit 10
-set maplist q2dmx
-map q2dm1
+map q2ctf1
 ```
 
-See `CONFIG.txt` for further details.
+## Known Issues
 
-## Windows Installation
+- The mod may lock up or segfault when using `gamemap`. Use `map` (full level reset) instead. On Q2Pro, set `sv_allow_map 1` to allow this.
+- Some models (e.g. grappling hook) are missing and require copying `pak` files from the `ctf` mod.
 
-A Windows `game.dll` file has been provided in the `windows` subdirectory. Paths for config, maplist and chaining \
-files have been made unixoid in the main source. `git grep BASEPATH` will provide concerned locations for future \
-compilations.  I have also provided a small patch file to switch these paths with ease. This is also included in \
-the `windows` subdirectory.
+## Credits
 
-Install the `.dll` in the *3zb2* folder (Check your engine requirements for **32** or **64bit** dll names):
+- **Ponpoko** - Original 3rd Zigock Bot II mod author and bot creator
+- Contributors and backport sources: tastyspleen, yquake2, OpenTDM, OpenFFA
+- **MashedD** - For additions and much needed tidy.
 
-    copy .\windows\gamex86.dll .\3zb2\game.dll
-    copy .\windows\gamex86.dll .\3zb2\gamex86.dll
+## License
 
-    copy .\windows\gamex86_64.dll .\3zb2\game.dll
-    copy .\windows\gamex86_64.dll .\3zb2\gamex64.dll
-    copy .\windows\gamex86_64.dll .\3zb2\gamex86_64.dll
+Id Software Quake II Source Code License. See [LICENSE](LICENSE) for details.
 
-Move the *3zb2* directory in the main Quake II installation folder, alongside *baseq2*.
-
-    move 3zb2 C:\Program Files\Quake2\
-
-Adjust the `zig.cfg` (see above) in the *3zb2* directory if required, then create a `.bat` file using the below\
-arguments as a minimum:
-
-    quake2.exe +set game 3zb2 +set deathmatch 1 +exec zig.cfg
-
-**Note:** `basepath` directive may **NOT** be required in Windows Quake II configuration files.
-
-## Linux Installation
-
-* Copy the *3zb2/* dir to your Quake II directory.
-* Build the `game.so` by calling `make` and copy it to the *3zb2/* dir.
-
-```
-sudo cp -R 3zb2 /usr/share/games/quake2/3zb2
-
-make 
-===> Building game.so
-make release/game.so
-make[1]: Entering directory '/home/user/3zb2'
-===> CC src/bot/bot.c
-===> CC src/bot/fire.c
-===> CC src/bot/func.c
-===> CC src/bot/za.c
-===> CC src/g_chase.c
-===> CC src/g_cmds.c
-===> CC src/g_combat.c
-===> CC src/g_ctf.c
-===> CC src/g_func.c
-===> CC src/g_items.c
-===> CC src/g_main.c
-===> CC src/g_misc.c
-===> CC src/g_monster.c
-===> CC src/g_phys.c
-===> CC src/g_save.c
-===> CC src/g_spawn.c
-===> CC src/g_svcmds.c
-===> CC src/g_target.c
-===> CC src/g_trigger.c
-===> CC src/g_utils.c
-===> CC src/g_weapon.c
-===> CC src/monster/move.c
-===> CC src/player/client.c
-===> CC src/player/hud.c
-===> CC src/player/menu.c
-===> CC src/player/trail.c
-===> CC src/player/view.c
-===> CC src/player/weapon.c
-===> CC src/shared/shared.c
-===> LD release/game.so
-make[1]: Leaving directory '/home/user/3zb2'
-
-sudo cp release/game.so /usr/share/games/quake2/3zb2/game.so
-sudo cp release/game.so /usr/share/games/quake2/3zb2/gamex86.so
-sudo cp release/game.so /usr/share/games/quake2/3zb2/gamex64.so
-```
-
-## Running bots
-
-To start `$` bots automatically, append:
-
-    +set autospawn $
-    +set autobot $
-
-`autobot` will automatically **remove/add** `autospawn` number of bots dependant on `autobot` value of real clients connected
-
-### Spawn bots at the farthest point
-
-    spawnbotfar $
-
-### Deathmatch
-
-    /usr/lib/yamagi-quake2/quake2 -datadir /usr/share/games/quake2/ +set game 3zb2 +set deathmatch 1 +set autospawn 5 +exec game.cfg
-
-### CTF (Capture the Flag)
-
-Copy **CTF** `.pak` files to *3zb2/*
-
-    sudo cp /usr/share/games/quake2/ctf/*.pak /usr/share/games/quake2/3zb2
-
-**Single process**:
-
-    /usr/lib/yamagi-quake2/quake2 -datadir /usr/share/games/quake2/ +set vid_gamma 1.400000 +set game 3zb2 +set deathmatch 1 +exec ctf.cfg 
-
-**Separate server and client**:
-
-    /usr/lib/yamagi-quake2/q2ded -datadir /usr/share/games/quake2/ +set game 3zb2 +set ip 127.0.0.1 +set port 27910 +set autospawn 5 +exec ctfserver.cfg
-
-    /usr/lib/yamagi-quake2/quake2 -datadir /usr/share/games/quake2/ +set vid_gamma 1.400000 +game 3zb2 +exec ctfplayer.cfg +connect 127.0.0.1:27910
-
-**Default grapple:** `bind MWHEELDOWN +hook`
-
-## Bot commands (See full details in CONFIG.txt)
-
-By default use: `KP_PLUS`, `KP_MINUS` & `KP_ENTER` for bot control
-
-`Console`
-
-Spawn `$` bots via:
-
-    sv spb $
-
-Remove `$` bots via:
-
-    sv rmb $
-
-## Other features (See full details in CONFIG.txt)
-
-Improved aim, enable `1` (default) or disable `0` via:
-
-    aimfix 1
-
-Fix noted Quake 2 gameplay flaws (opentdm), enable `1` (default) or disable `0` via:
-
-    fixflaws 1
-
-Flag takes health from a subdued holder, anti-camping, enable `1` (default) or disable `0`:
-
-    killerflag 1
-
-**Stay-in-the-fray** to avoid penalty.
-
-Identify player in the crosshair, enable `1` or disable `0` (default)
-
-    playerid 1
-
-Display extra (rank, timer) information in HUD:
-
-    combathud 1
-
-Auto switch to upgraded weapon on pickup, enable `1` or disable `0` (default):
-
-    weaponswap 1
-
-Option to add grapple to the fray - CTF `pak0.pak` required.
-
-    zigrapple 1
-
-Add spectator mode to game start (server mode)
-
-    zigintro 1
-
-`Capture and Hold (ZigFlag)` mode for Deathmatch/Team games:
-
-    zigmode 1
-    zigspawn 1
-    zigkiller 1
-
-Broadcast the summary of the top six players, in console, at level intermission:
-
-    ----------------
-    | q2dm1 | ~ 02 |
-    ------------------------------------------------------
-    | X | Player           |  S  |  P  |  T  |  F  |  A  |
-    ------------------------------------------------------
-    | * | [BOT]Batty       | 30  | 0   | 8   | +8  | +0  |
-    |   | [BOT]Chews       | 26  | 0   | 8   | +0  | +2  |
-    | F | [BOT]Lupin       | 21  | 0   | 8   | +3  | +2  |
-    |   | _GONZO_          | 6   | 19  | 8   | +6  | +0  |
-    ------------------------------------------------------
-
-**S** - *Score* \
-**P** - *Ping* \
-**T** - *Time* \
-**F** - *Flag Possession bonuses* \
-**A** - *Assassinations of Flagholder* \
-**~** - *Flag bounce occurrences*
-
-## Errata
-
-Specify a `basedir` to inform the mod of the system `baseq2` directory location. \
-On system level installs this may be needed to ensure the mod can find`3zbconfig.cfg,` \
-`3zbmaps.lst` and `chaining` files. The basedir can be specified in config via:
-
-    set basepath "/usr/share/games/quake2"
-
-Use on the following errors:
-
-    3ZB CFG: file not found: ./3zb2/3zbconfig.cfg
-    Chaining: file 3zb2/chdtm/q2dm1.chn not found.
-
-The mod has a random issues using `gamemap`, resulting in a lockup or segfault. Bot tracing in \
-`SV_RunThink()` seems to be the related area, but I have yet to track down. Use the `map` command which \
-causes a full level reset to overcome the issue. Note: **Q2Pro** attempts to enforce the use of \
-`gamemap`, use `sv_allow_map 1` in Q2Pro to overcome this:
-
-    map q2dm1
-
-
-## 獄
-
-![captureandhold](https://raw.githubusercontent.com/DirtBagXon/3zb2/master/screenshot/screenshot.png)
-![captureandhold](https://raw.githubusercontent.com/DirtBagXon/3zb2/master/screenshot/screenshot2.png)

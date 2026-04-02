@@ -364,7 +364,7 @@ void ED_CallSpawn (edict_t *ent)
 			else if(!strcmp(ent->classname,"weapon_hyperblaster"))	mpindex[WEAP_HYPERBLASTER] = i;
 			else if(!strcmp(ent->classname,"weapon_boomer"))		mpindex[WEAP_BOOMER] = i;
 			else if(!strcmp(ent->classname,"weapon_railgun"))		mpindex[WEAP_RAILGUN] = i;
-			else if(!strcmp(ent->classname,"weapon_phalanx"))		mpindex[WEAP_PHALANX] = i;			
+			else if(!strcmp(ent->classname,"weapon_phalanx"))		mpindex[WEAP_PHALANX] = i;
 			else if(!strcmp(ent->classname,"weapon_bfg"))			mpindex[WEAP_BFG] = i;
 			else if(!strcmp(ent->classname,"item_quad"))			mpindex[MPI_QUAD] = i;
 			else if(!strcmp(ent->classname,"item_invulnerability"))	mpindex[MPI_PENTA] = i;
@@ -395,7 +395,7 @@ char *ED_NewString (char *string)
 {
 	char	*newb, *new_p;
 	int		i,l;
-	
+
 	l = strlen(string) + 1;
 
 	newb = gi.TagMalloc (l, TAG_LEVEL);
@@ -415,7 +415,7 @@ char *ED_NewString (char *string)
 		else
 			*new_p++ = string[i];
 	}
-	
+
 	return newb;
 }
 
@@ -499,7 +499,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 
 // go through all the dictionary pairs
 	while (1)
-	{	
+	{
 	// parse key
 		com_token = COM_Parse (&data);
 		if (com_token[0] == '}')
@@ -508,8 +508,8 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 			gi.error ("ED_ParseEntity: EOF without closing brace");
 
 		strncpy (keyname, com_token, sizeof(keyname)-1);
-		
-	// parse value	
+
+	// parse value
 		com_token = COM_Parse (&data);
 		if (!data)
 			gi.error ("ED_ParseEntity: EOF without closing brace");
@@ -517,7 +517,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 		if (com_token[0] == '}')
 			gi.error ("ED_ParseEntity: closing brace without data");
 
-		init = true;	
+		init = true;
 
 	// keynames with a leading underscore are used for utility comments,
 	// and are immediately discarded by quake
@@ -598,7 +598,7 @@ All but the last will have the teamchain field set to the next one
 */
 void G_FindTrainTeam()
 {
-	edict_t	*teamlist[MAX_EDICTS + 1];	
+	edict_t	*teamlist[MAX_EDICTS + 1];
 	edict_t	*e,*t,*p;
 
 	qboolean	findteam;
@@ -634,7 +634,7 @@ void G_FindTrainTeam()
 					{
 						if(t->inuse && t->classname)
 						{
-							if(!Q_stricmp(t->classname,"func_train") 
+							if(!Q_stricmp(t->classname,"func_train")
 								&& !Q_stricmp(t->target,currtargetname)
 								&& t->trainteam == NULL)
 							{
@@ -701,7 +701,7 @@ G_FindItemLink
 
 
 void G_FindItemLink()
-{ 
+{
 	int i,j,k;
 
 	if(CurrentIndex <= 0) return;
@@ -744,7 +744,7 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 	vec3_t	v,vv;
 	int		mf = false;
 
-	grav = 1.0 * sv_gravity->value * FRAMETIME; 
+	grav = 1.0 * sv_gravity->value * FRAMETIME;
 
 	vel = VEL_BOT_JUMP;
 	yori = apos[2];
@@ -755,7 +755,7 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 	for(x = 1;x <= FALLCHK_LOOPMAX * 2 ;++x )
 	{
 		vel -= grav;
-		yori += vel * FRAMETIME; 
+		yori += vel * FRAMETIME;
 
 		if(vel > 0)
 		{
@@ -780,16 +780,16 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 				}
 			}
 		}
-	}	
+	}
 	VectorCopy(v,vv);
 	vv[2] = 0;
 
 	l = VectorLength(vv);
-	
+
 	if(x > 1) l = l / (x - 1);
 	if(l < MOVE_SPD_RUN && mf == true)
 	{
-		return true;							
+		return true;
 	}
 	return false;
 }
@@ -830,7 +830,7 @@ void G_FindRouteLink(edict_t *ent)
 		JumpMax = 0;
 		while(1)
 		{
-			JumpMax += x * FRAMETIME; 
+			JumpMax += x * FRAMETIME;
 			x -= ent->gravity * sv_gravity->value * FRAMETIME;
 			if( x < 0 ) break;
 		}
@@ -876,7 +876,7 @@ void G_FindRouteLink(edict_t *ent)
 
 //				VectorSubtract(Route[j].Pt,Route[i].Pt,v);
 
-				rs_trace = gi.trace(Route[j].Pt,NULL,NULL,Route[i].Pt,ent,MASK_SOLID); 
+				rs_trace = gi.trace(Route[j].Pt,NULL,NULL,Route[i].Pt,ent,MASK_SOLID);
 				//found!!
 				if(!rs_trace.startsolid && !rs_trace.allsolid && rs_trace.fraction == 1.0)
 				{
@@ -999,7 +999,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 // parse ents
 	while (1)
 	{
-		// parse the opening brace	
+		// parse the opening brace
 		com_token = COM_Parse (&entities);
 		if (!entities)
 			break;
@@ -1011,7 +1011,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 		else
 			ent = G_Spawn ();
 		entities = ED_ParseEdict (entities, ent);
-		
+
 		// remove things (except the world) from different skill levels or deathmatch
 		if (ent != g_edicts)
 		{
@@ -1019,7 +1019,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 			{
 				if ( ent->spawnflags & SPAWNFLAG_NOT_DEATHMATCH )
 				{
-					G_FreeEdict (ent);	
+					G_FreeEdict (ent);
 					inhibit++;
 					continue;
 				}
@@ -1032,7 +1032,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 					(((skill->value == 2) || (skill->value == 3)) && (ent->spawnflags & SPAWNFLAG_NOT_HARD))
 					)
 					{
-						G_FreeEdict (ent);	
+						G_FreeEdict (ent);
 						inhibit++;
 						continue;
 					}
@@ -1052,7 +1052,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	if (Q_stricmp(ent->classname, "item_flag_team1") == 0) bot_team_flag1 = ent;
 	else if (Q_stricmp(ent->classname, "item_flag_team2") == 0) bot_team_flag2 = ent;
 //PON-CTF
-	}	
+	}
 
 	gi.dprintf ("%i entities inhibited\n", inhibit);
 
@@ -1069,7 +1069,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 
 //ZOID
 
-//ponko	
+//ponko
 	CTFSetupNavSpawn();	//ナビの設置
 	if(!chedit->value) G_FindItemLink();	//アイテムのリンク(通常時のみ)
 
@@ -1122,7 +1122,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 
 #endif
 
-char *single_statusbar = 
+char *single_statusbar =
 "yb	-24 "
 
 // health
@@ -1173,7 +1173,7 @@ char *single_statusbar =
 "	pic	9 "
 "endif "
 
-//  help / weapon icon 
+//  help / weapon icon
 "if 11 "
 "	xv	148 "
 "	pic	11 "
@@ -1231,7 +1231,7 @@ char *dm_statusbar =
 "	pic	9 "
 "endif "
 
-//  help / weapon icon 
+//  help / weapon icon
 "if 11 "
 "	xv	148 "
 "	pic	11 "
@@ -1241,6 +1241,14 @@ char *dm_statusbar =
 "xr	-50 "
 "yt 2 "
 "num 3 14 "
+
+// Time remaining
+"if 30 "
+    "xr -50 "
+    "yb -65 "
+    "xv 105 "
+    "stat_string 30 "
+"endif "
 
 //sight
 "if 31 "
@@ -1485,9 +1493,9 @@ void SP_worldspawn (edict_t *ent)
 	gi.soundindex ("*death3.wav");
 	gi.soundindex ("*death4.wav");
 	gi.soundindex ("*fall1.wav");
-	gi.soundindex ("*fall2.wav");	
+	gi.soundindex ("*fall2.wav");
 	gi.soundindex ("*gurp1.wav");		// drowning damage
-	gi.soundindex ("*gurp2.wav");	
+	gi.soundindex ("*gurp2.wav");
 	gi.soundindex ("*jump1.wav");		// player jump
 	gi.soundindex ("*pain25_1.wav");
 	gi.soundindex ("*pain25_2.wav");
@@ -1526,7 +1534,7 @@ void SP_worldspawn (edict_t *ent)
 	gi.soundindex ("player/watr_out.wav");	// feet leaving water
 
 	gi.soundindex ("player/watr_un.wav");	// head going underwater
-	
+
 	gi.soundindex ("player/u_breath1.wav");
 	gi.soundindex ("player/u_breath2.wav");
 
@@ -1555,40 +1563,40 @@ void SP_worldspawn (edict_t *ent)
 
 	// 0 normal
 	gi.configstring(CS_LIGHTS+0, "m");
-	
+
 	// 1 FLICKER (first variety)
 	gi.configstring(CS_LIGHTS+1, "mmnmmommommnonmmonqnmmo");
-	
+
 	// 2 SLOW STRONG PULSE
 	gi.configstring(CS_LIGHTS+2, "abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba");
-	
+
 	// 3 CANDLE (first variety)
 	gi.configstring(CS_LIGHTS+3, "mmmmmaaaaammmmmaaaaaabcdefgabcdefg");
-	
+
 	// 4 FAST STROBE
 	gi.configstring(CS_LIGHTS+4, "mamamamamama");
-	
+
 	// 5 GENTLE PULSE 1
 	gi.configstring(CS_LIGHTS+5,"jklmnopqrstuvwxyzyxwvutsrqponmlkj");
-	
+
 	// 6 FLICKER (second variety)
 	gi.configstring(CS_LIGHTS+6, "nmonqnmomnmomomno");
-	
+
 	// 7 CANDLE (second variety)
 	gi.configstring(CS_LIGHTS+7, "mmmaaaabcdefgmmmmaaaammmaamm");
-	
+
 	// 8 CANDLE (third variety)
 	gi.configstring(CS_LIGHTS+8, "mmmaaammmaaammmabcdefaaaammmmabcdefmmmaaaa");
-	
+
 	// 9 SLOW STROBE (fourth variety)
 	gi.configstring(CS_LIGHTS+9, "aaaaaaaazzzzzzzz");
-	
+
 	// 10 FLUORESCENT FLICKER
 	gi.configstring(CS_LIGHTS+10, "mmamammmmammamamaaamammma");
 
 	// 11 SLOW PULSE NOT FADE TO BLACK
 	gi.configstring(CS_LIGHTS+11, "abcdefghijklmnopqrrqponmlkjihgfedcba");
-	
+
 	// styles 32-62 are assigned by the light program for switchable lights
 
 	// 63 testing
@@ -1623,5 +1631,3 @@ void SP_worldspawn (edict_t *ent)
 
 	memset(ExplIndex,0,sizeof(ExplIndex));
 }
-
-

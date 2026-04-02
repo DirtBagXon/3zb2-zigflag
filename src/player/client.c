@@ -384,8 +384,8 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 			case MOD_AIRSTRIKE:
 				message = "was striked by";
 				message2 = "'s airstrike";
-				break;			
-//PONKO			
+				break;
+//PONKO
 			}
 			if (message)
 			{
@@ -460,7 +460,7 @@ void TossClientWeapon (edict_t *self)
 	{
 		if(self->enemy->classname[0] == 'p')
 		{
-			
+
 			VectorSubtract(self->s.origin,self->enemy->s.origin,v);
 			dist = VectorLength(v);
 			if(dist < 200) enemy = self->enemy;
@@ -486,7 +486,7 @@ void TossClientWeapon (edict_t *self)
 		quadfire = false;
 	else
 		quadfire = (self->client->quadfire_framenum > (level.framenum + 10));
-	
+
 
 	if (item && quad)
 		spread = 22.5;
@@ -719,7 +719,7 @@ void InitClientPersistant (gclient_t *client)
 //	client->pers.inventory[client->pers.selected_item] = 1;
 //	item = FindItem("Trap");
 //	client->pers.inventory[ITEM_INDEX(item)] = 100;
-//test		
+//test
 	item = /*Fdi_BLASTER;//*/FindItem("Blaster");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
@@ -762,7 +762,7 @@ void InitClientResp (gclient_t *client)
 //ZOID
 
 	memset (&client->resp, 0, sizeof(client->resp));
-	
+
 //ZOID
 	client->resp.ctf_team = ctf_team;
 //ZOID
@@ -780,7 +780,7 @@ void InitClientResp (gclient_t *client)
 ==================
 SaveClientData
 
-Some information that should be persistant, like health, 
+Some information that should be persistant, like health,
 is still stored in the edict structure, so it needs to
 be mirrored out to the client structure before all the
 edicts are wiped.
@@ -1023,13 +1023,21 @@ edict_t *SelectFarthestDeathmatchSpawnPoint (void)
 
 edict_t *SelectDeathmatchSpawnPoint (void)
 {
-	if ( (int)(dmflags->value) & DF_SPAWN_FARTHEST)
-		return SelectFarthestDeathmatchSpawnPoint ();
-	else
-		if(fixflaws->value)
-			return SelectRandomDeathmatchSpawnPointAvoidClosest ();
-		else
-			return SelectRandomDeathmatchSpawnPoint ();
+	for (int i = 1; i <= maxclients->value; i++)
+	{
+		if (g_edicts[i].inuse && g_edicts[i].health > 0)
+		{
+			if ( (int)(dmflags->value) & DF_SPAWN_FARTHEST)
+				return SelectFarthestDeathmatchSpawnPoint ();
+
+			if(fixflaws->value)
+				return SelectRandomDeathmatchSpawnPointAvoidClosest ();
+			else
+				return SelectRandomDeathmatchSpawnPoint ();
+		}
+	}
+
+	return SelectTrueRandomDeathmatchSpawnPoint();
 }
 
 edict_t *SelectCoopSpawnPoint (edict_t *ent)
@@ -1256,6 +1264,8 @@ void respawn (edict_t *self)
 		self->client->ps.pmove.pm_time = 14;
 
 		self->client->respawn_time = level.time;
+
+		Cmd_Store_f(self);
 		return;
 	}
 
@@ -1280,7 +1290,7 @@ void check_spectator_limit(edict_t *ent)
 	}
 }
 
-/* 
+/*
  * only called when pers.spectator changes
  * note that resp.spectator should be the opposite of pers.spectator here
  */
@@ -1293,8 +1303,8 @@ void spectator_respawn (edict_t *ent)
 
 	if (ent->client->pers.spectator) {
 		char *value = Info_ValueForKey (ent->client->pers.userinfo, "spectator");
-		if (*spectator_password->string && 
-			strcmp(spectator_password->string, "none") && 
+		if (*spectator_password->string &&
+			strcmp(spectator_password->string, "none") &&
 			strcmp(spectator_password->string, value)) {
 			gi.cprintf(ent, PRINT_HIGH, "Spectator password incorrect.\n");
 			ent->client->pers.spectator = false;
@@ -1322,7 +1332,7 @@ void spectator_respawn (edict_t *ent)
 		// he was a spectator and wants to join the game
 		// he must have the right password
 		char *value = Info_ValueForKey (ent->client->pers.userinfo, "password");
-		if (*password->string && strcmp(password->string, "none") && 
+		if (*password->string && strcmp(password->string, "none") &&
 			strcmp(password->string, value)) {
 			gi.cprintf(ent, PRINT_HIGH, "Password incorrect.\n");
 			ent->client->pers.spectator = true;
@@ -1479,7 +1489,7 @@ void PutClientInServer (edict_t *ent)
 	ent->penalty = 0;
 	ent->svflags = 0;
 //ponko
-	ent->client->zc.aiming = 0;	
+	ent->client->zc.aiming = 0;
 	ent->client->zc.distance = 90;
 //ponko
 	VectorCopy (mins, ent->mins);
@@ -1592,7 +1602,7 @@ void PutClientInServer (edict_t *ent)
 =====================
 ClientBeginDeathmatch
 
-A client has just connected to the server in 
+A client has just connected to the server in
 deathmatch mode, so clear everything out before starting them.
 =====================
 */
@@ -1851,8 +1861,8 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	if (deathmatch->value && *value && !ctf->value && strcmp(value, "0")) {
 		int i, numspec;
 
-		if (*spectator_password->string && 
-			strcmp(spectator_password->string, "none") && 
+		if (*spectator_password->string &&
+			strcmp(spectator_password->string, "none") &&
 			strcmp(spectator_password->string, value)) {
 			Info_SetValueForKey(userinfo, "rejmsg", "Spectator password required or incorrect.");
 			return false;
@@ -1870,7 +1880,7 @@ qboolean ClientConnect (edict_t *ent, char *userinfo)
 	} else {
 		// check for a password
 		value = Info_ValueForKey (userinfo, "password");
-		if (*password->string && strcmp(password->string, "none") && 
+		if (*password->string && strcmp(password->string, "none") &&
 			strcmp(password->string, value)) {
 			Info_SetValueForKey(userinfo, "rejmsg", "Password required or incorrect.");
 			return false;
@@ -2005,7 +2015,7 @@ void Get_Position ( edict_t *ent, vec3_t position )
 void ChainPodThink (edict_t *ent)
 {
 	if(ent->owner == NULL )return;
-	
+
 	gi.WriteByte (svc_temp_entity);
 	gi.WriteByte (TE_BFG_LASER);
 	gi.WritePosition (ent->s.origin);
@@ -2054,17 +2064,17 @@ qboolean TraceX (edict_t *ent,vec3_t p2)
 		else if(!(ent->client->ps.pmove.pm_flags & PMF_DUCKED))
 		{
 			VectorSet(v1,-16,-16,-4);
-			VectorSet(v2,16,16,32);			
+			VectorSet(v2,16,16,32);
 		}
-		else 
+		else
 		{
 //			VectorCopy(ent->mins,v1);
 //			VectorCopy(ent->maxs,v2);
 			VectorSet(v1,-4,-4,-4);
-			VectorSet(v2,4,4,4);			
+			VectorSet(v2,4,4,4);
 		}
 	}
-	else 
+	else
 	{
 		VectorSet(v1,0,0,0);
 		VectorSet(v2,0,0,0);
@@ -2074,7 +2084,7 @@ qboolean TraceX (edict_t *ent,vec3_t p2)
 	rs_trace = gi.trace (ent->s.origin, v1, v2, p2 ,ent, contents );
 	if(rs_trace.fraction == 1.0 && !rs_trace.allsolid && !rs_trace.startsolid ) return true;
 
-	if(ent->client->zc.route_trace && rs_trace.ent && (ent->svflags & SVF_MONSTER)) 
+	if(ent->client->zc.route_trace && rs_trace.ent && (ent->svflags & SVF_MONSTER))
 	{
 		//if(!rs_trace.ent->targetname)
 		if(!Q_stricmp(rs_trace.ent->classname, "func_door"))
@@ -2084,7 +2094,7 @@ qboolean TraceX (edict_t *ent,vec3_t p2)
 		}
 //		if(!Q_stricmp(rs_trace.ent->classname, "func_train")) return true;
 	}
-	
+
 	return false;
 }
 
@@ -2105,7 +2115,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	impulse = ucmd->impulse;
 
-	
+
 	if(impulse == 1) gi.bprintf(PRINT_HIGH,"%f\n",ent->s.origin[2]);
 
 	//--------------------------------------------------------------------------------------
@@ -2124,7 +2134,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		JumpMax = 0;
 		while(1)
 		{
-			JumpMax += x * FRAMETIME; 
+			JumpMax += x * FRAMETIME;
 			x -= ent->gravity * sv_gravity->value * FRAMETIME;
 			if( x < 0 ) break;
 		}
@@ -2136,7 +2146,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 	if(!j && chedit->value && CurrentIndex < MAXNODES && !ent->deadflag && ent == &g_edicts[1])
 	{
-		if(targetindex > 0) 
+		if(targetindex > 0)
 		{
 			if(ent->target_ent == NULL) return;
 			other = ent->target_ent;
@@ -2171,7 +2181,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			ent->client->ps.viewangles[PITCH] = Get_pitch(vv);
 			ent->client->v_angle[PITCH] = ent->client->ps.viewangles[PITCH];
 			ent->viewheight = 22;
-			
+
 			ent->client->ps.pmove.pm_flags |= PMF_NO_PREDICTION ;
 			ent->client->ps.pmove.pm_flags = PM_FREEZE;
 			gi.linkentity(ent);
@@ -2251,15 +2261,15 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			{
 				VectorCopy(ent->s.old_origin,v);
 //gi.bprintf(PRINT_HIGH,"6\n");
-				i = true;				
-			}			
+				i = true;
+			}
 			else if(ent->groundentity /*&& !j*/&& wasground == false && k)
 			{
 //				VectorSubtract(ent->s.origin)
 
 				VectorCopy(ent->s.origin,v);
 //gi.bprintf(PRINT_HIGH,"7\n");
-				i = true;					
+				i = true;
 			}
 
 		}
@@ -2281,10 +2291,10 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 			{
 				VectorCopy(ent->s.old_origin,v);
 //gi.bprintf(PRINT_HIGH,"8\n");
-				i = true;							
-			}		
+				i = true;
+			}
 		}
-		
+
 		if(ent->groundentity)
 		{
 			if(ent->groundentity != old_ground)
@@ -2382,7 +2392,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 				if(!Q_stricmp(old_ground->target_ent->classname,"path_corner"))
 					VectorCopy(old_ground->target_ent->s.origin,Route[CurrentIndex].Tcourner);
 
-//gi.bprintf(PRINT_HIGH,"get chain\n");			
+//gi.bprintf(PRINT_HIGH,"get chain\n");
 			}
 			//when normal or items
 			if(++CurrentIndex < MAXNODES)
@@ -2593,7 +2603,6 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (other->inuse && ent->client->chase_target == other/*other->client->chase_target == ent*/)
 			UpdateChaseCam(ent/*other*/);
 	}
-
 }
 
 

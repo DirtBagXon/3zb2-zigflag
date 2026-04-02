@@ -16,8 +16,7 @@
 //ZOID
 
 // Override BASE_DIR
-#define	DEFAULTPATH	"."
-#define GET_BASEPATH_STR()	((strlen(basepath->string)) == 0 ? DEFAULTPATH : basepath->string)
+#define GET_BASEPATH_STR() ((basepath && basepath->string && strlen(basepath->string)) ? basepath->string : gamedir->string)
 
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
@@ -53,19 +52,19 @@
 
 // edict->spawnflags
 // these are set with checkboxes on each entity in the map editor
-#define	SPAWNFLAG_NOT_EASY			0x00000100
+#define	SPAWNFLAG_NOT_EASY		0x00000100
 #define	SPAWNFLAG_NOT_MEDIUM		0x00000200
-#define	SPAWNFLAG_NOT_HARD			0x00000400
+#define	SPAWNFLAG_NOT_HARD		0x00000400
 #define	SPAWNFLAG_NOT_DEATHMATCH	0x00000800
-#define	SPAWNFLAG_NOT_COOP			0x00001000
+#define	SPAWNFLAG_NOT_COOP		0x00001000
 
 // edict->flags
-#define	FL_FLY					0x00000001
-#define	FL_SWIM					0x00000002	// implied immunity to drowining
+#define	FL_FLY				0x00000001
+#define	FL_SWIM				0x00000002	// implied immunity to drowning
 #define FL_IMMUNE_LASER			0x00000004
-#define	FL_INWATER				0x00000008
-#define	FL_GODMODE				0x00000010
-#define	FL_NOTARGET				0x00000020
+#define	FL_INWATER			0x00000008
+#define	FL_GODMODE			0x00000010
+#define	FL_NOTARGET			0x00000020
 #define FL_IMMUNE_SLIME			0x00000040
 #define FL_IMMUNE_LAVA			0x00000080
 #define	FL_PARTIALGROUND		0x00000100	// not all corners are valid
@@ -73,7 +72,7 @@
 #define	FL_TEAMSLAVE			0x00000400	// not the first on the team
 #define FL_NO_KNOCKBACK			0x00000800
 #define FL_POWER_ARMOR			0x00001000	// power armor (if any) is active
-#define FL_RESPAWN				0x80000000	// used for item respawning
+#define FL_RESPAWN			0x80000000	// used for item respawning
 
 #define	FLAG_HEALTH		5
 #define	MAX_SPAWNS		64
@@ -107,9 +106,9 @@ typedef enum
 	DAMAGE_AIM			// auto targeting recognizes this
 } damage_t;
 
-typedef enum 
+typedef enum
 {
-	WEAPON_READY, 
+	WEAPON_READY,
 	WEAPON_ACTIVATING,
 	WEAPON_DROPPING,
 	WEAPON_FIRING
@@ -133,7 +132,7 @@ typedef enum
 #define DEAD_NO					0
 #define DEAD_DYING				1
 #define DEAD_DEAD				2
-#define DEAD_RESPAWNABLE		3
+#define DEAD_RESPAWNABLE			3
 
 //range
 #define RANGE_MELEE				0
@@ -143,23 +142,23 @@ typedef enum
 
 //gib types
 #define GIB_ORGANIC				0
-#define GIB_METALLIC			1
+#define GIB_METALLIC				1
 
 //monster ai flags
 #define AI_STAND_GROUND			0x00000001
-#define AI_TEMP_STAND_GROUND	0x00000002
+#define AI_TEMP_STAND_GROUND		0x00000002
 #define AI_SOUND_TARGET			0x00000004
 #define AI_LOST_SIGHT			0x00000008
-#define AI_PURSUIT_LAST_SEEN	0x00000010
+#define AI_PURSUIT_LAST_SEEN		0x00000010
 #define AI_PURSUE_NEXT			0x00000020
 #define AI_PURSUE_TEMP			0x00000040
 #define AI_HOLD_FRAME			0x00000080
-#define AI_GOOD_GUY				0x00000100
-#define AI_BRUTAL				0x00000200
-#define AI_NOSTEP				0x00000400
-#define AI_DUCKED				0x00000800
+#define AI_GOOD_GUY			0x00000100
+#define AI_BRUTAL			0x00000200
+#define AI_NOSTEP			0x00000400
+#define AI_DUCKED			0x00000800
 #define AI_COMBAT_POINT			0x00001000
-#define AI_MEDIC				0x00002000
+#define AI_MEDIC			0x00002000
 #define AI_RESURRECTING			0x00004000
 
 //monster attack state
@@ -170,20 +169,20 @@ typedef enum
 
 // armor types
 #define ARMOR_NONE				0
-#define ARMOR_JACKET			1
-#define ARMOR_COMBAT			2
+#define ARMOR_JACKET				1
+#define ARMOR_COMBAT				2
 #define ARMOR_BODY				3
 #define ARMOR_SHARD				4
 
 // power armor types
-#define POWER_ARMOR_NONE		0
-#define POWER_ARMOR_SCREEN		1
-#define POWER_ARMOR_SHIELD		2
+#define POWER_ARMOR_NONE			0
+#define POWER_ARMOR_SCREEN			1
+#define POWER_ARMOR_SHIELD			2
 
 // handedness values
-#define RIGHT_HANDED			0
+#define RIGHT_HANDED				0
 #define LEFT_HANDED				1
-#define CENTER_HANDED			2
+#define CENTER_HANDED				2
 
 
 // game.serverflags values
@@ -195,13 +194,13 @@ typedef enum
 #define SFL_CROSS_TRIGGER_6		0x00000020
 #define SFL_CROSS_TRIGGER_7		0x00000040
 #define SFL_CROSS_TRIGGER_8		0x00000080
-#define SFL_CROSS_TRIGGER_MASK	0x000000ff
+#define SFL_CROSS_TRIGGER_MASK		0x000000ff
 
 
 // noise types for PlayerNoise
 #define PNOISE_SELF				0
-#define PNOISE_WEAPON			1
-#define PNOISE_IMPACT			2
+#define PNOISE_WEAPON				1
+#define PNOISE_IMPACT				2
 
 
 //3ZB CTF state
@@ -245,7 +244,7 @@ typedef struct
 #define	IT_WEAPON		1		// use makes active weapon
 #define	IT_AMMO			2
 #define IT_ARMOR		4
-#define IT_STAY_COOP	8
+#define IT_STAY_COOP		8
 #define IT_KEY			16
 #define IT_POWERUP		32
 //ZOID
@@ -253,35 +252,35 @@ typedef struct
 //ZOID
 
 // gitem_t->weapmodel for weapons indicates model index
-#define WEAP_BLASTER			1 
-#define WEAP_SHOTGUN			2 
-#define WEAP_SUPERSHOTGUN		3 
-#define WEAP_MACHINEGUN			4 
-#define WEAP_CHAINGUN			5 
-#define WEAP_GRENADES			6 
-#define WEAP_GRENADELAUNCHER	7 
-#define WEAP_ROCKETLAUNCHER		8 
-#define WEAP_HYPERBLASTER		9 
+#define WEAP_BLASTER			1
+#define WEAP_SHOTGUN			2
+#define WEAP_SUPERSHOTGUN		3
+#define WEAP_MACHINEGUN			4
+#define WEAP_CHAINGUN			5
+#define WEAP_GRENADES			6
+#define WEAP_GRENADELAUNCHER		7
+#define WEAP_ROCKETLAUNCHER		8
+#define WEAP_HYPERBLASTER		9
 #define WEAP_RAILGUN			10
-#define WEAP_BFG				11
+#define WEAP_BFG			11
 #define WEAP_PHALANX			12
-#define WEAP_BOOMER				13
+#define WEAP_BOOMER			13
 
-#define WEAP_DISRUPTOR			12		// PGM
-#define WEAP_ETFRIFLE			13		// PGM
-#define WEAP_PLASMA				14		// PGM
-#define WEAP_PROXLAUNCH			15		// PGM
-#define WEAP_CHAINFIST			16		// PGM
+#define WEAP_DISRUPTOR			12	// PGM
+#define WEAP_ETFRIFLE			13	// PGM
+#define WEAP_PLASMA			14	// PGM
+#define WEAP_PROXLAUNCH			15	// PGM
+#define WEAP_CHAINFIST			16	// PGM
 
-#define WEAP_TRAP				17
+#define WEAP_TRAP			17
 
 #define WEAP_GRAPPLE			20
 
-#define MPI_QUAD				21
-#define	MPI_PENTA				22
-#define MPI_QUADF				23
+#define MPI_QUAD			21
+#define	MPI_PENTA			22
+#define MPI_QUADF			23
 
-#define MPI_INDEX				24	//MPI count
+#define MPI_INDEX			24	//MPI count
 
 typedef struct gitem_s
 {
@@ -620,6 +619,7 @@ extern	cvar_t  *fixflaws;
 extern	cvar_t  *playerid;
 
 //ponpoko
+extern	cvar_t	*gamedir;
 extern	cvar_t	*basepath;
 extern	cvar_t	*gamepath;
 extern	cvar_t	*chedit;
@@ -664,7 +664,7 @@ extern	qboolean	is_quad;
 #define FFL_NOSPAWN			2
 
 typedef enum {
-	F_INT, 
+	F_INT,
 	F_FLOAT,
 	F_LSTRING,			// string on disk, pointer in memory, TAG_LEVEL
 	F_GSTRING,			// string on disk, pointer in memory, TAG_GAME
@@ -696,6 +696,9 @@ extern	gitem_t	itemlist[];
 //
 void Cmd_Help_f (edict_t *ent);
 void Cmd_Score_f (edict_t *ent);
+
+void Cmd_Store_f (edict_t *ent);
+void Cmd_Recall_f (edict_t *ent);
 
 //
 // g_items.c
@@ -988,6 +991,12 @@ typedef struct
 
 	qboolean	joined;				// client has joined the game
 	qboolean	spectator;			// client is a spectator
+
+	vec3_t  stored_origin;
+	vec3_t  stored_angles;
+	int     stored_frame;
+
+	qboolean showspeed;
 } client_persistant_t;
 
 /*
@@ -998,14 +1007,14 @@ typedef struct zgcl_s
 {
 	int			zclass;			//class no.
 
-// true client用 zoom フラグ	
+// true client用 zoom フラグ
 	int			aiming;			//0-not 1-aiming  2-firing zoomingflag
 	float		distance;		//zoom中のFOV値
 	float		olddistance;	//旧zooming FOV値
 	qboolean	autozoom;		//autozoom
 	qboolean	lockon;			//lockon flag false-not true-locking
 
-// bot用	
+// bot用
 	int			zcstate;		//status
 
 	int			botskill;		//skill
@@ -1024,7 +1033,7 @@ typedef struct zgcl_s
 	float		moveyaw;		//true moving yaw
 
 	//camp & aiming
-	float		preaimingtime;	
+	float		preaimingtime;
 	float		campingtime;
 
 	//combat
@@ -1147,7 +1156,7 @@ struct gclient_s
 	float		quadfire_framenum;
 	qboolean	trap_blew_up;
 	float		trap_time;
-	
+
 	int			silencer_shots;
 	int			weapon_sound;
 
@@ -1183,7 +1192,7 @@ struct edict_s
 
 	// FIXME: move these fields to a server private sv_entity_t
 	link_t		area;				// linked to a division node or leaf
-	
+
 	int			num_clusters;		// if -1, use headnode instead
 	int			clusternums[MAX_ENT_CLUSTERS];
 	int			headnode;			// unused if num_clusters != -1
@@ -1208,7 +1217,7 @@ struct edict_s
 
 	char		*model;
 	float		freetime;			// sv.time when the object was freed
-	
+
 	//
 	// only used locally in game, not by server
 	//

@@ -35,12 +35,22 @@ typedef enum {
 	CTF_GRAPPLE_STATE_HANG
 } ctfgrapplestate_t;
 
+typedef struct ctfgame_s
+{
+	int team1, team2;
+	int total1, total2; // these are only set when going into intermission!
+	float last_flag_capture;
+	int last_capture_team;
+} ctfgame_t;
+
 extern cvar_t *ctf;
+extern cvar_t *tdm;
+extern ctfgame_t ctfgame;
 
 #define CTF_TEAM1_SKIN "ctf_r"
 #define CTF_TEAM2_SKIN "ctf_b"
 
-#define DF_CTF_FORCEJOIN	131072	
+#define DF_CTF_FORCEJOIN	131072
 #define DF_ARMOR_PROTECT	262144
 #define DF_CTF_NO_TECH      524288
 

@@ -83,7 +83,7 @@ void Load_BotInfo()
 
 	//botlist value
 	botlist = gi.cvar ("botlist", "default", CVAR_SERVERINFO | CVAR_LATCH);
-	gamepath = gi.cvar ("game", "0", CVAR_NOSET);
+	gamepath = gi.cvar ("game", "0", CVAR_LATCH);
 
 	//load info
 	//sprintf(Buff,"%s/3ZBConfig.cfg",gamepath->string);
@@ -93,7 +93,7 @@ void Load_BotInfo()
 	{
 		gi.dprintf("3ZB CFG: file not found: %s\n", Buff);
 		gi.dprintf("\nUse: +set basepath\n\n");
-		gi.error (ERR_FATAL);
+		gi.error("%s", ERR_FATAL ? ERR_FATAL : "Unknown bot info file error");
 	}
 	else
 	{

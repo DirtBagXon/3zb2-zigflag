@@ -128,11 +128,31 @@ only happens when a new game is started or a save game
 is loaded.
 ============
 */
+
+
+static cvar_t *GetGameDir(void)
+{
+	cvar_t *dir;
+
+	dir = gi.cvar("basedir", "", 0);
+	if (dir && dir->string && strcmp(dir->string, ".") != 0)
+		return dir;
+
+	dir = gi.cvar("datadir", "", 0);
+	if (dir && dir->string && strcmp(dir->string, ".") != 0)
+		return dir;
+
+	return gi.cvar("gamedir", ".", 0);
+}
+
 void SetBotFlag1(edict_t *ent);	//チーム1の旗
 void SetBotFlag2(edict_t *ent);  //チーム2の旗
 void InitGame (void)
 {
+	srand((unsigned)time(NULL));
 	gi.dprintf ("==== InitGame ====\n");
+
+	gamedir = GetGameDir();
 
 	bot_team_flag1 = NULL;
 	bot_team_flag2 = NULL;
@@ -218,7 +238,7 @@ void InitGame (void)
 	zigspawn = gi.cvar("zigspawn", "1", CVAR_ARCHIVE);
 	zigkiller = gi.cvar("zigkiller", "1", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	zigrapple = gi.cvar("zigrapple", "0", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	basepath = gi.cvar("basepath", ".", CVAR_NOSET);
+	basepath = gi.cvar("basepath", "", CVAR_NOSET);
 	respawn_protection = gi.cvar("respawn_protection", "0", CVAR_ARCHIVE);
 
 	// items

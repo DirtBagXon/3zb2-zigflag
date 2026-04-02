@@ -2,6 +2,7 @@
 
 #include "header/local.h"
 #include "header/bot.h"
+
 /*
 ============
 CanDamage
@@ -28,7 +29,7 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 			return true;
 		return false;
 	}
-	
+
 
 	trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, targ->s.origin, inflictor, MASK_SOLID);
 	if (trace.fraction == 1.0f)
@@ -289,7 +290,7 @@ static int CheckArmor (edict_t *ent, vec3_t point, vec3_t normal, int damage, in
 qboolean CheckTeamDamage (edict_t *targ, edict_t *attacker)
 {
 //ZOID
-	if (ctf->value && targ->client && attacker->client)
+	if (ctf->value && !tdm->value && targ->client && attacker->client)
 		if (targ->client->resp.ctf_team == attacker->client->resp.ctf_team &&
 			targ != attacker)
 			return true;
@@ -461,7 +462,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			{
 				if(client->zc.battlemode & FIRE_CHIKEN) client->zc.battlemode &= ~FIRE_CHIKEN;
 
-				if(mod == MOD_RAILGUN 
+				if(mod == MOD_RAILGUN
 				|| mod == MOD_BFG_LASER
 				|| mod == MOD_ROCKET
 				|| mod == MOD_BLASTER
@@ -483,7 +484,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 
 
 		targ->health = targ->health - take;
-			
+
 		if (targ->health <= 0)
 		{
 			if ((targ->svflags & SVF_MONSTER) || (client))

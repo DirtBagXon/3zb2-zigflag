@@ -1,22 +1,3 @@
-# ----------------------------------------------------- #
-# Makefile for the 3zb2 game module for Quake II       #
-#                                                       #
-# Just type "make" to compile the                       #
-#  - 3rd. Zigock Bot Game (game.so)                         #
-#                                                       #
-# Dependencies:                                         #
-# - None, but you need a Quake II to play.              #
-#   While in theorie every client should work           #
-#   Yamagi Quake II ist recommended.                    #
-#                                                       #
-# Platforms:                                            #
-# - FreeBSD                                             #
-# - Linux                                               #
-# - Mac OS X                                            #
-# - OpenBSD                                             #
-# - Windows                                             #
-# ----------------------------------------------------- #
-
 # Detect the OS
 ifdef SystemRoot
 OSTYPE := Windows
@@ -56,10 +37,10 @@ endif
 
 # ----------
 
-# Base CFLAGS. 
+# Base CFLAGS.
 #
 # -O2 are enough optimizations.
-# 
+#
 # -fno-strict-aliasing since the source doesn't comply
 #  with strict aliasing rules and it's next to impossible
 #  to get it there...
@@ -79,7 +60,8 @@ CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
 		  -Wall -pipe -g -fwrapv -arch i386 -arch x86_64
 else
 CFLAGS := -O2 -fno-strict-aliasing -fomit-frame-pointer \
-		  -Wall -pipe -g -MMD -fwrapv -fPIC -msse2 -mfpmath=sse -Wno-unused-result
+		  -Wall -pipe -g -MMD -fwrapv -fPIC -msse2 -mfpmath=sse -Wno-unused-result \
+		  -std=gnu99
 endif
 
 # ----------
@@ -131,12 +113,12 @@ Q := @
 endif
 
 # ----------
- 
+
 # Phony targets
 .PHONY : all clean 3zb2
 
 # ----------
- 
+
 # Cleanup
 clean:
 	@echo "===> CLEAN"
@@ -233,4 +215,3 @@ release/game.so : $(3ZB2_OBJS)
 	${Q}$(CC) $(LDFLAGS) -o $@ $(3ZB2_OBJS)
 endif
 
-# ----------

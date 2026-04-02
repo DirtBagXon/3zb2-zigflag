@@ -35,7 +35,7 @@ void MoveClientToIntermission (edict_t *ent)
 
 	// RAFAEL
 	ent->client->quadfire_framenum = 0;
-	
+
 	// RAFAEL
 	ent->client->trap_blew_up = false;
 	ent->client->trap_time = 0;
@@ -51,7 +51,7 @@ void MoveClientToIntermission (edict_t *ent)
 
 	// add the layout
 
-	if (deathmatch->value && !(ent->svflags & SVF_MONSTER)) 
+	if (deathmatch->value && !(ent->svflags & SVF_MONSTER))
 	{
 		if(zigmode->value)
 			DeathmatchScoreboardMessage (ent, ent->flagholder);
@@ -382,12 +382,12 @@ void HelpComputer (edict_t *ent)
 		"xv 0 yv 54 cstring2 \"%s\" "		// help 1
 		"xv 0 yv 110 cstring2 \"%s\" "		// help 2
 		"xv 50 yv 164 string2 \" kills     goals    secrets\" "
-		"xv 50 yv 172 string2 \"%3i/%3i     %i/%i       %i/%i\" ", 
+		"xv 50 yv 172 string2 \"%3i/%3i     %i/%i       %i/%i\" ",
 		sk,
 		level.level_name,
 		game.helpmessage1,
 		game.helpmessage2,
-		level.killed_monsters, level.total_monsters, 
+		level.killed_monsters, level.total_monsters,
 		level.found_goals, level.total_goals,
 		level.found_secrets, level.total_secrets);
 
@@ -656,7 +656,7 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_AMMO_ICON] = gi.imageindex (item->icon);
 		ent->client->ps.stats[STAT_AMMO] = ent->client->pers.inventory[ent->client->ammo_index];
 	}
-	
+
 	//
 	// armor
 	//
@@ -788,12 +788,12 @@ void G_SetStats (edict_t *ent)
 	//
 	// rank and time
 	//
-	if(zigmode->value && combathud->value && (level.framenum&8)
-			&& !level.intermissiontime)
+	if(combathud->value && (level.framenum&8) && !level.intermissiontime)
 	{
-		ent->client->ps.stats[STAT_RANK] = ent->client->pers.rank;
+		if (zigmode->value)
+			ent->client->ps.stats[STAT_RANK] = ent->client->pers.rank;
 
-		if(timelimit->value > 0)
+		if (timelimit->value > 0)
 			ent->client->ps.stats[STAT_TIME] = CS_TIME;
 	}
 
