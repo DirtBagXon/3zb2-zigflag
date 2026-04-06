@@ -317,6 +317,7 @@ typedef struct
 //bot info struct
 #define MAXBOTS		128
 #define MAXBOP		16
+#define MAXBOTXT	21
 
 // bot params
 #define BOP_WALK		0	//flags
@@ -338,13 +339,13 @@ typedef struct
 
 typedef	struct
 {
-	char	netname[21];		//netname
-	char	model[21];			//model
-	char	skin[21];			//skin
-	int		spflg;				//spawned flag 0-not 1-waiting 2-spawned
-	int		team;				//team NO. 0-noteam 1-RED 2-BLUE
-	int		arena;				//if arena is on
-	unsigned char	param[MAXBOP];		//Params
+	char            netname[MAXBOTXT];  //netname
+	char            model[MAXBOTXT];    //model
+	char            skin[MAXBOTXT];     //skin
+	int             spflg;              //spawned flag 0-not 1-waiting 2-spawned
+	int             team;               //team NO. 0-noteam 1-RED 2-BLUE
+	int             arena;              //if arena is on
+	unsigned char   param[MAXBOP];      //Params
 }	botinfo_t;
 
 //----------------------------------------------------------------

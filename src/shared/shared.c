@@ -7,6 +7,41 @@ vec3_t vec3_origin = {0,0,0};
 //============================================================================
 
 #ifdef _WIN32
+#include <windows.h>
+
+const char *GetExeDirectory(void)
+{
+	static char path[MAX_PATH];
+	char *lastSlash1, *lastSlash2, *lastSlash;
+
+	GetModuleFileNameA(NULL, path, sizeof(path));
+
+	lastSlash1 = strrchr(path, '\\');
+	lastSlash2 = strrchr(path, '/');
+
+	lastSlash = lastSlash1 > lastSlash2 ? lastSlash1 : lastSlash2;
+
+	if (lastSlash)
+	    *lastSlash = '\0';
+
+	return path;
+}
+
+size_t strlcpy(char *dst, const char *src, size_t size)
+{
+	size_t src_len = strlen(src);
+
+	if (size > 0) {
+	    size_t copy_len = (src_len >= size) ? size - 1 : src_len;
+	    memcpy(dst, src, copy_len);
+	    dst[copy_len] = '\0';
+	}
+
+	return src_len;
+}
+#endif
+
+#if defined(_MSC_VER)
 #pragma optimize( "", off )
 #endif
 
@@ -65,7 +100,7 @@ void RotatePointAroundVector( vec3_t dst, const vec3_t dir, const vec3_t point, 
 	}
 }
 
-#ifdef _WIN32
+#if defined(_MSC_VER)
 #pragma optimize( "", on )
 #endif
 
@@ -628,12 +663,11 @@ void COM_FileBase (char *in, char *out)
 	;
 	
 	if (s-s2 < 2)
-		out[0] = 0;
+		out[0] = '\0';
 	else
 	{
 		s--;
-		strncpy (out,s2+1, s-s2);
-		out[s-s2] = 0;
+		strlcpy (out, s2+1, s-s2);
 	}
 }
 
@@ -653,8 +687,7 @@ void COM_FilePath (char *in, char *out)
 	while (s != in && *s != '/')
 		s--;
 
-	strncpy (out,in, s-in);
-	out[s-in] = 0;
+	strlcpy (out,in, s-in);
 }
 
 
@@ -774,7 +807,7 @@ void Swap_Init (void)
 // set the byte swapping variables in a portable manner	
 	if ( *(short *)swaptest == 1)
 	{
-		bigendien = false;
+		bigendien = qfalse;
 		_BigShort = ShortSwap;
 		_LittleShort = ShortNoSwap;
 		_BigLong = LongSwap;
@@ -784,7 +817,7 @@ void Swap_Init (void)
 	}
 	else
 	{
-		bigendien = true;
+		bigendien = qtrue;
 		_BigShort = ShortNoSwap;
 		_LittleShort = ShortSwap;
 		_BigLong = LongNoSwap;
@@ -939,7 +972,7 @@ void Com_PageInMemory (byte *buffer, int size)
 // FIXME: replace all Q_stricmp with Q_strcasecmp
 int Q_stricmp (char *s1, char *s2)
 {
-#if defined(WIN32)
+#ifdef _WIN32
 	return _stricmp (s1, s2);
 #else
 	return strcasecmp (s1, s2);
@@ -991,7 +1024,7 @@ void Com_sprintf (char *dest, int size, char *fmt, ...)
 	va_end (argptr);
 	if (len >= size)
 		Com_Printf ("Com_sprintf: overflow of %i in %i\n", len, size);
-	strncpy (dest, bigbuffer, size-1);
+	strlcpy (dest, bigbuffer, size);
 }
 
 /*
@@ -1091,7 +1124,7 @@ void Info_RemoveKey (char *s, char *key)
 
 		if (!strcmp (key, pkey) )
 		{
-			strcpy (start, s);	// remove this part
+			memmove(start, s, strlen(s) + 1);
 			return;
 		}
 
@@ -1113,10 +1146,10 @@ can mess up the server's parsing
 qboolean Info_Validate (char *s)
 {
 	if (strstr (s, "\""))
-		return false;
+		return qfalse;
 	if (strstr (s, ";"))
-		return false;
-	return true;
+		return qfalse;
+	return qtrue;
 }
 
 void Info_SetValueForKey (char *s, char *key, char *value)

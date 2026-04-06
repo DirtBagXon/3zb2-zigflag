@@ -358,17 +358,17 @@ void vectoangles (vec3_t value1, vec3_t angles)
 
 char *G_CopyString (char *in)
 {
-	char	*out;
+	size_t len = strlen(in) + 1;
 	
-	out = gi.TagMalloc (strlen(in)+1, TAG_LEVEL);
-	strcpy (out, in);
+	char *out = gi.TagMalloc (strlen(in)+1, TAG_LEVEL);
+	memcpy(out, in, len);
 	return out;
 }
 
 
 void G_InitEdict (edict_t *e)
 {
-	e->inuse = true;
+	e->inuse = qtrue;
 	e->classname = "noclass";
 	e->gravity = 1.0;
 	e->s.number = e - g_edicts;
@@ -388,10 +388,10 @@ angles and bad trails.
 */
 edict_t *G_Spawn (void)
 {
-	int			i;
+	int		i;
 	edict_t		*e;
-	int                     attempt;
-	const int       MAX_ATTEMPTS = 2;
+	int		attempt;
+	const int	MAX_ATTEMPTS = 2;
 
 	for (attempt = 1; attempt <= MAX_ATTEMPTS; ++attempt) {
 		qboolean permit_recently_freed = (attempt > 1);
@@ -435,7 +435,7 @@ void G_FreeEdict (edict_t *ed)
 	memset (ed, 0, sizeof(*ed));
 	ed->classname = "freed";
 	ed->freetime = level.time;
-	ed->inuse = false;
+	ed->inuse = qfalse;
 }
 
 #define MAX_RECLAIM_SEVERITY 2
@@ -701,11 +701,11 @@ qboolean KillBox (edict_t *ent)
 
 			// if we didn't kill it, fail
 			if (tr.ent->solid)
-				return false;
+				return qfalse;
 		}
 	}
 
-	return true;		// all clear
+	return qtrue;		// all clear
 }
 
 /*

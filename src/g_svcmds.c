@@ -69,7 +69,7 @@ static qboolean StringToFilter (char *s, ipfilter_t *f)
 		if (*s < '0' || *s > '9')
 		{
 			gi.cprintf(NULL, PRINT_HIGH, "Bad filter address: %s\n", s);
-			return false;
+			return qfalse;
 		}
 		
 		j = 0;
@@ -90,7 +90,7 @@ static qboolean StringToFilter (char *s, ipfilter_t *f)
 	f->mask = *(unsigned *)m;
 	f->compare = *(unsigned *)b;
 	
-	return true;
+	return qtrue;
 }
 
 /*
@@ -224,9 +224,9 @@ void SVCmd_WriteIP_f (void)
 	game = gi.cvar("game", "", 0);
 
 	if (!*game->string)
-		sprintf (name, "%s/listip.cfg", GAMEVERSION);
+		snprintf(name, sizeof(name), "%s/listip.cfg", GAMEVERSION);
 	else
-		sprintf (name, "%s/listip.cfg", game->string);
+		snprintf(name, sizeof(name), "%s/listip.cfg", game->string);
 
 	gi.cprintf (NULL, PRINT_HIGH, "Writing %s.\n", name);
 
@@ -248,31 +248,34 @@ void SVCmd_WriteIP_f (void)
 	fclose (f);
 }
 
-
-
-
-
 //ルート修正
 //ノーマルポッドは全て切り捨て
 void Move_LastRouteIndex()
 {
-	int	i;
+	int i;
 
-	for(i = CurrentIndex - 1 ; i >= 0;i--)
+	for (i = CurrentIndex - 1; i >= 0; i--)
 	{
-		if(Route[i].state) break;
-		else if(!Route[i].index) break;
+		if (Route[i].state)
+			break;
+		else if (!Route[i].index)
+			break;
 	}
-	if(!CurrentIndex || !Route[i].index) CurrentIndex = i;
-	else CurrentIndex = i + 1;
 
-	if(CurrentIndex < MAXNODES)
+	// limit index range fixes memset offset out of bounds warning
+	if (i < 0 || i >= MAXNODES)
+		return;
+
+	if (!CurrentIndex || !Route[i].index)
+		CurrentIndex = i;
+	else
+		CurrentIndex = i + 1;
+
+	if (CurrentIndex < MAXNODES)
 	{
-	       if(CurrentIndex > 0)
-	       {
-			memset(&Route[CurrentIndex],0,sizeof(route_t));
+		memset(&Route[CurrentIndex], 0, sizeof(route_t));
+		if (CurrentIndex > 0)
 			Route[CurrentIndex].index = Route[CurrentIndex - 1].index + 1;
-		}
 	}
 }
 
@@ -313,11 +316,8 @@ void SaveChain()
 	}
 
 	//とりあえずCTFだめ
-	//if(ctf->value) 	sprintf(name,".\\%s\\chctf\\%s.chf",gamepath->string,level.mapname);
-	//else 	sprintf(name,".\\%s\\chdtm\\%s.chn",gamepath->string,level.mapname);
-
-	if(ctf->value) 	sprintf(name,"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
-	else 	sprintf(name,"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+	if(ctf->value) snprintf(name,sizeof(name),"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+	else snprintf(name,sizeof(name),"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
 
 	fpout = fopen(name,"wb");
 	if(fpout == NULL) gi.cprintf(NULL,PRINT_HIGH,"Can't open %s\n",name);

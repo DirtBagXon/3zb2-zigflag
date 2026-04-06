@@ -60,7 +60,7 @@ cvar_t	*weaponswap;
 
 //ponpoko
 cvar_t	*gamedir;
-cvar_t	*basepath;
+cvar_t	*cfgpath;
 cvar_t	*gamepath;
 cvar_t	*chedit;
 cvar_t	*vwep;
@@ -220,7 +220,7 @@ get next map's file name
 void Get_NextMap()
 {
 	FILE	*fp;
-	qboolean	firstflag = false;
+	qboolean	firstflag = qfalse;
 	char	Buff[MAX_QPATH];
 	char	top[MAX_QPATH];
 	char	nextmap[MAX_QPATH];
@@ -228,8 +228,7 @@ void Get_NextMap()
 
 	if(!maplist->string) return;
 
-	//sprintf(Buff,".\\%s\\3ZBMAPS.LST",gamepath->string);
-	sprintf(Buff,"%s/%s/3zbmaps.lst",GET_BASEPATH_STR(),gamepath->string);
+	snprintf(Buff,sizeof(Buff),"%s/%s/3zbmaps.lst",GET_BASEPATH_STR(),gamepath->string);
 	fp = fopen(Buff,"r");
 	if(fp == NULL) return;
 
@@ -266,7 +265,7 @@ void Get_NextMap()
 		{
 			if( firstflag )
 			{
-				strcpy(nextmap,top);
+				strlcpy(nextmap,top,MAX_QPATH);
 				goto SETNEXTMAP;
 			}
 			else goto NONEXTMAP;
@@ -278,8 +277,8 @@ void Get_NextMap()
 
 		if(!firstflag)
 		{
-			firstflag = true;
-			strcpy(top,nextmap);
+			firstflag = qtrue;
+			strlcpy(top,nextmap,MAX_QPATH);
 		}
 
 		if(Q_stricmp (level.mapname, nextmap) == 0) break;
@@ -292,7 +291,7 @@ void Get_NextMap()
 		{
 			if( firstflag )
 			{
-				strcpy(nextmap,top);
+				strlcpy(nextmap,top,MAX_QPATH);
 				goto SETNEXTMAP;
 			}
 			else goto NONEXTMAP;
@@ -302,7 +301,7 @@ void Get_NextMap()
 		{
 			if( firstflag )
 			{
-				strcpy(nextmap,top);
+				strlcpy(nextmap,top,MAX_QPATH);
 				goto SETNEXTMAP;
 			}
 			else goto NONEXTMAP;
@@ -315,7 +314,7 @@ void Get_NextMap()
 	}
 SETNEXTMAP:
 
-	strcpy(level.nextmap,nextmap);
+	strlcpy(level.nextmap,nextmap,MAX_QPATH);
 
 NONEXTMAP:
 	fclose(fp);
@@ -380,7 +379,7 @@ void CheckNeedPass (void)
 	// as needed
 	if (password->modified || spectator_password->modified)
 	{
-		password->modified = spectator_password->modified = false;
+		password->modified = spectator_password->modified = qfalse;
 
 		need = 0;
 
@@ -497,8 +496,8 @@ void G_RunFrame (void)
 	static unsigned short	zflag_stall = 0;
 	static unsigned short	zflag_bounce = 0;
 	static float	next_fragadd = 0;
-	static qboolean	zf_warn = false;
-	static qboolean	zf_move = false;
+	static qboolean	zf_warn = qfalse;
+	static qboolean	zf_move = qfalse;
 	static edict_t	*flagholder = NULL;
 	static edict_t	*lastholder = NULL;
 	char   buffer[MAX_TEXT];
@@ -530,8 +529,8 @@ void G_RunFrame (void)
 		lastholder = NULL;
 		zflag_stall = 0;
 		zflag_bounce = 0;
-		zf_warn = false;
-		zf_move = false;
+		zf_warn = qfalse;
+		zf_move = qfalse;
 		return;
 	}
 
@@ -559,7 +558,7 @@ void G_RunFrame (void)
 	// treat each object in turn
 	// even the world gets a chance to think
 	//
-	haveflag = false;
+	haveflag = qfalse;
 	ent = &g_edicts[0];
 	for (i=0 ; i<globals.num_edicts ; i++, ent++)
 	{
@@ -591,7 +590,7 @@ void G_RunFrame (void)
 			}
 		}
 //////////旗のスコアチェック
-		if(zigmode->value == 1 && !ctf->value)
+		if(zigmode->value && !ctf->value)
 		{
 			if(i > 0 && i <= maxclients->value)
 			{
@@ -603,7 +602,7 @@ void G_RunFrame (void)
 					if(g_edicts[i].client->pers.inventory[ITEM_INDEX(zflag_item)])
 					{
 						flagholder = ent;
-						haveflag = true;
+						haveflag = qtrue;
 						zflag_stall = 0;
 						zflag_ent = NULL;
 
@@ -696,22 +695,22 @@ void G_RunFrame (void)
 		G_RunEntity (ent);
 	}
 
-	zf_warn = false;
-	zf_move = false;
+	zf_warn = qfalse;
+	zf_move = qfalse;
 
 	if(!haveflag)
 		flagholder = NULL;
 
 	if(next_fragadd < level.time)
 	{
-		if(!flagholder && !ctf->value && zigmode->value == 1 && zigspawn->value == 1)
+		if(!flagholder && !ctf->value && zigmode->value && zigspawn->value)
 		{
 			zflag_stall++;
 
 			if(zflag_stall == (ZIGRESET - 1))
 			{
-				zf_warn = true;
-				sprintf(buffer,"Flag will bounce in %d seconds\n", (int)(FRAMETIME * ZIGTICK));
+				zf_warn = qtrue;
+				snprintf(buffer,sizeof(buffer),"Flag will bounce in %d seconds\n", (int)(FRAMETIME * ZIGTICK));
 				HighlightStr(hitxt, buffer, MAX_TEXT);
 				gi.bprintf (PRINT_HIGH, "%s", hitxt);
 			}
@@ -732,7 +731,7 @@ void G_RunFrame (void)
 						gi.multicast (zflag_ent->s.origin, MULTICAST_PVS);
 					}
 				}
-				zf_move = true;
+				zf_move = qtrue;
 				zflag_stall = 0;
 				zflag_bounce++;
 				SelectFlagSpawnPoint (ent, v, vv);
@@ -745,7 +744,7 @@ void G_RunFrame (void)
 			}
 		}
 
-		if(!zigspawn->value && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value == 1 && zigflag_spawn == 1)
+		if(!zigspawn->value && zflag_ent == NULL && !haveflag && !ctf->value && zigmode->value && zigflag_spawn)
 		{
 			SelectFlagSpawnPoint (ent, v, vv);
 			if(ZIGDrop_FlagCheck(ent,zflag_item))

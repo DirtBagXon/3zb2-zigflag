@@ -15,9 +15,6 @@
 #include "menu.h"
 //ZOID
 
-// Override BASE_DIR
-#define GET_BASEPATH_STR() ((basepath && basepath->string && strlen(basepath->string)) ? basepath->string : gamedir->string)
-
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
 
@@ -27,11 +24,12 @@
 // Timer
 #define CS_TIME	(CS_GENERAL + 1)
 
-// Observer notice
-#define CS_OBSERVE	(CS_GENERAL + 2)
+// Observer notices
+#define CS_OBSERVE1	(CS_GENERAL + 2)
+#define CS_OBSERVE2	(CS_GENERAL + 3)
 
 // Player ID
-#define CS_PLAYERNAMES	(CS_GENERAL + 3)
+#define CS_PLAYERNAMES	(CS_GENERAL + 4)
 
 // Immune on respawn (n * FRAMETIME) sec
 #define	SPAWNPROTECT	10
@@ -571,10 +569,10 @@ extern	int	meansOfDeath;
 
 extern	edict_t			*g_edicts;
 
-#define	FOFS(x) (long)&(((edict_t *)0)->x)
-#define	STOFS(x) (long)&(((spawn_temp_t *)0)->x)
-#define	LLOFS(x) (long)&(((level_locals_t *)0)->x)
-#define	CLOFS(x) (long)&(((gclient_t *)0)->x)
+#define	FOFS(x) (intptr_t)&(((edict_t *)0)->x)
+#define	STOFS(x) (intptr_t)&(((spawn_temp_t *)0)->x)
+#define	LLOFS(x) (intptr_t)&(((level_locals_t *)0)->x)
+#define	CLOFS(x) (intptr_t)&(((gclient_t *)0)->x)
 
 #define random()	((rand () & 0x7fff) / ((float)0x7fff))
 #define crandom()	(2.0 * (random() - 0.5))
@@ -620,7 +618,7 @@ extern	cvar_t  *playerid;
 
 //ponpoko
 extern	cvar_t	*gamedir;
-extern	cvar_t	*basepath;
+extern	cvar_t	*cfgpath;
 extern	cvar_t	*gamepath;
 extern	cvar_t	*chedit;
 extern	cvar_t	*vwep;
@@ -953,8 +951,8 @@ void GetChaseTarget(edict_t *ent);
 typedef struct
 {
 	char		userinfo[MAX_INFO_STRING];
-	char		netname[16];
-	int			hand;
+	char		netname[MAX_NAME];
+	int		hand;
 
 	qboolean	connected;			// a loadgame will leave valid entities that
 									// just don't have a connection yet
@@ -1007,12 +1005,12 @@ typedef struct zgcl_s
 {
 	int			zclass;			//class no.
 
-// true client用 zoom フラグ
+// qtrue client用 zoom フラグ
 	int			aiming;			//0-not 1-aiming  2-firing zoomingflag
 	float		distance;		//zoom中のFOV値
 	float		olddistance;	//旧zooming FOV値
 	qboolean	autozoom;		//autozoom
-	qboolean	lockon;			//lockon flag false-not true-locking
+	qboolean	lockon;			//lockon flag qfalse-not qtrue-locking
 
 // bot用
 	int			zcstate;		//status
@@ -1030,7 +1028,7 @@ typedef struct zgcl_s
 	edict_t		*waitin_obj;	//for waiting sequence complete
 
 	//basical moving
-	float		moveyaw;		//true moving yaw
+	float		moveyaw;		//qtrue moving yaw
 
 	//camp & aiming
 	float		preaimingtime;
@@ -1166,7 +1164,7 @@ struct gclient_s
 
 //ZOID
 	void		*ctf_grapple;		// entity of grapple
-	int			ctf_grapplestate;		// true if pulling
+	int			ctf_grapplestate;		// qtrue if pulling
 	float		ctf_grapplereleasetime;	// time of grapple release
 	float		ctf_regentime;		// regen tech
 	float		ctf_techsndtime;

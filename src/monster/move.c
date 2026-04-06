@@ -8,7 +8,7 @@
 =============
 M_CheckBottom
 
-Returns false if any part of the bottom of the entity is off an edge that
+Returns qfalse if any part of the bottom of the entity is off an edge that
 is not a staircase.
 
 =============
@@ -39,7 +39,7 @@ qboolean M_CheckBottom (edict_t *ent)
 		}
 
 	c_yes++;
-	return true;		// we got out easy
+	return qtrue;		// we got out easy
 
 realcheck:
 	c_no++;
@@ -55,7 +55,7 @@ realcheck:
 	trace = gi.trace (start, vec3_origin, vec3_origin, stop, ent,MASK_PLAYERSOLID /*MASK_MONSTERSOLID*/);
 
 	if (trace.fraction == 1.0)
-		return false;
+		return qfalse;
 	mid = bottom = trace.endpos[2];
 	
 // the corners must be within 16 of the midpoint	
@@ -70,11 +70,11 @@ realcheck:
 			if (trace.fraction != 1.0 && trace.endpos[2] > bottom)
 				bottom = trace.endpos[2];
 			if (trace.fraction == 1.0 || mid - trace.endpos[2] > STEPSIZE)
-				return false;
+				return qfalse;
 		}
 
 	c_yes++;
-	return true;
+	return qtrue;
 }
 
 

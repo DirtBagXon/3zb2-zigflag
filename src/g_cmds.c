@@ -38,14 +38,15 @@ qboolean OnSameTeam (edict_t *ent1, edict_t *ent2)
 	char	ent2Team [512];
 
 	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
-		return false;
+		return qfalse;
 
-	strcpy (ent1Team, ClientTeam (ent1));
-	strcpy (ent2Team, ClientTeam (ent2));
+	strlcpy(ent1Team, ClientTeam (ent1), sizeof(ent1Team));
+	strlcpy(ent2Team, ClientTeam (ent2), sizeof(ent2Team));
 
 	if (strcmp(ent1Team, ent2Team) == 0)
-		return true;
-	return false;
+		return qtrue;
+
+	return qfalse;
 }
 
 
@@ -163,9 +164,9 @@ void Cmd_Give_f (edict_t *ent)
 	name = gi.args();
 
 	if (Q_stricmp(name, "all") == 0)
-		give_all = true;
+		give_all = qtrue;
 	else
-		give_all = false;
+		give_all = qfalse;
 
 	if (give_all || Q_stricmp(gi.argv(1), "health") == 0)
 	{
@@ -530,20 +531,20 @@ void Cmd_Inven_f (edict_t *ent)
 
 	cl = ent->client;
 
-	cl->showscores = false;
-	cl->showhelp = false;
+	cl->showscores = qfalse;
+	cl->showhelp = qfalse;
 
 //ZOID
 	if (ent->client->menu) {
 		PMenu_Close(ent);
-		ent->client->update_chase = true;
+		ent->client->update_chase = qtrue;
 		return;
 	}
 //ZOID
 
 	if (cl->showinventory)
 	{
-		cl->showinventory = false;
+		cl->showinventory = qfalse;
 		return;
 	}
 
@@ -554,14 +555,14 @@ void Cmd_Inven_f (edict_t *ent)
 	}
 //ZOID
 
-	cl->showinventory = true;
+	cl->showinventory = qtrue;
 
 	gi.WriteByte (svc_inventory);
 	for (i=0 ; i<MAX_ITEMS ; i++)
 	{
 		gi.WriteShort (cl->pers.inventory[i]);
 	}
-	gi.unicast (ent, true);
+	gi.unicast (ent, qtrue);
 }
 
 /*
@@ -574,7 +575,7 @@ void Cmd_InvUse_f (edict_t *ent)
 	gitem_t		*it;
 
 	if (ent->client->resp.spectator && !ent->client->pers.joined) {
-		ent->client->pers.joined = true;
+		ent->client->pers.joined = qtrue;
 		spectator_respawn(ent);
 		return;
 	}
@@ -778,13 +779,13 @@ Cmd_PutAway_f
 */
 void Cmd_PutAway_f (edict_t *ent)
 {
-	ent->client->showscores = false;
-	ent->client->showhelp = false;
-	ent->client->showinventory = false;
+	ent->client->showscores = qfalse;
+	ent->client->showhelp = qfalse;
+	ent->client->showinventory = qfalse;
 //ZOID
 	if (ent->client->menu)
 		PMenu_Close(ent);
-	ent->client->update_chase = true;
+	ent->client->update_chase = qtrue;
 //ZOID
 }
 
@@ -916,7 +917,7 @@ void Cmd_Say_f (edict_t *ent, qboolean team, qboolean arg0)
 		return;
 
 	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
-		team = false;
+		team = qfalse;
 
 	if (team)
 		Com_sprintf (text, sizeof(text), "(%s): ", ent->client->pers.netname);
@@ -1028,12 +1029,12 @@ void Cmd_AutoZoom(edict_t *ent)
 	if( ent->client->zc.autozoom )
 	{
 		gi.cprintf(ent,PRINT_HIGH,"autozoom off.\n");
-		ent->client->zc.autozoom = false;
+		ent->client->zc.autozoom = qfalse;
 	}
 	else
 	{
 		gi.cprintf(ent,PRINT_HIGH,"autozoom on.\n");
-		ent->client->zc.autozoom = true;
+		ent->client->zc.autozoom = qtrue;
 	}
 }
 
@@ -1089,12 +1090,12 @@ void ClientCommand (edict_t *ent)
 	}
 	if (Q_stricmp (cmd, "say") == 0)
 	{
-		Cmd_Say_f (ent, false, false);
+		Cmd_Say_f (ent, qfalse, qfalse);
 		return;
 	}
 	if (Q_stricmp (cmd, "say_team") == 0)
 	{
-		Cmd_Say_f (ent, true, false);
+		Cmd_Say_f (ent, qtrue, qfalse);
 		return;
 	}
 	if (Q_stricmp (cmd, "score") == 0)
@@ -1108,16 +1109,17 @@ void ClientCommand (edict_t *ent)
 		return;
 	}
 
-    if (Q_stricmp (cmd, "store") == 0)
-    {
-        Cmd_Store_f(ent);
-        return;
-    }
-    if (Q_stricmp (cmd, "recall") == 0)
-    {
-        Cmd_Recall_f(ent);
-        return;
-    }
+	if (Q_stricmp (cmd, "store") == 0)
+	{
+		Cmd_Store_f(ent);
+		return;
+	}
+
+	if (Q_stricmp (cmd, "recall") == 0)
+	{
+		Cmd_Recall_f(ent);
+		return;
+	}
 
 	if (level.intermissiontime)
 		return;
@@ -1186,48 +1188,48 @@ void ClientCommand (edict_t *ent)
 	}
 //ZOID
 	else	// anything that doesn't match a command will be a chat
-		Cmd_Say_f (ent, false, true);
+		Cmd_Say_f (ent, qfalse, qtrue);
 }
 
 void Cmd_Store_f (edict_t *ent)
 {
-    if (!ent->client)
-        return;
+	if (!ent->client)
+		return;
 
-    if (!sv_cheats->value) {
-        gi.cprintf(ent, PRINT_HIGH, "Not allowed\n");
-        return;
-    }
+	if (!sv_cheats->value) {
+		gi.cprintf(ent, PRINT_HIGH, "Not allowed\n");
+		return;
+	}
 
-    VectorCopy(ent->s.origin, ent->client->pers.stored_origin);
-    VectorCopy(ent->client->ps.viewangles, ent->client->pers.stored_angles);
-    ent->client->pers.stored_frame = level.framenum;
+	VectorCopy(ent->s.origin, ent->client->pers.stored_origin);
+	VectorCopy(ent->client->ps.viewangles, ent->client->pers.stored_angles);
+	ent->client->pers.stored_frame = level.framenum;
 }
 
 void Cmd_Recall_f (edict_t *ent)
 {
-    if (!ent->client)
-        return;
+	if (!ent->client)
+		return;
 
-    if (ent->client->pers.stored_frame == 0)
-    {
-        gi.cprintf(ent, PRINT_HIGH, "No valid position stored.\n");
-        return;
-    }
+	if (ent->client->pers.stored_frame == 0)
+	{
+		gi.cprintf(ent, PRINT_HIGH, "No valid position stored.\n");
+		return;
+	}
 
-    VectorCopy(ent->client->pers.stored_origin, ent->s.origin);
-    VectorCopy(ent->client->pers.stored_origin, ent->s.old_origin);
-    VectorCopy(ent->client->pers.stored_origin, ent->client->ps.pmove.origin);
+	VectorCopy(ent->client->pers.stored_origin, ent->s.origin);
+	VectorCopy(ent->client->pers.stored_origin, ent->s.old_origin);
+	VectorCopy(ent->client->pers.stored_origin, ent->client->ps.pmove.origin);
 
-    VectorCopy(ent->client->pers.stored_angles, ent->client->ps.viewangles);
-    VectorCopy(ent->client->pers.stored_angles, ent->client->v_angle);
-    VectorCopy(ent->client->pers.stored_angles, ent->s.angles);
+	VectorCopy(ent->client->pers.stored_angles, ent->client->ps.viewangles);
+	VectorCopy(ent->client->pers.stored_angles, ent->client->v_angle);
+	VectorCopy(ent->client->pers.stored_angles, ent->s.angles);
 
-    for (int i=0 ; i<3 ; i++)
-        ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(ent->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
+	for (int i=0 ; i<3 ; i++)
+		ent->client->ps.pmove.delta_angles[i] = ANGLE2SHORT(ent->client->v_angle[i] - ent->client->resp.cmd_angles[i]);
 
-    VectorCopy(vec3_origin, ent->velocity);
-    VectorCopy(vec3_origin, ent->client->ps.pmove.velocity);
+	VectorCopy(vec3_origin, ent->velocity);
+	VectorCopy(vec3_origin, ent->client->ps.pmove.velocity);
 
-    gi.linkentity(ent);
+	gi.linkentity(ent);
 }

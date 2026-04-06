@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Modern DMFlag Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #eee;
+    padding: 24px;
+    max-width: 900px;
+    margin: auto;
+  }
+  h1 { margin-bottom: 8px; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    gap: 10px 24px;
+    margin: 20px 0;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+  .result {
+    font-size: 2rem;
+    font-weight: bold;
+    padding: 12px;
+    background: #1c1c1c;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin: 20px 0;
+  }
+  button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+</style>
+</head>
+<body>
+  <h1>DM Flag Calculator</h1>
+  <p>Select the flags you want enabled. The total <code>dmflags</code> value updates automatically.</p>
+
+  <div class="result" id="total">0</div>
+
+  <div class="grid" id="flags"></div>
+
+  <button onclick="resetFlags()">Reset</button>
+
+<script>
+const flags = [
+  [1, 'DF_NO_HEALTH'],
+  [2, 'DF_NO_ITEMS'],
+  [4, 'DF_WEAPONS_STAY'],
+  [8, 'DF_NO_FALLING'],
+  [16, 'DF_INSTANT_ITEMS'],
+  [32, 'DF_SAME_LEVEL'],
+  [64, 'DF_SKINTEAMS'],
+  [128, 'DF_MODELTEAMS'],
+  [256, 'DF_NO_FRIENDLY_FIRE'],
+  [512, 'DF_SPAWN_FARTHEST'],
+  [1024, 'DF_FORCE_RESPAWN'],
+  [2048, 'DF_NO_ARMOR'],
+  [4096, 'DF_ALLOW_EXIT'],
+  [8192, 'DF_INFINITE_AMMO'],
+  [16384, 'DF_QUAD_DROP'],
+  [32768, 'DF_FIXED_FOV'],
+  [65536, 'DF_QUADFIRE_DROP (Xatrix)'],
+  [131072, 'DF_CTF_FORCEJOIN'],
+  [262144, 'DF_ARMOR_PROTECT'],
+  [524288, 'DF_CTF_NO_TECH']
+];
+
+const container = document.getElementById('flags');
+const totalEl = document.getElementById('total');
+
+function renderFlags() {
+  container.innerHTML = '';
+  flags.forEach(([value, label]) => {
+    const row = document.createElement('label');
+    row.innerHTML = `<input type="checkbox" value="${value}"> ${value} — ${label}`;
+    row.querySelector('input').addEventListener('change', updateTotal);
+    container.appendChild(row);
+  });
+}
+
+function updateTotal() {
+  const total = [...container.querySelectorAll('input:checked')]
+    .reduce((sum, cb) => sum + Number(cb.value), 0);
+  totalEl.textContent = total;
+}
+
+function resetFlags() {
+  container.querySelectorAll('input').forEach(cb => cb.checked = false);
+  updateTotal();
+}
+
+renderFlags();
+</script>
+<script data-goatcounter="https://dirtbagxon.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js">
+</script>
+</body>
+</html>

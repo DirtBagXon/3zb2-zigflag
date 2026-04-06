@@ -108,7 +108,7 @@ void ChaseNext(edict_t *ent)
 	} while (e != ent->client->chase_target);
 
 	ent->client->chase_target = e;
-	ent->client->update_chase = true;
+	ent->client->update_chase = qtrue;
 }
 
 void ChasePrev(edict_t *ent)
@@ -132,7 +132,7 @@ void ChasePrev(edict_t *ent)
 	} while (e != ent->client->chase_target);
 
 	ent->client->chase_target = e;
-	ent->client->update_chase = true;
+	ent->client->update_chase = qtrue;
 }
 
 void GetChaseTarget(edict_t *ent)
@@ -145,7 +145,7 @@ void GetChaseTarget(edict_t *ent)
 		other = g_edicts + i;
 		if (other->inuse && !other->client->resp.spectator) {
 			ent->client->chase_target = other;
-			ent->client->update_chase = true;
+			ent->client->update_chase = qtrue;
 			UpdateChaseCam(ent);
 			return;
 		}

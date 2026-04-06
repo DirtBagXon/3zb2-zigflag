@@ -27,12 +27,12 @@ The premise is simple: **get the flag and keep it**. Plays on standard Deathmatc
 
 ### General
 
-- `store` / `recall` commands to save and restore player position (Jump mod style)
+- `store` / `recall` commands to save and restore player position (_Jump mod style_)
 - Remaining time display for all game modes
 - Basic Team Deathmatch support (`set tdm 1`)
 - Random player spawn points on map start
 - Fixed menu item selection
-- Improved aim (`aimfix`), Quake 2 gameplay flaw fixes (`fixflaws`)
+- Improved aim (`aimfix`) - Quake 2 gameplay flaw fixes (`fixflaws`)
 
 See [CONFIG.md](CONFIG.md) for full configuration details.
 
@@ -77,7 +77,8 @@ paru -S \
 
 ### Compilation
 
-Review build scripts before executing.
+Review build scripts before executing.  
+Add `FORCE_OSTYPE=Windows_NT` to force an `OSTYPE`.
 
 ```bash
 ./build-lin64.sh
@@ -86,7 +87,7 @@ Review build scripts before executing.
 ./build-win32.sh
 
 ./clean.sh
-./build-win64.sh
+./build-win64.sh FORCE_OSTYPE=Windows_NT
 ```
 
 ## Bot Commands
@@ -112,23 +113,24 @@ Example server config for ZigFlag:
 
 ```
 exec addbot.cfg
-exec configs-ctf.cfg
+exec config-zflag.cfg
 set zigmode 1
 set zigspawn 1
 set zigkiller 1
-map q2ctf1
+map q2dm1
 ```
 
 ## Known Issues
 
-- The mod may lock up or segfault when using `gamemap`. Use `map` (full level reset) instead. On Q2Pro, set `sv_allow_map 1` to allow this.
-- Some models (e.g. grappling hook) are missing and require copying `pak` files from the `ctf` mod.
+- The mod may lock up or segfault when using `gamemap`.  
+  Use `map` (_full level reset_) instead. On Q2Pro, set `sv_allow_map 1` to allow this.
+- Some models (_e.g. grappling hook_) are missing and require copying `pak` files from the `ctf` mod.
 
 ## Credits
 
 - **Ponpoko** - Original 3rd Zigock Bot II mod author and bot creator
 - Contributors and backport sources: tastyspleen, yquake2, OpenTDM, OpenFFA
-- **MashedD** - For additions and much needed tidy.
+- **MashedD** - Many thanks for the work and additions to this repo.
 
 ## License
 

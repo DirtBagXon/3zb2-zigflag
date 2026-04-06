@@ -44,6 +44,7 @@ Route chain files (`.chn`/`.chf`) contain object and level navigation data. See 
 | `fixflaws` | Fix known Quake 2 gameplay flaws | `1` (on) |
 | `playerid` | Identify player in crosshair | `0` (off) |
 | `weaponswap` | Auto-switch to better weapon on pickup | `0` (off) |
+| `cfgpath` | Override path for config file folder location | `basedir` |
 
 ### Live-Updated
 
@@ -106,7 +107,7 @@ Route chain files (`.chn`/`.chf`) contain object and level navigation data. See 
 ### Tips
 
 - Avoid rocket jumps and grenade jumps in routes.
-- Deaths (lava, slime, etc.) auto-correct routes to safe paths.
+- Deaths (_lava, slime, etc._) auto-correct routes to safe paths.
 - Manually remove stuck bots: `sv rmb 1`
 
 ## Map List
@@ -230,6 +231,8 @@ Automatically spawn bots on match start.
 | `DF_SKINTEAMS` | `64` |
 | `DF_MODELTEAMS` | `128` |
 | `DF_NO_FRIENDLY_FIRE` | `256` |
+
+:point_right: [DMFlag Calculator](https://DirtBagXon.github.io/3zb2-zigflag/dmcalc.html)
 
 ### Capture and Hold (ZigFlag)
 

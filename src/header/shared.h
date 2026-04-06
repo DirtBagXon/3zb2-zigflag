@@ -4,7 +4,7 @@
 #ifndef Q_SHARED
 #define Q_SHARED
 
-#ifdef _WIN32
+#if defined(_MSC_VER)
 // unknown pragmas are SUPPOSED to be ignored, but....
 #pragma warning(disable : 4244)     // MIPS
 #pragma warning(disable : 4136)     // X86
@@ -36,8 +36,20 @@
 #define idaxp	0
 #endif
 
+#ifdef _WIN32
+const char *GetExeDirectory(void);
+size_t strlcpy(char *dst, const char *src, size_t size);
+#define GET_BASEPATH_STR() ((cfgpath && cfgpath->string && cfgpath->string[0]) ? cfgpath->string : GetExeDirectory())
+#else
+#define GET_BASEPATH_STR() ((cfgpath && cfgpath->string && cfgpath->string[0]) ? cfgpath->string : gamedir->string)
+#endif
+
 typedef unsigned char 		byte;
-typedef enum {false, true}	qboolean;
+
+#ifndef QBOOLEAN_T
+#define QBOOLEAN_T
+typedef enum { qfalse, qtrue } qboolean;
+#endif
 
 
 #ifndef NULL
@@ -435,8 +447,8 @@ typedef struct mapsurface_s  // used internally due to name len probs //ZOID
 // a trace is returned when a box is swept through the world
 typedef struct
 {
-	qboolean	allsolid;	// if true, plane is not valid
-	qboolean	startsolid;	// if true, the initial point was in a solid area
+	qboolean	allsolid;	// if qtrue, plane is not valid
+	qboolean	startsolid;	// if qtrue, the initial point was in a solid area
 	float		fraction;	// time completed, 1.0 = didn't hit anything
 	vec3_t		endpos;		// final position
 	cplane_t	plane;		// surface normal at impact

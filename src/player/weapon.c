@@ -126,7 +126,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		&& other->client->pers.inventory[index])
 	{
 		if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM) ) )
-			return false;	// leave the weapon for others to pickup
+			return qfalse;	// leave the weapon for others to pickup
 	}
 
 	other->client->pers.inventory[index]++;
@@ -166,7 +166,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 				{
 					item = Fdi_GRAPPLE;//FindItem("Grapple");
 					if(	other->client->pers.inventory[ITEM_INDEX(item)]) item->use(other,item);
-					return true;
+					return qtrue;
 				}
 			}
 		}
@@ -194,7 +194,7 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		ent->item->use(other,ent->item);//other->client->pers.weapon = ent->item;
 		ShowGun(other);
 	}
-	return true;
+	return qtrue;
 }
 
 
@@ -247,7 +247,7 @@ void ChangeWeapon (edict_t *ent)
 
 		ent->client->grenade_time = level.time;
 		ent->client->weapon_sound = 0;
-		weapon_grenade_fire (ent, false);
+		weapon_grenade_fire (ent, qfalse);
 		ent->client->grenade_time = 0;
 	}
 
@@ -899,8 +899,8 @@ void Weapon_Grenade (edict_t *ent)
 			if (!ent->client->grenade_blew_up && level.time >= ent->client->grenade_time)
 			{
 				ent->client->weapon_sound = 0;
-				weapon_grenade_fire (ent, true);
-				ent->client->grenade_blew_up = true;
+				weapon_grenade_fire (ent, qtrue);
+				ent->client->grenade_blew_up = qtrue;
 			}
 
 			if (ent->client->buttons & BUTTON_ATTACK)
@@ -911,7 +911,7 @@ void Weapon_Grenade (edict_t *ent)
 				if (level.time >= ent->client->grenade_time)
 				{
 					ent->client->ps.gunframe = 15;
-					ent->client->grenade_blew_up = false;
+					ent->client->grenade_blew_up = qfalse;
 				}
 				else
 				{
@@ -923,7 +923,7 @@ void Weapon_Grenade (edict_t *ent)
 		if (ent->client->ps.gunframe == 12)
 		{
 			ent->client->weapon_sound = 0;
-			weapon_grenade_fire (ent, false);
+			weapon_grenade_fire (ent, qfalse);
 		}
 
 		if ((ent->client->ps.gunframe == 15) && (level.time < ent->client->grenade_time))
@@ -1060,7 +1060,7 @@ void Weapon_LockonRocketLauncher_Fire (edict_t *ent)
 
 	if (ent->client->buttons & BUTTON_ATTACK)
 	{
-		ent->client->zc.lockon = false;		//スナイパーにロックオン機能なし
+		ent->client->zc.lockon = qfalse;		//スナイパーにロックオン機能なし
 		if(ent->client->zc.aiming == 0)
 		{
 			gi.sound (ent, CHAN_WEAPON, gi.soundindex("weapons/sshotr1b.wav"), 1, ATTN_NONE, 0);
@@ -1087,7 +1087,7 @@ void Weapon_LockonRocketLauncher_Fire (edict_t *ent)
 				{
 					if(ent->client->resp.ctf_team != rs_trace.ent->client->resp.ctf_team)				
 					{
-						ent->client->zc.lockon = true;
+						ent->client->zc.lockon = qtrue;
 
 						if(ent->client->zc.first_target != rs_trace.ent) {
 							gi.sound (ent, CHAN_AUTO, gi.soundindex("3zb/locrloc.wav"), 1, ATTN_NORM, 0);
@@ -1101,7 +1101,7 @@ void Weapon_LockonRocketLauncher_Fire (edict_t *ent)
 				}
 				else
 				{
-					ent->client->zc.lockon = true;
+					ent->client->zc.lockon = qtrue;
 					if(ent->client->zc.first_target != rs_trace.ent)
 						gi.sound (ent, CHAN_AUTO, gi.soundindex("3zb/locrloc.wav"), 1, ATTN_NORM, 0);
 					ent->client->zc.first_target = rs_trace.ent;
@@ -1223,7 +1223,7 @@ void Weapon_Blaster_Fire (edict_t *ent)
 		damage = 15;
 	else
 		damage = 10;
-	Blaster_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
+	Blaster_Fire (ent, vec3_origin, damage, qfalse, EF_BLASTER);
 	ent->client->ps.gunframe++;
 }
 
@@ -1278,7 +1278,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 				damage = 15;
 			else
 				damage = 20;
-			Blaster_Fire (ent, offset, damage, true, effect);
+			Blaster_Fire (ent, offset, damage, qtrue, effect);
 			// ### Hentai ### BEGIN
 
 			ent->client->anim_priority = ANIM_ATTACK;
@@ -1797,9 +1797,29 @@ void weapon_supershotgun_fire (edict_t *ent)
 	v[YAW]   = ent->client->v_angle[YAW] - 5;
 	v[ROLL]  = ent->client->v_angle[ROLL];
 	AngleVectors (v, forward, NULL, NULL);
+	if (aimfix->value)
+	{
+		AngleVectors(v, forward, right, NULL);
+
+		VectorScale(forward, -2, ent->client->kick_origin);
+		ent->client->kick_angles[0] = -2;
+
+		VectorSet(offset, 0, 8, ent->viewheight - 8);
+		P_ProjectSource(ent, offset, forward, right, start);
+	}
 	fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT/2, MOD_SSHOTGUN);
 	v[YAW]   = ent->client->v_angle[YAW] + 5;
 	AngleVectors (v, forward, NULL, NULL);
+	if (aimfix->value)
+	{
+		AngleVectors(v, forward, right, NULL);
+
+		VectorScale(forward, -2, ent->client->kick_origin);
+		ent->client->kick_angles[0] = -2;
+
+		VectorSet(offset, 0, 8, ent->viewheight - 8);
+		P_ProjectSource(ent, offset, forward, right, start);
+	}
 	fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT/2, MOD_SSHOTGUN);
 
 	// send muzzle flash
@@ -1960,7 +1980,7 @@ void Weapon_SnipeRailgun (edict_t *ent)
 
 	if (ent->client->buttons & BUTTON_ATTACK)
 	{
-		ent->client->zc.lockon = false;		//スナイパーにロックオン機能なし
+		ent->client->zc.lockon = qfalse;		//スナイパーにロックオン機能なし
 		if( ent->client->zc.aiming == 0)
 		{
 			//サイトの作成
@@ -2365,8 +2385,8 @@ void Weapon_Trap (edict_t *ent)
 			if (!ent->client->grenade_blew_up && level.time >= ent->client->grenade_time)
 			{
 				ent->client->weapon_sound = 0;
-				weapon_trap_fire (ent, true);
-				ent->client->grenade_blew_up = true;
+				weapon_trap_fire (ent, qtrue);
+				ent->client->grenade_blew_up = qtrue;
 			}
 
 			if (ent->client->buttons & BUTTON_ATTACK)
@@ -2377,7 +2397,7 @@ void Weapon_Trap (edict_t *ent)
 				if (level.time >= ent->client->grenade_time)
 				{
 					ent->client->ps.gunframe = 15;
-					ent->client->grenade_blew_up = false;
+					ent->client->grenade_blew_up = qfalse;
 				}
 				else
 				{
@@ -2389,7 +2409,7 @@ void Weapon_Trap (edict_t *ent)
 		if (ent->client->ps.gunframe == 12)
 		{
 			ent->client->weapon_sound = 0;
-			weapon_trap_fire (ent, false);
+			weapon_trap_fire (ent, qfalse);
 			if (ent->client->pers.inventory[ent->client->ammo_index] == 0)
 				NoAmmoWeaponChange (ent);
 		}

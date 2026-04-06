@@ -891,11 +891,11 @@ void G_SetClientSound (edict_t *ent)
 		if(ent->client->resp.flagsound > 80)
 		{
 			static int r;
-			static qboolean rs = true;
+			static qboolean rs = qtrue;
 
 			if(rs) {
 				r = rand()%4;
-				rs = false;
+				rs = qfalse;
 			}
 
 			if(r == 0) ent->s.sound = gi.soundindex("3zb/zposs1.wav");
@@ -903,7 +903,7 @@ void G_SetClientSound (edict_t *ent)
 
 			if(ent->client->resp.flagsound > 92) { //  1.2 sec soundbytes
 				ent->client->resp.flagsound = 0;
-				rs = true;
+				rs = qtrue;
 			}
 		}
 		ent->client->resp.flagsound += 1;
@@ -926,13 +926,13 @@ void G_SetClientFrame (edict_t *ent)
 	client = ent->client;
 
 	if (client->ps.pmove.pm_flags & PMF_DUCKED)
-		duck = true;
+		duck = qtrue;
 	else
-		duck = false;
+		duck = qfalse;
 	if (xyspeed)
-		run = true;
+		run = qtrue;
 	else
-		run = false;
+		run = qfalse;
 
 	// check for stand/duck and stop/go transitions
 	if (duck != client->anim_duck && client->anim_priority < ANIM_DEATH)
@@ -1161,7 +1161,7 @@ void ClientEndServerFrame (edict_t *ent)
 		else
 			DeathmatchScoreboardMessage (ent, ent->enemy);
 
-		gi.unicast (ent, false);
+		gi.unicast (ent, qfalse);
 	}
 }
 
@@ -1577,7 +1577,7 @@ void BotEndServerFrame (edict_t *ent)
 		} else
 //ZOID
 			DeathmatchScoreboardMessage (ent, ent->enemy);
-		gi.unicast (ent, false);
+		gi.unicast (ent, qfalse);
 	}*/
 }
 

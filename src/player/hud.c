@@ -13,7 +13,7 @@ void MoveClientToIntermission (edict_t *ent)
 {
 	if(!(ent->svflags & SVF_MONSTER))
 	{
-	ent->client->showscores = true;
+	ent->client->showscores = qtrue;
 //	VectorCopy (level.intermission_origin, ent->s.origin);
 	ent->client->ps.pmove.origin[0] = level.intermission_origin[0]*8;
 	ent->client->ps.pmove.origin[1] = level.intermission_origin[1]*8;
@@ -30,14 +30,14 @@ void MoveClientToIntermission (edict_t *ent)
 	ent->client->invincible_framenum = 0;
 	ent->client->breather_framenum = 0;
 	ent->client->enviro_framenum = 0;
-	ent->client->grenade_blew_up = false;
+	ent->client->grenade_blew_up = qfalse;
 	ent->client->grenade_time = 0;
 
 	// RAFAEL
 	ent->client->quadfire_framenum = 0;
 
 	// RAFAEL
-	ent->client->trap_blew_up = false;
+	ent->client->trap_blew_up = qfalse;
 	ent->client->trap_time = 0;
 
 	ent->viewheight = 0;
@@ -58,7 +58,7 @@ void MoveClientToIntermission (edict_t *ent)
 		else
 			DeathmatchScoreboardMessage (ent, NULL);
 
-		gi.unicast (ent, true);
+		gi.unicast (ent, qtrue);
 	}
 
 }
@@ -80,7 +80,7 @@ void BeginIntermission (edict_t *targ)
 		CTFCalcScores();
 //ZOID
 
-//	game.autosaved = false;
+//	game.autosaved = qfalse;
 
 	// respawn any dead clients
 //	for (i=0 ; i<maxclients->value ; i++)
@@ -248,7 +248,8 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		else
 			tag = NULL;
 
-		if (zigintro->value && !ENT_IS_BOT(cl_ent) && !cl_ent->client->pers.joined)
+		if (cl_ent->client->pers.spectator || (zigintro->value &&
+				!ENT_IS_BOT(cl_ent) && !cl_ent->client->pers.joined))
 			tag = "spectag";
 
 		if(zigmode->value)
@@ -262,8 +263,15 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			j = strlen(entry);
 			if (stringlength + j > 1024)
 				break;
-			strcpy (string + stringlength, entry);
-			stringlength += j;
+
+			size_t copy_len = strlen(entry);
+			if (copy_len > 1024 - 1 - stringlength)
+				copy_len = 1024 - 1 - stringlength;
+
+			memcpy(string + stringlength, entry, copy_len);
+			stringlength += copy_len;
+
+			string[stringlength] = '\0';
 		}
 
 		if(level.intermissiontime && !level.broadcast && ent == &g_edicts[1] && rtotal <= broadcast && i < topresult)
@@ -288,8 +296,15 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		j = strlen(entry);
 		if (stringlength + j > 1024)
 			break;
-		strcpy (string + stringlength, entry);
-		stringlength += j;
+
+		size_t copy_len = strlen(entry);
+		if (copy_len > 1024 - 1 - stringlength)
+			copy_len = 1024 - 1 - stringlength;
+
+		memcpy(string + stringlength, entry, copy_len);
+		stringlength += copy_len;
+
+		string[stringlength] = '\0';
 	}
 
 	gi.WriteByte (svc_layout);
@@ -299,7 +314,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		CPRepeat('-', 54);
 
 	if(level.intermissiontime)
-		level.broadcast = true;
+		level.broadcast = qtrue;
 }
 
 
@@ -318,7 +333,7 @@ void DeathmatchScoreboard (edict_t *ent)
 	else
 		DeathmatchScoreboardMessage (ent, ent->enemy);
 
-	gi.unicast (ent, true);
+	gi.unicast (ent, qtrue);
 }
 
 
@@ -331,8 +346,8 @@ Display the scoreboard
 */
 void Cmd_Score_f (edict_t *ent)
 {
-	ent->client->showinventory = false;
-	ent->client->showhelp = false;
+	ent->client->showinventory = qfalse;
+	ent->client->showhelp = qfalse;
 
 //ZOID
 	if (ent->client->menu)
@@ -344,11 +359,11 @@ void Cmd_Score_f (edict_t *ent)
 
 	if (ent->client->showscores)
 	{
-		ent->client->showscores = false;
+		ent->client->showscores = qfalse;
 		return;
 	}
 
-	ent->client->showscores = true;
+	ent->client->showscores = qtrue;
 	DeathmatchScoreboard (ent);
 }
 
@@ -393,7 +408,7 @@ void HelpComputer (edict_t *ent)
 
 	gi.WriteByte (svc_layout);
 	gi.WriteString (string);
-	gi.unicast (ent, true);
+	gi.unicast (ent, qtrue);
 }
 
 
@@ -413,16 +428,16 @@ void Cmd_Help_f (edict_t *ent)
 		return;
 	}
 
-	ent->client->showinventory = false;
-	ent->client->showscores = false;
+	ent->client->showinventory = qfalse;
+	ent->client->showscores = qfalse;
 
 	if (ent->client->showhelp && (ent->client->resp.game_helpchanged == game.helpchanged))
 	{
-		ent->client->showhelp = false;
+		ent->client->showhelp = qfalse;
 		return;
 	}
 
-	ent->client->showhelp = true;
+	ent->client->showhelp = qtrue;
 	ent->client->resp.helpchanged = 0;
 	HelpComputer (ent);
 }
@@ -451,7 +466,7 @@ static qboolean visiblemask(edict_t *self, edict_t *other, int mask)
         trace = gi.trace(spot1, vec3_origin, vec3_origin, spot2, self, mask);
 
         if (trace.fraction == 1.0f)
-            return true;
+            return qtrue;
 
         if (trace.allsolid && (trace.contents & MASK_WATER)) {
             mask &= ~MASK_WATER;
@@ -467,7 +482,7 @@ static qboolean visiblemask(edict_t *self, edict_t *other, int mask)
 
         break;
     }
-    return false;
+    return qfalse;
 }
 
 
@@ -538,7 +553,7 @@ static edict_t *find_by_angles(edict_t *ent)
     for (who = g_edicts + 1; who <= g_edicts + game.maxclients; who++) {
         if (!who->inuse)
             continue;
-        if (who->client->pers.connected == false)
+        if (who->client->pers.connected == qfalse)
             continue;
         if (who->health <= 0)
             continue;
@@ -600,14 +615,14 @@ void G_WriteTime(int remaining)
 	int min = remaining / 60;
 	int i;
 
-	sprintf(message, "[ Time: ");
-	sprintf(end, " ]");
+	snprintf(message, sizeof(message), "[ Time: ");
+	snprintf(end, sizeof(end),  " ]");
 
 	if(remaining < 0)
-		sprintf(buffer, " 0:00");
+		snprintf(buffer, sizeof(buffer), " 0:00");
 	else
 	{
-		sprintf(buffer, "%2d:%02d", min, sec);
+		snprintf(buffer, sizeof(buffer), "%2d:%02d", min, sec);
 
 		if (remaining <= 30 && (sec & 1) == 0) {
 			for (i = 0; buffer[i]; i++) {
@@ -811,7 +826,7 @@ void G_SetStats (edict_t *ent)
 //ponpoko
 
 	// zigmode now hijacks this - can't find an instance of zsight being used...
-	if(zigmode->value != 1) {
+	if(!zigmode->value) {
 		if(ent->client->zc.aiming == 1)
 		{
 			ent->client->ps.stats[STAT_SIGHT_PIC] = gi.imageindex ("zsight");
@@ -884,8 +899,10 @@ void G_SetSpectatorStats (edict_t *ent)
 	if (cl->chase_target && cl->chase_target->inuse)
 		cl->ps.stats[STAT_CHASE] = CS_PLAYERNAMES +
 			(cl->chase_target - g_edicts) - 1;
+	else if (!cl->pers.spectator)
+		cl->ps.stats[STAT_CHASE] = CS_OBSERVE1;
 	else
-		cl->ps.stats[STAT_CHASE] = CS_OBSERVE;
+		cl->ps.stats[STAT_CHASE] = CS_OBSERVE2;
 }
 
 /*
@@ -981,16 +998,16 @@ void Flag_Msg(char *response, size_t length)
 	switch(x)
 	{
 		case 0:
-			strncpy(pants, "with a vampirical tendency", length);
+			strlcpy(pants, "with a vampirical tendency", length);
 			break;
 		case 1:
-			strncpy(pants, "that's slaying stamina", length);
+			strlcpy(pants, "that's slaying stamina", length);
 			break;
 		case 2:
-			strncpy(pants, "while slaughtering health", length);
+			strlcpy(pants, "while slaughtering health", length);
 			break;
 		case 3:
-			strncpy(pants, "drawing their life blood", length);
+			strlcpy(pants, "drawing their life blood", length);
 			break;
 	}
 

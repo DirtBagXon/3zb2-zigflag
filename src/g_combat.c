@@ -7,7 +7,7 @@
 ============
 CanDamage
 
-Returns true if the inflictor can directly damage the target.  Used for
+Returns qtrue if the inflictor can directly damage the target.  Used for
 explosions and melee attacks.
 ============
 */
@@ -24,16 +24,16 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 		VectorScale (dest, 0.5, dest);
 		trace = gi.trace (inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
 		if (trace.fraction == 1.0)
-			return true;
+			return qtrue;
 		if (trace.ent == targ)
-			return true;
-		return false;
+			return qtrue;
+		return qfalse;
 	}
 
 
 	trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, targ->s.origin, inflictor, MASK_SOLID);
 	if (trace.fraction == 1.0f)
-		return true;
+		return qtrue;
 
 	if (fixflaws->value) {
 		vec_t *bounds[] = { targ->absmin, targ->absmax };
@@ -47,7 +47,7 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 			trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
 
 			if (trace.fraction == 1.0f)
-				return true;
+				return qtrue;
 		}
 	}
 	else
@@ -71,11 +71,11 @@ qboolean CanDamage (edict_t *targ, edict_t *inflictor)
 			trace = gi.trace(inflictor->s.origin, vec3_origin, vec3_origin, dest, inflictor, MASK_SOLID);
 
 			if (trace.fraction == 1.0f)
-				return true;
+				return qtrue;
 		}
 	}
 
-	return false;
+	return qfalse;
 }
 
 
@@ -293,12 +293,12 @@ qboolean CheckTeamDamage (edict_t *targ, edict_t *attacker)
 	if (ctf->value && !tdm->value && targ->client && attacker->client)
 		if (targ->client->resp.ctf_team == attacker->client->resp.ctf_team &&
 			targ != attacker)
-			return true;
+			return qtrue;
 //ZOID
 
 		//FIXME make the next line real and uncomment this block
 		// if ((ability to damage a teammate == OFF) && (targ's team == attacker's team))
-	return false;
+	return qfalse;
 }
 
 void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir, vec3_t point, vec3_t normal, int damage, int knockback, int dflags, int mod)
@@ -575,7 +575,7 @@ qboolean KillerFlagCheck(edict_t *ent)
 	{
 		meansOfDeath = MOD_FLAG;
 		player_die (flagholder, NULL, NULL, FLAG_HEALTH, vec3_origin);
-		return true;
+		return qtrue;
 	}
 
 	flagholder->client->damage_blood = 1 * flagholder->penalty;
@@ -588,5 +588,5 @@ qboolean KillerFlagCheck(edict_t *ent)
 	else
 		gi.sound(ent, CHAN_VOICE, gi.soundindex("mutant/step2.wav"), 1, ATTN_NORM, 0);
 
-	return false;
+	return qfalse;
 }

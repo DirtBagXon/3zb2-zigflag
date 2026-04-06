@@ -312,18 +312,16 @@ Set the Observe mode string
 */
 void CSObserve()
 {
-	char observe[32];
-	char tab[4];
-	char end[16];
-	char Highlight[MAX_STRING_CHARS];
+	char observe[64];
+	char highlight[32];
+	char noone[32];
 
-	sprintf(observe, "[");
-	sprintf(tab, "ENT");
-	sprintf(end, "] to Join");
-	HighlightStr(Highlight, tab, MAX_STRING_CHARS);
-	strcat(observe, Highlight);
-	strcat(observe, end);
-	gi.configstring(CS_OBSERVE, observe);
+	HighlightStr(highlight, "USE", sizeof(highlight));
+	Com_sprintf(observe, sizeof(observe), "[%s] to Join", highlight);
+	gi.configstring(CS_OBSERVE1, observe);
+
+	HighlightStr(noone, "NO CHASE TARGET", sizeof(noone));
+	gi.configstring(CS_OBSERVE2, noone);
 }
 
 /*
@@ -494,7 +492,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 	char		keyname[256];
 	char		*com_token;
 
-	init = false;
+	init = qfalse;
 	memset (&st, 0, sizeof(st));
 
 // go through all the dictionary pairs
@@ -507,7 +505,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 		if (!data)
 			gi.error ("ED_ParseEntity: EOF without closing brace");
 
-		strncpy (keyname, com_token, sizeof(keyname)-1);
+		strlcpy (keyname, com_token, sizeof(keyname));
 
 	// parse value
 		com_token = COM_Parse (&data);
@@ -517,7 +515,7 @@ char *ED_ParseEdict (char *data, edict_t *ent)
 		if (com_token[0] == '}')
 			gi.error ("ED_ParseEntity: closing brace without data");
 
-		init = true;
+		init = qtrue;
 
 	// keynames with a leading underscore are used for utility comments,
 	// and are immediately discarded by quake
@@ -622,7 +620,7 @@ void G_FindTrainTeam()
 
 				memset(&teamlist,0,sizeof(teamlist));
 				memset(&targethist,0,sizeof(targethist));
-				findteam = false;
+				findteam = qfalse;
 
 				loopindex = 0;
 				targethist[0] = e->targetname;
@@ -661,14 +659,14 @@ void G_FindTrainTeam()
 					}
 					if(k < loopindex)
 					{
-						findteam = true;
+						findteam = qtrue;
 						break;
 					}
 					targethist[loopindex] = currtargetname;
 					loopindex++;
 					/*if(!Q_stricmp(currtarget,orgtargetname))
 					{
-						findteam = true;
+						findteam = qtrue;
 						break;
 					}*/
 				}
@@ -742,7 +740,7 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 {
 	float	x,l,grav,vel,ypos,yori;
 	vec3_t	v,vv;
-	int		mf = false;
+	int		mf = qfalse;
 
 	grav = 1.0 * sv_gravity->value * FRAMETIME;
 
@@ -759,14 +757,14 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 
 		if(vel > 0)
 		{
-			if(mf == false)
+			if(mf == qfalse)
 			{
 				if(ypos < yori) mf = 2;
 			}
 		}
 		else if(x > 1)
 		{
-			if(mf == false)
+			if(mf == qfalse)
 			{
 				if(ypos < yori) mf = 2;
 			}
@@ -775,7 +773,7 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 			{
 				if(ypos >= yori)
 				{
-						mf = true;
+						mf = qtrue;
 						break;
 				}
 			}
@@ -787,11 +785,11 @@ qboolean RTJump_Chk(vec3_t apos,vec3_t tpos)
 	l = VectorLength(vv);
 
 	if(x > 1) l = l / (x - 1);
-	if(l < MOVE_SPD_RUN && mf == true)
+	if(l < MOVE_SPD_RUN && mf == qtrue)
 	{
-		return true;
+		return qtrue;
 	}
-	return false;
+	return qfalse;
 }
 
 /*
@@ -811,7 +809,7 @@ void G_FindRouteLink(edict_t *ent)
 
 
 	//旗を発生させる
-	if(!ctf->value && zigmode->value == 1)
+	if(!ctf->value && zigmode->value)
 	{
 		SelectFlagSpawnPoint (ent, v, vv);
 		if(ZIGDrop_FlagCheck(ent,zflag_item))
@@ -856,7 +854,7 @@ void G_FindRouteLink(edict_t *ent)
 									continue;
 				}
 
-				tpbool = false;
+				tpbool = qfalse;
 				for(l = -5;l < 6;l++)
 				{
 					if( (i + l) < 0 || (i + l) >= CurrentIndex) continue;
@@ -866,7 +864,7 @@ void G_FindRouteLink(edict_t *ent)
 						if(!Route[i + l].linkpod[k]) break;
 						if(abs(Route[i + l].linkpod[k] - j) < 50)
 						{
-							tpbool = true;
+							tpbool = qtrue;
 							break;
 						}
 					}
@@ -983,8 +981,8 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	memset (&level, 0, sizeof(level));
 	memset (g_edicts, 0, game.maxentities * sizeof (g_edicts[0]));
 
-	strncpy (level.mapname, mapname, sizeof(level.mapname)-1);
-	strncpy (game.spawnpoint, spawnpoint, sizeof(game.spawnpoint)-1);
+	strlcpy (level.mapname, mapname, sizeof(level.mapname));
+	strlcpy (game.spawnpoint, spawnpoint, sizeof(game.spawnpoint));
 
 	// set client fields on player ents
 	for (i=0 ; i<game.maxclients ; i++) {
@@ -1076,7 +1074,7 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	CSObserve();
 	G_SpawnRouteLink();
 
-	if(zigmode->value == 1) zigflag_spawn = 1;
+	if(zigmode->value) zigflag_spawn = 1;
 	else zigflag_spawn = 0;
 
 	zflag_item =  FindItem("Zig Flag");
@@ -1379,7 +1377,7 @@ void SP_worldspawn (edict_t *ent)
 {
 	ent->movetype = MOVETYPE_PUSH;
 	ent->solid = SOLID_BSP;
-	ent->inuse = true;			// since the world doesn't use G_Spawn()
+	ent->inuse = qtrue;			// since the world doesn't use G_Spawn()
 	ent->s.modelindex = 1;		// world model is always index 1
 
 	//---------------
@@ -1391,7 +1389,7 @@ void SP_worldspawn (edict_t *ent)
 	SetItemNames ();
 
 	if (st.nextmap)
-		strcpy (level.nextmap, st.nextmap);
+		strlcpy(level.nextmap, st.nextmap, MAX_QPATH);
 
 	// make some data visible to the server
 
@@ -1402,7 +1400,7 @@ void SP_worldspawn (edict_t *ent)
 		memcpy(level.level_name, ent->message, sizeLn + 1);
 	}
 	else
-		strncpy (level.level_name, level.mapname, sizeof(level.level_name));
+		strlcpy (level.level_name, level.mapname, sizeof(level.level_name));
 
 	if (st.sky && st.sky[0])
 		gi.configstring (CS_SKY, st.sky);
@@ -1444,7 +1442,7 @@ void SP_worldspawn (edict_t *ent)
 				gi.soundindex("weapons/grapple/grfire.wav");
 			}*/
 //ZOID
-		} else if (zigmode->value == 1) {
+		} else if (zigmode->value) {
 			gi.configstring (CS_STATUSBAR, zig_statusbar);
 			gi.imageindex("i_zig");
 			gi.imageindex("zigtag");

@@ -22,8 +22,8 @@ qboolean visible (edict_t *self, edict_t *other)
 	trace = gi.trace (spot1, vec3_origin, vec3_origin, spot2, self, MASK_OPAQUE);
 	
 	if (trace.fraction == 1.0)
-		return true;
-	return false;
+		return qtrue;
+	return qfalse;
 }
 
 /*
@@ -80,7 +80,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	VectorSubtract (self->enemy->s.origin, self->s.origin, dir);
 	range = VectorLength(dir);
 	if (range > aim[0])
-		return false;
+		return qfalse;
 
 	if (aim[1] > self->mins[0] && aim[1] < self->maxs[0])
 	{
@@ -102,7 +102,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	if (tr.fraction < 1)
 	{
 		if (!tr.ent->takedamage)
-			return false;
+			return qfalse;
 		// if it will hit any client/monster then hit the one we wanted to hit
 		if ((tr.ent->svflags & SVF_MONSTER) || (tr.ent->client))
 			tr.ent = self->enemy;
@@ -118,7 +118,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	T_Damage (tr.ent, self, self, dir, point, vec3_origin, damage, kick/2, DAMAGE_NO_KNOCKBACK, MOD_HIT);
 
 	if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
-		return false;
+		return qfalse;
 
 	// do our special form of knockback here
 	VectorMA (self->enemy->absmin, 0.5, self->enemy->size, v);
@@ -127,7 +127,7 @@ qboolean fire_hit (edict_t *self, vec3_t aim, int damage, int kick)
 	VectorMA (self->enemy->velocity, kick, v, self->enemy->velocity);
 	if (self->enemy->velocity[2] > 0)
 		self->enemy->groundentity = NULL;
-	return true;
+	return qtrue;
 }
 
 
@@ -147,7 +147,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 	float		r;
 	float		u;
 	vec3_t		water_start;
-	qboolean	water = false;
+	qboolean	water = qfalse;
 	int			content_mask = MASK_SHOT | MASK_WATER;
 
 	tr = gi.trace (self->s.origin, NULL, NULL, start, self, MASK_SHOT);
@@ -164,7 +164,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 
 		if (gi.pointcontents (start) & MASK_WATER)
 		{
-			water = true;
+			water = qtrue;
 			VectorCopy (start, water_start);
 			content_mask &= ~MASK_WATER;
 		}
@@ -176,7 +176,7 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 		{
 			int		color;
 
-			water = true;
+			water = qtrue;
 			VectorCopy (tr.endpos, water_start);
 
 			if (!VectorCompare (start, tr.endpos))
@@ -796,7 +796,7 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 	VectorMA (start, 8192, aimdir, end);
 	VectorCopy (start, from);
 	ignore = self;
-	water = false;
+	water = qfalse;
 	mask = MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA;
 	while (ignore)
 	{
@@ -805,7 +805,7 @@ void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick
 		if (tr.contents & (CONTENTS_SLIME|CONTENTS_LAVA))
 		{
 			mask &= ~(CONTENTS_SLIME|CONTENTS_LAVA);
-			water = true;
+			water = qtrue;
 		}
 		else
 		{
@@ -853,7 +853,7 @@ void fire_sniperail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int
 	VectorMA (start, 8192, aimdir, end);
 	VectorCopy (start, from);
 	ignore = self;
-	water = false;
+	water = qfalse;
 	mask = MASK_SHOT|CONTENTS_SLIME|CONTENTS_LAVA;
 	while (ignore)
 	{
@@ -862,7 +862,7 @@ void fire_sniperail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int
 		if (tr.contents & (CONTENTS_SLIME|CONTENTS_LAVA))
 		{
 			mask &= ~(CONTENTS_SLIME|CONTENTS_LAVA);
-			water = true;
+			water = qtrue;
 		}
 		else
 		{
@@ -1580,7 +1580,7 @@ static void Trap_Think (edict_t *ent)
 			if(best->svflags & SVF_MONSTER)
 			{
 				//if(best->velocity[2] < 100) best->velocity[2] = 100;
-				best->client->zc.trapped = true;
+				best->client->zc.trapped = qtrue;
 			}
 		}
 		else

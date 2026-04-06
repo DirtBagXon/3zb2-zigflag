@@ -1,25 +1,30 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 # Enforce "Debug" as standard build type
 if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 # CMake project configuration
-project(yquake2-3zb2)
+project(3zb2-zigflag)
 
 # Enforce compiler flags (GCC / Clang compatible, yquake2
 # won't build with another compiler anyways)
 #  -Wall                -> More warnings
 #  -fno-strict-aliasing -> Quake 2 is far away from strict aliasing
 #  -fwrapv              -> Make signed integer overflows defined
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -msse2 -mfpmath=sse -fno-strict-aliasing -fwrapv")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -fno-strict-aliasing -fwrapv")
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -msse2 -mfpmath=sse")
+endif()
 
 # Use -O2 as maximum optimization level. -O3 has it's problems with yquake2.
 string(REPLACE "-O3" "-O2" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 
 # Operating system
 add_definitions(-DOSTYPE="${CMAKE_SYSTEM_NAME}")
+message(STATUS "CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
 
 # Architecture string
 string(REGEX REPLACE "amd64" "x86_64" ARCH "${CMAKE_SYSTEM_PROCESSOR}")
@@ -28,7 +33,7 @@ string(REGEX REPLACE "^arm.*" "arm" ARCH "${ARCH}")
 add_definitions(-DARCH="${ARCH}")
 
 # Linker Flags
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+if(WIN32 OR MINGW OR MSYS OR CMAKE_C_COMPILER MATCHES "mingw")
 	list(APPEND 3zb2LinkerFlags "-lm")
 else()
 	list(APPEND 3zb2LinkerFlags "-lm -rdynamic")
@@ -81,7 +86,7 @@ set(3zb2-Header
 add_library(game SHARED ${3zb2-Source} ${3zb2-Header})
 set_target_properties(game PROPERTIES
 	PREFIX ""
-	LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug
-	LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release
+	LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug
+	LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release
 )
 target_link_libraries(game ${3zb2LinkerFlags})

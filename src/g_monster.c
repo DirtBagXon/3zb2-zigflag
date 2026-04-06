@@ -31,7 +31,7 @@ void monster_fire_shotgun (edict_t *self, vec3_t start, vec3_t aimdir, int damag
 
 void monster_fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int flashtype, int effect)
 {
-	fire_blaster (self, start, dir, damage, speed, effect, false);
+	fire_blaster (self, start, dir, damage, speed, effect, qfalse);
 
 	gi.WriteByte (svc_muzzleflash2);
 	gi.WriteShort (self - g_edicts);
@@ -590,7 +590,7 @@ qboolean monster_start (edict_t *self)
 	if (deathmatch->value )
 	{
 		G_FreeEdict (self);
-		return false;
+		return qfalse;
 	}
 
 	if ((self->spawnflags & 4) && !(self->monsterinfo.aiflags & AI_GOOD_GUY))
@@ -631,7 +631,7 @@ qboolean monster_start (edict_t *self)
 	if (self->monsterinfo.currentmove)
 		self->s.frame = self->monsterinfo.currentmove->firstframe + (rand() % (self->monsterinfo.currentmove->lastframe - self->monsterinfo.currentmove->firstframe + 1));
 
-	return true;
+	return qtrue;
 }
 
 void monster_start_go (edict_t *self)
@@ -649,18 +649,18 @@ void monster_start_go (edict_t *self)
 		edict_t		*target;
 
 		target = NULL;
-		notcombat = false;
-		fixup = false;
+		notcombat = qfalse;
+		fixup = qfalse;
 		while ((target = G_Find (target, FOFS(targetname), self->target)) != NULL)
 		{
 			if (strcmp(target->classname, "point_combat") == 0)
 			{
 				self->combattarget = self->target;
-				fixup = true;
+				fixup = qtrue;
 			}
 			else
 			{
-				notcombat = true;
+				notcombat = qtrue;
 			}
 		}
 		if (notcombat && self->combattarget)
