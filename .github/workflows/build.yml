@@ -71,6 +71,49 @@ jobs:
           name: linux64-build
           path: 3zb2-linux64-${{ env.VERSION }}.zip
 
+  build-macos:
+    name: MacOS 64-bit
+    runs-on: macos-latest
+    needs: generate-config
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v7
+        with:
+          name: config-text
+          path: .
+
+      - name: Install Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        if: success()
+
+      - name: Install Dependencies
+        run: |
+          brew install make
+          echo "/opt/homebrew/opt/make/libexec/gnubin" >> $GITHUB_PATH
+
+      - name: Build Mac 64-bit
+        run: |
+          chmod +x ./clean.sh ./build-mac64.sh
+          ./clean.sh
+          ./build-mac64.sh
+
+      - name: Package Mac artifacts
+        run: |
+          cp release/*.dylib 3zb2/
+          echo "3zb2 build version: $VERSION" > INSTALL.txt
+          echo "" >> INSTALL.txt
+          echo "Rename the dylib to your Quake II engine’s expected filename." >> INSTALL.txt
+          zip -r 3zb2-mac64-$VERSION.zip 3zb2/ INSTALL.txt CONFIG.txt
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: mac64-build
+          path: 3zb2-mac64-${{ env.VERSION }}.zip
+
   build-win32:
     name: Windows 32-bit
     runs-on: windows-latest
@@ -165,7 +208,7 @@ jobs:
 
   release:
     name: Create GitHub Release
-    needs: [build-linux, build-win32, build-win64]
+    needs: [build-linux, build-macos, build-win32, build-win64]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
@@ -184,6 +227,7 @@ jobs:
         run: |
           gh release create ${{ github.ref_name }} \
             release-assets/linux64-build/3zb2-linux64-${{ env.VERSION }}.zip \
+            release-assets/mac64-build/3zb2-mac64-${{ env.VERSION }}.zip \
             release-assets/win32-build/3zb2-win32-${{ env.VERSION }}.zip \
             release-assets/win64-build/3zb2-win64-${{ env.VERSION }}.zip \
             --generate-notes
