@@ -415,7 +415,9 @@ void PutBotInServer (edict_t *ent)
 
 	//current weapon
 	client = ent->client;
-	item = Fdi_BLASTER;//FindItem("Blaster");
+	item = FindItem("Blaster");
+	if (!item)
+		gi.error("No Blaster item found");
 	client->pers.selected_item = ITEM_INDEX(item);
 	client->pers.inventory[client->pers.selected_item] = 1;
 	client->pers.weapon = item;
