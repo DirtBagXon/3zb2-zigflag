@@ -37,6 +37,13 @@ qboolean OnSameTeam (edict_t *ent1, edict_t *ent2)
 	char	ent1Team [512];
 	char	ent2Team [512];
 
+	if (ctf->value && ent1->client && ent2->client)
+	{
+		if (ent1->client->resp.ctf_team >= CTF_TEAM1 &&
+			ent1->client->resp.ctf_team == ent2->client->resp.ctf_team)
+			return qtrue;
+	}
+
 	if (!((int)(dmflags->value) & (DF_MODELTEAMS | DF_SKINTEAMS)))
 		return qfalse;
 

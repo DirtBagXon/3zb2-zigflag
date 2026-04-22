@@ -67,11 +67,9 @@ sudo pacman -S \
 paru -S \
     mingw-w64-zlib \
     mingw-w64-zlib-ng \
-    mingw-w64-ffmpeg \
     mingw-w64-pkg-config \
     mingw-w64-libpng \
     mingw-w64-libjpeg-turbo \
-    mingw-w64-openal \
     mingw-w64-zstd
 ```
 
@@ -114,9 +112,6 @@ Example server config for ZigFlag:
 ```
 exec addbot.cfg
 exec config-zflag.cfg
-set zigmode 1
-set zigspawn 1
-set zigkiller 1
 map q2dm1
 ```
 
