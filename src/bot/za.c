@@ -1479,7 +1479,7 @@ void Set_Combatstate(edict_t *ent,int foundedenemy)
 	float	distance;
 	edict_t	*target;
 	int		enewep;
-	int		combskill = 5;
+	int		combskill;
 	float	aim;
 
 	client = ent->client;
@@ -1529,6 +1529,9 @@ void Set_Combatstate(edict_t *ent,int foundedenemy)
 	//enemy's weapon
 	enewep = Get_KindWeapon(target->client->pers.weapon);
 
+	combskill = (int)Bot[client->zc.botindex].param[BOP_COMBATSKILL];
+	if(combskill < 0 || combskill > 9) combskill = 5;
+
 	//threat assessment (only when not already in a combat mode)
 	if(client->zc.battlemode == 0)
 	{
@@ -1552,9 +1555,6 @@ void Set_Combatstate(edict_t *ent,int foundedenemy)
 	//status set
 	aim = 10.0 - (float)Bot[client->zc.botindex].param[BOP_AIM];
 	if(aim <= 0 || aim > 10) aim = 5; 
-	combskill = (int)Bot[client->zc.botindex].param[BOP_COMBATSKILL];
-	if(combskill < 0 || combskill > 9) combskill = 5;
-
 
 	if(!(client->zc.zccmbstt & CTS_ENEM_NSEE)) Combat_Level0(ent,foundedenemy,enewep,aim,distance,combskill);
 	else if(client->zc.zccmbstt & FIRE_REFUGE) Combat_Level0(ent,foundedenemy,enewep,aim,distance,combskill);
