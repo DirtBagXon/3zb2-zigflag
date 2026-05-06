@@ -627,6 +627,7 @@ extern	cvar_t	*botlist;
 extern	cvar_t	*autospawn;
 extern	cvar_t	*autobot;
 extern	cvar_t	*zigmode;
+extern	cvar_t  *instagib;
 extern	cvar_t  *zigspawn;
 extern	cvar_t  *zigkiller;
 extern	cvar_t  *zigrapple;

@@ -697,9 +697,11 @@ void Bot_SearchItems (edict_t *ent)
 				{
 					if(entcln[7] == 's' && entcln[8] == 'h' )	//weapon_shotgun
 					{
-						if(!wstayf || (wstayf && !pickup_pri 
-							&& (!ent->client->pers.inventory[ITEM_INDEX(Fdi_SHOTGUN/*FindItem("Shotgun")*/)] 
-							|| trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM) ) )) target = trent;
+						qboolean isDropped = (trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) != 0;
+						if(!wstayf || (wstayf && (!pickup_pri || isDropped))) {
+							if(!ent->client->pers.inventory[ITEM_INDEX(Fdi_SHOTGUN)] || isDropped)
+								target = trent;
+						}
 					}
 					else if(entcln[7] == 's')					//weapon_supershotgun
 					{
@@ -726,10 +728,12 @@ void Bot_SearchItems (edict_t *ent)
 						|| trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))) target = trent;
 					}
 					else if(entcln[7]=='r' && entcln[8] == 'o')	//weapon_rocketlauncher
-						{
-						if(!wstayf || (wstayf 
-							&& (!ent->client->pers.inventory[ITEM_INDEX(Fdi_ROCKETLAUNCHER/*FindItem("Rocket Launcher")*/)]
-							|| trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))) target = trent;
+					{
+						qboolean isDropped = (trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) != 0;
+						if(!wstayf || (wstayf && (!pickup_pri || isDropped))) {
+							if(!ent->client->pers.inventory[ITEM_INDEX(Fdi_ROCKETLAUNCHER)] || isDropped)
+								target = trent;
+						}
 					}
 					else if(entcln[7] == 'h')					//weapon_hyperblaster
 					{
@@ -757,9 +761,11 @@ void Bot_SearchItems (edict_t *ent)
 					}
 					else if(entcln[7] == 'b')					//weapon_bfg
 					{
-						if(!wstayf || (wstayf 
-							&& (!ent->client->pers.inventory[ITEM_INDEX(Fdi_BFG/*FindItem("BFG10K")*/)]
-							|| trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)))) target = trent;					
+						qboolean isDropped = (trent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM)) != 0;
+						if(!wstayf || (wstayf && (!pickup_pri || isDropped))) {
+							if(!ent->client->pers.inventory[ITEM_INDEX(Fdi_BFG)] || isDropped)
+								target = trent;
+						}
 					}
 				}
 				else if(entcln[0] == 'R' && !ent->client->zc.route_trace)
@@ -834,7 +840,17 @@ void Bot_SearchItems (edict_t *ent)
 			}
 			if(target != NULL && !ctf->value )
 			{
-				if((target->s.origin[2] - ent->s.origin[2]) > 32  && !q)
+				qboolean isWeapon = (target->classname[0] == 'w');
+				qboolean isDroppedWeapon = isWeapon && (target->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM));
+				float distToTarget = 0;
+				vec3_t distVec;
+				VectorSubtract(target->s.origin, ent->s.origin, distVec);
+				distToTarget = VectorLength(distVec);
+				
+				if(isDroppedWeapon && distToTarget < 150) {
+					// Very close dropped weapon - always pick up
+				}
+				else if((target->s.origin[2] - ent->s.origin[2]) > 32  && !q)
 				{
 					x = target->moveinfo.start_origin[2] - ent->s.origin[2];
 					if(x > 54 || x < -24) target = NULL;
@@ -1222,8 +1238,14 @@ int Bot_Watermove ( edict_t *ent,vec3_t pos,float dist,float upd)
 		if(rs_trace.fraction > 0)
 		{
 			VectorCopy(rs_trace.endpos,pos);
-			return qtrue;
 			if(upd < 0) ent->velocity[2] = 0;
+			if(dist > 0)
+			{
+				float wyaw = ent->client->zc.moveyaw * M_PI * 2 / 360;
+				ent->velocity[0] = cos(wyaw) * dist;
+				ent->velocity[1] = sin(wyaw) * dist;
+			}
+			return qtrue;
 		}
 	}
 //gi.bprintf(PRINT_HIGH,"Water MOVE NG %f %f!\n",dist,upd);
@@ -1277,6 +1299,12 @@ int Bot_Watermove ( edict_t *ent,vec3_t pos,float dist,float upd)
 //gi.bprintf(PRINT_HIGH,"Water MOVE OK %f %f!\n",dist,upd);
 	VectorCopy(trmax,pos);
 	if(upd < 0) ent->velocity[2] = 0;
+	if(dist > 0)
+	{
+		float wyaw = ent->client->zc.moveyaw * M_PI * 2 / 360;
+		ent->velocity[0] = cos(wyaw) * dist;
+		ent->velocity[1] = sin(wyaw) * dist;
+	}
 	return qtrue;
 	
 	touchmin[0] = cos(vec) * 16;//dist ;
@@ -1451,7 +1479,7 @@ void Set_Combatstate(edict_t *ent,int foundedenemy)
 	float	distance;
 	edict_t	*target;
 	int		enewep;
-	int		combskill;
+	int		combskill = 5;
 	float	aim;
 
 	client = ent->client;
@@ -1501,6 +1529,26 @@ void Set_Combatstate(edict_t *ent,int foundedenemy)
 	//enemy's weapon
 	enewep = Get_KindWeapon(target->client->pers.weapon);
 
+	//threat assessment (only when not already in a combat mode)
+	if(client->zc.battlemode == 0)
+	{
+		int threatResult = Bot_AssessThreat(ent, target, foundedenemy, distance);
+		client->zc.last_threat_check = level.time;
+
+		if(threatResult > 0 && foundedenemy <= 2)
+		{
+			if(distance < 600 && ent->groundentity && (9 * random()) < combskill)
+			{
+				client->zc.battlemode |= FIRE_RUSH;
+				client->zc.battlecount = 8 + (int)(8 * random());
+			}
+		}
+	}
+	else
+	{
+		Bot_AssessThreat(ent, target, foundedenemy, distance);
+	}
+
 	//status set
 	aim = 10.0 - (float)Bot[client->zc.botindex].param[BOP_AIM];
 	if(aim <= 0 || aim > 10) aim = 5; 
@@ -1518,6 +1566,44 @@ void Set_Combatstate(edict_t *ent,int foundedenemy)
 		VectorCopy(client->zc.first_target->s.origin,client->zc.last_pos);
 	}
 	return;
+}
+
+int Bot_AssessThreat(edict_t *ent, edict_t *target, int foundedenemy, float distance)
+{
+	int myHealth = ent->health;
+	int myArmor = ent->client->pers.inventory[ITEM_INDEX(FindItem("Jacket Armor"))]
+				+ ent->client->pers.inventory[ITEM_INDEX(FindItem("Combat Armor"))]
+				+ ent->client->pers.inventory[ITEM_INDEX(FindItem("Body Armor"))];
+	int myWeapon = Get_KindWeapon(ent->client->pers.weapon);
+	int myPower = myHealth + (myArmor * 2) + (myWeapon * 15);
+
+	int enemyHealth = target->health;
+	int enemyArmor = target->client->pers.inventory[ITEM_INDEX(FindItem("Jacket Armor"))]
+				+ target->client->pers.inventory[ITEM_INDEX(FindItem("Combat Armor"))]
+				+ target->client->pers.inventory[ITEM_INDEX(FindItem("Body Armor"))];
+	int enemyWeapon = Get_KindWeapon(target->client->pers.weapon);
+	int enemyPower = enemyHealth + (enemyArmor * 2) + (enemyWeapon * 15);
+
+	if(enemyPower <= 0) enemyPower = 1;
+	if(myPower <= 0) myPower = 1;
+
+	float threatRatio = (float)enemyPower / (float)myPower;
+	if(threatRatio < 0.5f) threatRatio = 0.5f;
+	if(threatRatio > 2.5f) threatRatio = 2.5f;
+
+	ent->client->zc.threat_level = threatRatio / 2.5f;
+	ent->client->zc.nearby_enemies = foundedenemy;
+
+	if(ent->client->invincible_framenum > level.time && threatRatio > 0.8f)
+		return 1;
+
+	if(myWeapon == WEAP_BFG && distance > 300 && myHealth > 80)
+		return 1;
+
+	if(myHealth > enemyHealth + 60 && myWeapon >= enemyWeapon && myHealth > 100)
+		return 1;
+
+	return 0;
 }
 
 //-----------------------------------------------------------------------------------------
@@ -2995,8 +3081,19 @@ gi.bprintf(PRINT_HIGH,"OFF 5\n"); //ppx
 		k = qfalse;
 
 		zc->secondinterval++;
+		
+		qboolean needBetterWeapon = qfalse;
+		int mywep = Get_KindWeapon(ent->client->pers.weapon);
+		if(mywep <= WEAP_BLASTER || mywep == WEAP_GRENADES) {
+			needBetterWeapon = qtrue;
+		}
+		
+		int searchInterval = 40;
+		if(zc->first_target == NULL) searchInterval = 20;
+		if(needBetterWeapon) searchInterval = 10;
+		
 		//when tracing routes
-		if(zc->route_trace && zc->secondinterval > 40)
+		if(zc->route_trace && zc->secondinterval > searchInterval)
 		{
 			for(i = zc->routeindex ; i < (zc->routeindex + 20); i++)
 			{
@@ -5900,7 +5997,11 @@ VCHCANSEL_L:
 	}
 	else
 	{
-		if(ent->waterlevel > 2) {ent->velocity[0] = 0;ent->velocity[1] = 0;/*VectorClear(ent->velocity);*/}
+		if(ent->waterlevel > 2)
+		{
+			ent->velocity[0] *= 0.5;
+			ent->velocity[1] *= 0.5;
+		}
 		else if(ent->waterlevel && !ent->groundentity && ent->velocity[2] < 0) VectorClear(ent->velocity);//ent->velocity[2] = 0; 
 	}
 //ZOID
@@ -5912,6 +6013,9 @@ ent->velocity[1] = 800 * (random() - 0.5);
 ent->client->ps.pmove.pm_flags |= PMF_DUCKED;
 */
 	ent->client->zc.trapped = qfalse;		//trapcatch clear
+
+	if(ent->client->zc.oldyaw == 0)
+		ent->client->zc.oldyaw = ent->s.angles[YAW];
 
 	gi.linkentity (ent);
 	G_TouchTriggers (ent);

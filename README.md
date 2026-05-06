@@ -30,6 +30,7 @@ The premise is simple: **get the flag and keep it**. Plays on standard Deathmatc
 - `store` / `recall` commands to save and restore player position (_Jump mod style_)
 - Remaining time display for all game modes
 - Basic Team Deathmatch support (`set tdm 1`)
+- Instagib option (`set instagib 1`)
 - Random player spawn points on map start
 - Fixed menu item selection
 - Improved aim (`aimfix`) - Quake 2 gameplay flaw fixes (`fixflaws`)

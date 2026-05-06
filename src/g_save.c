@@ -194,6 +194,7 @@ void InitGame (void)
 	vwep = gi.cvar ("vwep", "1", CVAR_LATCH);
 	//game mode
 	zigmode = gi.cvar ("zigmode", "0", CVAR_SERVERINFO| CVAR_LATCH);
+	instagib = gi.cvar ("instagib", "0", CVAR_SERVERINFO| CVAR_LATCH);
 	//game setup
 	zigintro = gi.cvar ("zigintro", "0", CVAR_LATCH);
 //ZOID

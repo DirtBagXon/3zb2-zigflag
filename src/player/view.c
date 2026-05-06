@@ -259,11 +259,11 @@ void SV_CalcViewOffset (edict_t *ent)
 		// add angles based on bob
 
 		delta = bobfracsin * bob_pitch->value * xyspeed;
-		if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
+		if (ent->client->ps.pmove.pm_flags & PMF_DUCKED && ent->groundentity)
 			delta *= 6;		// crouching
 		angles[PITCH] += delta;
 		delta = bobfracsin * bob_roll->value * xyspeed;
-		if (ent->client->ps.pmove.pm_flags & PMF_DUCKED)
+		if (ent->client->ps.pmove.pm_flags & PMF_DUCKED && ent->groundentity)
 			delta *= 6;		// crouching
 		if (bobcycle & 1)
 			delta = -delta;
@@ -1102,7 +1102,7 @@ void ClientEndServerFrame (edict_t *ent)
 	
 	bobtime = (current_client->bobtime += bobmove);
 
-	if (current_client->ps.pmove.pm_flags & PMF_DUCKED)
+	if (current_client->ps.pmove.pm_flags & PMF_DUCKED && current_player->groundentity)
 		bobtime *= 4;
 
 	bobcycle = (int)bobtime;
@@ -1513,7 +1513,7 @@ void BotEndServerFrame (edict_t *ent)
 	
 	bobtime = (current_client->bobtime += bobmove);
 
-	if (current_client->ps.pmove.pm_flags & PMF_DUCKED)
+	if (current_client->ps.pmove.pm_flags & PMF_DUCKED && current_player->groundentity)
 		bobtime *= 4;
 
 	bobcycle = (int)bobtime;

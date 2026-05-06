@@ -476,6 +476,8 @@ void TossClientWeapon (edict_t *self)
 		item = NULL;
 	if (item && (strcmp (item->pickup_name, "Blaster") == 0))
 		item = NULL;
+	if (item && instagib && instagib->value)
+		item = NULL;
 
 	if (!((int)(dmflags->value) & DF_QUAD_DROP))
 		quad = qfalse;
@@ -721,14 +723,31 @@ void InitClientPersistant (gclient_t *client)
 //	item = FindItem("Trap");
 //	client->pers.inventory[ITEM_INDEX(item)] = 100;
 //test
-	item = /*Fdi_BLASTER;//*/FindItem("Blaster");
-	client->pers.selected_item = ITEM_INDEX(item);
-	client->pers.inventory[client->pers.selected_item] = 1;
+	if (instagib && instagib->value)
+	{
+		item = FindItem("Railgun");
+		if (!item)
+			gi.error("No Railgun item found");
+		client->pers.selected_item = ITEM_INDEX(item);
+		client->pers.inventory[client->pers.selected_item] = 1;
 
-	client->pers.weapon = item;
+		client->pers.weapon = item;
+		client->pers.lastweapon = item;
+		client->pers.inventory[ITEM_INDEX(FindItem("Slugs"))] = 50;
+	}
+	else
+	{
+		item = FindItem("Blaster");
+		if (!item)
+			gi.error("No Blaster item found");
+		client->pers.selected_item = ITEM_INDEX(item);
+		client->pers.inventory[client->pers.selected_item] = 1;
+
+		client->pers.weapon = item;
 //ZOID
-	client->pers.lastweapon = item;
+		client->pers.lastweapon = item;
 //ZOID
+	}
 
 //ZOID
 	item = FindItem("Grapple");
@@ -880,6 +899,8 @@ to other players
 
 edict_t *SelectTrueRandomDeathmatchSpawnPoint(void)
 {
+	if (level.numspawns == 0)
+		return NULL;
 	return level.spawns[rand_uniform(level.numspawns)];
 }
 
@@ -888,6 +909,9 @@ edict_t *SelectRandomDeathmatchSpawnPointAvoidClosest (void)
 	edict_t *spot, *spot1, *spot2;
 	float   range, range1, range2;
 	int     i;
+
+	if (level.numspawns <= 2)
+		return SelectTrueRandomDeathmatchSpawnPoint();
 
 	range1 = range2 = 99999;
 	spot1 = spot2 = NULL;
@@ -1597,6 +1621,14 @@ void PutClientInServer (edict_t *ent)
 		client->resp.spawnframe = level.framenum;
 	}
 
+	if (client->pers.stored_frame == 0)
+	{
+		VectorCopy(ent->s.origin, client->pers.stored_origin);
+		VectorCopy(client->ps.viewangles, client->pers.stored_angles);
+		client->pers.stored_frame = level.framenum;
+		if (client->pers.stored_frame == 0)
+			client->pers.stored_frame = 1;
+	}
 }
 
 /*
@@ -2471,6 +2503,23 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 
 		// perform a pmove
 		gi.Pmove (&pm);
+
+		// mid-air crouch support (optional, triggered by +movedown)
+		if (!pm.groundentity && pm.waterlevel == 0 && pm.s.pm_type == PM_NORMAL)
+		{
+			if (pm.cmd.upmove < 0)
+			{
+				pm.s.pm_flags |= PMF_DUCKED;
+				pm.viewheight = 8;
+				pm.maxs[2] = 16;
+			}
+			else
+			{
+				pm.s.pm_flags &= ~PMF_DUCKED;
+				pm.viewheight = 22;
+				pm.maxs[2] = 32;
+			}
+		}
 
 		// save results of pmove
 		client->ps.pmove = pm.s;

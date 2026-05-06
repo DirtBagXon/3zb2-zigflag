@@ -74,6 +74,7 @@ void AutoBot();
 void Combat_Level0(edict_t *ent,int foundedenemy,int enewep,float aim,float distance,int skill);
 void Combat_LevelX(edict_t *ent,int foundedenemy,int enewep,float aim,float distance,int skill);
 void UsePrimaryWeapon(edict_t *ent);
+int Bot_AssessThreat(edict_t *ent, edict_t *target, int foundedenemy, float distance);
 
 //Explotion Index
 void UpdateExplIndex(edict_t* ent);
@@ -235,6 +236,9 @@ void CTFJobAssign (void);		//job assign
 #define FIRE_REFLECT		0x00080000	// 壁に反射させる
 
 #define FIRE_IGNORE			0x10000000	//無視して逃げる
+#define FIRE_THREATASSESS	0x20000000	//assess threat level
+#define FIRE_TACTICALRETREAT 0x40000000	//tactical retreat when outmatched
+#define FIRE_OUTNUMBERED	0x80000000	//multiple enemies nearby
 
 // means of death
 

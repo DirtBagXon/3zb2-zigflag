@@ -1105,26 +1105,68 @@ void Combat_Level0(edict_t *ent,int foundedenemy,int enewep
 
 		if(rs_trace.ent == ent)
 		{
-			if(rs_trace.endpos[2] > (ent->s.origin[2] + 4) && random() < 0.4)
+			qboolean enemyFiring = (target->client->weaponstate == WEAPON_FIRING);
+			float dodgeChance = Bot[ent->client->zc.botindex].param[BOP_DODGE] / 10.0;
+			
+			if(enemyFiring) dodgeChance += 0.3;
+			
+			if(random() < dodgeChance)
 			{
-				client->ps.pmove.pm_flags |= PMF_DUCKED;
-				zc->battleduckcnt = 2 + 8 * random();
-			}
-			else if(rs_trace.endpos[2] < (ent->s.origin[2] + JumpMax - 24))
-			{
-				if(zc->route_trace)
+				vec3_t toTarget, strafeDir;
+				float randDodge = random();
+				
+				VectorSubtract(target->s.origin, ent->s.origin, toTarget);
+				toTarget[2] = 0;
+				VectorNormalize(toTarget);
+				
+				CrossProduct(toTarget, vec3_origin, strafeDir);
+				if(strafeDir[0] == 0 && strafeDir[1] == 0) {
+					strafeDir[0] = -toTarget[1];
+					strafeDir[1] = toTarget[0];
+				}
+				
+				if(randDodge < 0.25 && rs_trace.endpos[2] > (ent->s.origin[2] + 4))
 				{
-					if(Bot_Fall(ent,ent->s.origin,0)) trace_priority = TRP_MOVEKEEP;;
+					client->ps.pmove.pm_flags |= PMF_DUCKED;
+					zc->battleduckcnt = 2 + 6 * random();
+				}
+				else if(randDodge < 0.5 && rs_trace.endpos[2] < (ent->s.origin[2] + JumpMax - 24))
+				{
+					if(zc->route_trace)
+					{
+						if(Bot_Fall(ent,ent->s.origin,0)) trace_priority = TRP_MOVEKEEP;
+					}
+					else
+					{
+						ent->moveinfo.speed = 0.5;
+						ent->velocity[2] += VEL_BOT_JUMP;
+						gi.sound(ent, CHAN_VOICE, gi.soundindex("*jump1.wav"), 1, ATTN_NORM, 0);
+						PlayerNoise(ent, ent->s.origin, PNOISE_SELF);
+						Set_BotAnim(ent,ANIM_JUMP,FRAME_jump1-1,FRAME_jump6);
+					}
+				}
+				else if(randDodge < 0.75)
+				{
+					float strafeYaw;
+					if(random() < 0.5) {
+						strafeYaw = ent->s.angles[YAW] + 90;
+					} else {
+						strafeYaw = ent->s.angles[YAW] - 90;
+					}
+					if(strafeYaw > 180) strafeYaw -= 360;
+					else if(strafeYaw < -180) strafeYaw += 360;
+					zc->moveyaw = strafeYaw;
+					zc->battlemode |= FIRE_SHIFT;
+					zc->battlesubcnt = 4 + (int)(8 * random());
+					trace_priority = TRP_MOVEKEEP;
 				}
 				else
 				{
-					ent->moveinfo.speed = 0.5;
-	
-					ent->velocity[2] += VEL_BOT_JUMP;
-					gi.sound(ent, CHAN_VOICE, gi.soundindex("*jump1.wav"), 1, ATTN_NORM, 0);
-					PlayerNoise(ent, ent->s.origin, PNOISE_SELF);	//pon
-					Set_BotAnim(ent,ANIM_JUMP,FRAME_jump1-1,FRAME_jump6);
-				}					
+					zc->moveyaw = ent->s.angles[YAW] + 180;
+					if(zc->moveyaw > 180) zc->moveyaw -= 360;
+					else if(zc->moveyaw < -180) zc->moveyaw += 360;
+					trace_priority = TRP_MOVEKEEP;
+				}
 			}
 		}
 	}
@@ -1322,7 +1364,7 @@ void Combat_Level0(edict_t *ent,int foundedenemy,int enewep
 	mywep = Get_KindWeapon(client->pers.weapon);
 
 	//左右回避セット========================
-	if(!(zc->battlemode & FIRE_SHIFT) && skill > (random() * skill) /*&& distance < 250*/
+	if(!(zc->battlemode & FIRE_SHIFT) && skill > (random() * skill)
 		&& (30 * random()) < Bot[zc->botindex].param[BOP_OFFENCE])
 	{
 		k = qfalse;
@@ -1355,17 +1397,30 @@ void Combat_Level0(edict_t *ent,int foundedenemy,int enewep
 				f = -(f + 360);
 			}
 	
-			//俺をみている！！
-			if(f <= -160)
-			{
-
-				zc->battlemode |= FIRE_SHIFT_L;
-				zc->battlesubcnt = 5 + (int)(16 * random());
+			qboolean enemyFiring = (target->client->weaponstate == WEAPON_FIRING);
+			float triggerAngle = 150;
+			float dodgeChance = Bot[zc->botindex].param[BOP_DODGE] / 10.0;
+			
+			if(enemyFiring) {
+				triggerAngle = 130;
+				dodgeChance += 0.2;
 			}
-			else if(f >= 160)
+			
+			if(skill >= 7) triggerAngle -= 15;
+			if(skill >= 5) triggerAngle -= 10;
+			
+			if(random() < dodgeChance)
 			{
-				zc->battlemode |= FIRE_SHIFT_R;
-				zc->battlesubcnt = 5 + (int)(16 * random());
+				if(f <= -triggerAngle)
+				{
+					zc->battlemode |= FIRE_SHIFT_L;
+					zc->battlesubcnt = 4 + (int)(12 * random());
+				}
+				else if(f >= triggerAngle)
+				{
+					zc->battlemode |= FIRE_SHIFT_R;
+					zc->battlesubcnt = 4 + (int)(12 * random());
+				}
 			}
 		}
 	}
@@ -1482,7 +1537,36 @@ void Combat_Level0(edict_t *ent,int foundedenemy,int enewep
 	
 	//-----------------------------------------------------------------------
 	//プライオリティ
-	//-----------------------------------------------------------------------	
+	//-----------------------------------------------------------------------
+
+	if(zc->threat_level > 0.7f && ent->health > 50)
+	{
+		if(distance > 200 && distance < 600)
+		{
+			if(B_UseRocket(ent,target,enewep,aim * 0.8,distance,skill)) goto FIRED;
+		}
+	}
+
+	if(zc->nearby_enemies >= 3 && distance < 500)
+	{
+		if(B_UseBfg(ent,target,enewep,aim * 0.7,distance,skill)) goto FIRED;
+		if(distance < 400 && (target->s.origin[2] - ent->s.origin[2]) < 100)
+		{
+			if(B_UseGrenadeLauncher(ent,target,enewep,aim * 0.8,distance,skill)) goto FIRED;
+		}
+	}
+
+	if(ent->health < 40 && distance < 300)
+	{
+		if(B_UseSuperShotgun(ent,target,enewep,aim * 0.7,distance,skill)) goto FIRED;
+		if(B_UseShotgun(ent,target,enewep,aim * 0.7,distance,skill)) goto FIRED;
+	}
+
+	if(target->s.origin[2] > ent->s.origin[2] + 100 && distance < 800)
+	{
+		if(B_UseRocket(ent,target,enewep,aim * 0.85,distance,skill)) goto FIRED;
+	}
+
 	//BFG
 	if(distance > 200)
 	{

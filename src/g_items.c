@@ -1776,6 +1776,24 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 	// some items will be prevented in deathmatch
 	if (deathmatch->value)
 	{
+		if (instagib && instagib->value)
+		{
+			if (item->pickup == Pickup_Weapon ||
+				item->pickup == Pickup_Ammo ||
+				item->pickup == Pickup_Armor ||
+				item->pickup == Pickup_PowerArmor ||
+				item->pickup == Pickup_Powerup ||
+				item->pickup == Pickup_Health ||
+				item->pickup == Pickup_Adrenaline ||
+				item->pickup == Pickup_AncientHead ||
+				item->pickup == Pickup_Pack ||
+				item->pickup == Pickup_Bandolier)
+			{
+				G_FreeEdict (ent);
+				return;
+			}
+		}
+
 		if ( (int)dmflags->value & DF_NO_ARMOR )
 		{
 			if (item->pickup == Pickup_Armor || item->pickup == Pickup_PowerArmor)

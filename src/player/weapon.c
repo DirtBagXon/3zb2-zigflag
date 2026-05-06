@@ -1923,7 +1923,12 @@ void weapon_railgun_fire (edict_t *ent)
 	int			damage;
 	int			kick;
 
-	if (deathmatch->value)
+	if (instagib && instagib->value)
+	{
+		damage = 10000;
+		kick = 200;
+	}
+	else if (deathmatch->value)
 	{	// normal damage is too extreme in dm
 		damage = 100;
 		kick = 200;
@@ -1967,7 +1972,7 @@ void weapon_railgun_fire (edict_t *ent)
 	ent->client->ps.gunframe++;
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
-	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
+	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) && !(instagib && instagib->value))
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 
 //	ent->client->ps.fov = 90;					//ズーム解除

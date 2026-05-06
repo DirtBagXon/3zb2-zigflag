@@ -37,6 +37,7 @@ typedef struct zgcl_s
 
 	//basical moving
 	float		moveyaw;		//qtrue moving yaw
+	float           oldyaw;                 //previous frame yaw (for rate limiting)
 
 	//combat
 	int			total_bomb;		//total put bomb
@@ -89,6 +90,11 @@ typedef struct zgcl_s
 
 	vec3_t		aimedpos;		//shottenpoint
 	qboolean	trapped;		//trapflag
+
+	//threat assessment
+	float		threat_level;	//0.0-1.0: how dangerous current situation is
+	float		last_threat_check;	//level.time of last threat assessment
+	int			nearby_enemies;	//count of enemies in vicinity
 
 	//team
 	short		tmplstate;		//teamplay state
