@@ -278,6 +278,23 @@ edict_t *Get_NewClient (void)
 //----------------------------------------------------------------
 void Bot_Think (edict_t *self)
 {
+	if (!self || self < g_edicts || self >= &g_edicts[globals.num_edicts]) {
+		return;
+	}
+
+	int self_idx = self - g_edicts;
+
+	if (self_idx < 1 || self_idx > (int)maxclients->value) {
+		self->think     = NULL;
+		self->nextthink = 0;
+		return;
+	}
+
+	if (!self->client) {
+		self->think     = NULL;
+		self->nextthink = 0;
+		return;
+	}
 
 	if (self->linkcount != self->monsterinfo.linkcount)
 	{

@@ -787,6 +787,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
+	ent->client->resp.frags[FRAG_GRENADES].atts++;
 
 	// ### Hentai ### BEGIN
 
@@ -967,6 +968,7 @@ void weapon_grenadelauncher_fire (edict_t *ent)
 	ent->client->kick_angles[0] = -1;
 
 	fire_grenade (ent, start, forward, damage, 600, 2.5, radius);
+	ent->client->resp.frags[FRAG_GRENADELAUNCHER].atts++;
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1033,6 +1035,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 		damage -= 20;//ロックオンは20ダメージ減り
 		fire_lockon_rocket (ent, start, forward, damage, 20, damage_radius, radius_damage);
 	}
+	ent->client->resp.frags[FRAG_ROCKETLAUNCHER].atts++;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1224,6 +1227,7 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	else
 		damage = 10;
 	Blaster_Fire (ent, vec3_origin, damage, qfalse, EF_BLASTER);
+	ent->client->resp.frags[FRAG_BLASTER].atts++;
 	ent->client->ps.gunframe++;
 }
 
@@ -1279,6 +1283,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 			else
 				damage = 20;
 			Blaster_Fire (ent, offset, damage, qtrue, effect);
+			ent->client->resp.frags[FRAG_HYPERBLASTER].atts++;
 			// ### Hentai ### BEGIN
 
 			ent->client->anim_priority = ANIM_ATTACK;
@@ -1395,6 +1400,7 @@ void Machinegun_Fire (edict_t *ent)
 	VectorSet(offset, 0, 8, ent->viewheight-8);
 	P_ProjectSource (ent, offset, forward, right, start);
 	fire_bullet (ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD, DEFAULT_BULLET_VSPREAD, MOD_MACHINEGUN);
+	ent->client->resp.frags[FRAG_MACHINEGUN].atts++;
 
 	gi.WriteByte (svc_muzzleflash);
 	gi.WriteShort (ent-g_edicts);
@@ -1502,6 +1508,8 @@ void Chaingun_Fire (edict_t *ent)
 		NoAmmoWeaponChange (ent);
 		return;
 	}
+
+	ent->client->resp.frags[FRAG_CHAINGUN].atts += shots;
 
 	if (is_quad)
 	{
@@ -1629,6 +1637,8 @@ void Gatringgun_Fire (edict_t *ent)
 		return;
 	}
 
+	ent->client->resp.frags[FRAG_CHAINGUN].atts += shots;
+
 	if (is_quad)
 	{
 		damage *= 4;
@@ -1744,6 +1754,7 @@ void weapon_shotgun_fire (edict_t *ent)
 		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
 	else
 		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
+	ent->client->resp.frags[FRAG_SHOTGUN].atts++;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1821,6 +1832,7 @@ void weapon_supershotgun_fire (edict_t *ent)
 		P_ProjectSource(ent, offset, forward, right, start);
 	}
 	fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT/2, MOD_SSHOTGUN);
+	ent->client->resp.frags[FRAG_SUPERSHOTGUN].atts++;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1960,6 +1972,7 @@ void weapon_railgun_fire (edict_t *ent)
 		damage += 20;
 		fire_sniperail (ent, start, forward, damage, kick);
 	}
+	ent->client->resp.frags[FRAG_RAILGUN].atts++;
 
 //	gi.bprintf(PRINT_HIGH,"jj %i\n",ent->moveinfo.sound_start);
 
@@ -2098,6 +2111,7 @@ void weapon_bfg_fire (edict_t *ent)
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent, offset, forward, right, start);
 	fire_bfg (ent, start, forward, damage, 400, damage_radius);
+	ent->client->resp.frags[FRAG_BFG].atts++;
 
 	ent->client->ps.gunframe++;
 

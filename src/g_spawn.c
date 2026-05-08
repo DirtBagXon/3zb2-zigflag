@@ -959,12 +959,14 @@ void SpawnEntities (char *mapname, char *entities, char *spawnpoint)
 	char		netname[MAX_NAME];
 
 	int			laser = 0;
+
 //ponko
 	memset(mpindex,0,sizeof(mpindex));	//target item index
 	memset(LaserIndex,0,sizeof(LaserIndex));
 //ponko
 
 	Bot_LevelChange();
+	ClearStatsCache();
 
 	skill_level = floor (skill->value);
 	if (skill_level < 0)

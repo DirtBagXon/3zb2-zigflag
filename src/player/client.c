@@ -181,9 +181,54 @@ qboolean IsFemale (edict_t *ent)
 }
 
 
+const int mod_to_frag[64] = {
+	FRAG_UNKNOWN,          // MOD_UNKNOWN
+	FRAG_BLASTER,          // MOD_BLASTER
+	FRAG_SHOTGUN,          // MOD_SHOTGUN
+	FRAG_SUPERSHOTGUN,     // MOD_SSHOTGUN
+	FRAG_MACHINEGUN,       // MOD_MACHINEGUN
+	FRAG_CHAINGUN,         // MOD_CHAINGUN
+	FRAG_GRENADELAUNCHER,  // MOD_GRENADE
+	FRAG_GRENADELAUNCHER,  // MOD_G_SPLASH
+	FRAG_ROCKETLAUNCHER,   // MOD_ROCKET
+	FRAG_ROCKETLAUNCHER,   // MOD_R_SPLASH
+	FRAG_HYPERBLASTER,     // MOD_HYPERBLASTER
+	FRAG_RAILGUN,          // MOD_RAILGUN
+	FRAG_BFG,              // MOD_BFG_LASER
+	FRAG_BFG,              // MOD_BFG_BLAST
+	FRAG_BFG,              // MOD_BFG_EFFECT
+	FRAG_GRENADES,         // MOD_HANDGRENADE
+	FRAG_GRENADES,         // MOD_HG_SPLASH
+	FRAG_UNKNOWN,          // MOD_WATER
+	FRAG_UNKNOWN,          // MOD_SLIME
+	FRAG_UNKNOWN,          // MOD_LAVA
+	FRAG_UNKNOWN,          // MOD_CRUSH
+	FRAG_UNKNOWN,          // MOD_TELEFRAG
+	FRAG_UNKNOWN,          // MOD_FALLING
+	FRAG_UNKNOWN,          // MOD_SUICIDE
+	FRAG_GRENADES,         // MOD_HELD_GRENADE
+	FRAG_UNKNOWN,          // MOD_EXPLOSIVE
+	FRAG_UNKNOWN,          // MOD_BARREL
+	FRAG_UNKNOWN,          // MOD_BOMB
+	FRAG_UNKNOWN,          // MOD_EXIT
+	FRAG_UNKNOWN,          // MOD_SPLASH
+	FRAG_UNKNOWN,          // MOD_TARGET_LASER
+	FRAG_UNKNOWN,          // MOD_TRIGGER_HURT
+	FRAG_UNKNOWN,          // MOD_HIT
+	FRAG_UNKNOWN,          // MOD_TARGET_BLASTER
+	FRAG_UNKNOWN,          // MOD_GRAPPLE
+	FRAG_UNKNOWN,          // MOD_RIPPER
+	FRAG_UNKNOWN,          // MOD_PHALANX
+	FRAG_UNKNOWN,          // MOD_BRAINTENTACLE
+	FRAG_UNKNOWN,          // MOD_BLASTOFF
+	FRAG_UNKNOWN,          // MOD_GEKK
+	FRAG_UNKNOWN,          // MOD_TRAP
+	FRAG_UNKNOWN,          // MOD_FLAG
+};
+
 void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 {
-	int			mod;
+	int			mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
 	char		*message;
 	char		*message2;
 	qboolean	ff, fk;
@@ -194,7 +239,6 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 	if (deathmatch->value || coop->value)
 	{
 		ff = meansOfDeath & MOD_FRIENDLY_FIRE;
-		mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
 		message = NULL;
 		message2 = "";
 		fk = qfalse;
@@ -284,8 +328,10 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 		if (message)
 		{
 			gi.bprintf (PRINT_MEDIUM, "%s %s.\n", self->client->pers.netname, message);
-			if (deathmatch->value)
+			if (deathmatch->value) {
 				self->client->resp.score--;
+				self->client->resp.frags[mod_to_frag[mod & 63]].suicides++;
+			}
 			self->enemy = NULL;
 			return;
 		}
@@ -429,8 +475,11 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 				{
 					if (ff)
 						attacker->client->resp.score--;
-					else
+					else {
 						attacker->client->resp.score++;
+						attacker->client->resp.frags[mod_to_frag[mod & 63]].kills++;
+					}
+					self->client->resp.frags[mod_to_frag[mod & 63]].deaths++;
 				}
 				return;
 			}
@@ -438,8 +487,10 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 	}
 
 	gi.bprintf (PRINT_MEDIUM,"%s died.\n", self->client->pers.netname);
-	if (deathmatch->value)
+	if (deathmatch->value) {
 		self->client->resp.score--;
+		self->client->resp.frags[mod_to_frag[mod & 63]].suicides++;
+	}
 }
 
 
@@ -2445,9 +2496,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 //--------------------------------------
 	level.current_entity = ent;
 	client = ent->client;
-	float delay = 5.0;
-
-	if(zigmode->value) delay = 7.5;
+	float delay = 8;
 
 	if (level.intermissiontime)
 	{

@@ -452,6 +452,21 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	CTFCheckHurtCarrier(targ, attacker);
 //ZOID
 
+	if (client)
+	{
+		int frag = mod_to_frag[meansOfDeath & 63];
+		if (frag >= FRAG_BLASTER && frag <= FRAG_BFG) {
+			client->resp.damage_recvd += damage;
+			if (attacker && attacker->client && attacker != targ) {
+				attacker->client->resp.damage_given += damage;
+				if (attacker->client->resp.last_hit_framenum[frag] != level.framenum || frag == FRAG_RAILGUN) {
+					attacker->client->resp.frags[frag].hits++;
+					attacker->client->resp.last_hit_framenum[frag] = level.framenum;
+				}
+			}
+		}
+	}
+
 // do the damage
 	if (take)
 	{

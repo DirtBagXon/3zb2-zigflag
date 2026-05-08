@@ -125,6 +125,9 @@ void BeginIntermission (edict_t *targ)
 	VectorCopy (ent->s.origin, level.intermission_origin);
 	VectorCopy (ent->s.angles, level.intermission_angle);
 
+	// Snapshot all stats now, before clients start disconnecting
+	SaveStatsSnapshot();
+
 	// move all clients to the intermission point
 	for (i=0 ; i<maxclients->value ; i++)
 	{
@@ -305,6 +308,21 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		stringlength += copy_len;
 
 		string[stringlength] = '\0';
+	}
+
+	if (level.intermissiontime)
+	{
+		Com_sprintf(entry, sizeof(entry),
+		"xv 0 yv 280 cstring2 \"Use 'stats-all' for a detailed player report\"");
+
+		j = strlen(entry);
+
+		if (stringlength + j < 1024)
+		{
+			memcpy(string + stringlength, entry, j);
+			stringlength += j;
+			string[stringlength] = '\0';
+		}
 	}
 
 	gi.WriteByte (svc_layout);

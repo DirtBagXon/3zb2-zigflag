@@ -34,6 +34,7 @@ The premise is simple: **get the flag and keep it**. Plays on standard Deathmatc
 - Random player spawn points on map start
 - Fixed menu item selection
 - Improved aim (`aimfix`) - Quake 2 gameplay flaw fixes (`fixflaws`)
+- Use `accuracy` or `stats` and `stats-all` to display stats
 
 See [CONFIG.md](CONFIG.md) for full configuration details.
 
