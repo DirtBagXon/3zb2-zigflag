@@ -1170,6 +1170,45 @@ void Combat_Level0(edict_t *ent,int foundedenemy,int enewep
 			}
 		}
 	}
+	//dodge (water) =============================
+	else if (Bot[ent->client->zc.botindex].param[BOP_DODGE]
+		&& ent->waterlevel >= 2)  // waist-deep or fully submerged only
+	{
+		// Same shot trace as land dodge: project enemy's aim 300 units forward
+		AngleVectors(target->client->v_angle, v, NULL, NULL);
+		VectorScale(v, 300, v);
+
+		VectorSet(vv, 0, 0, target->viewheight - 8);
+		VectorAdd(target->s.origin, vv, vv);
+		VectorAdd(vv, v, v);
+
+		VectorSet(v1, -4, -4, -4);
+		VectorSet(v2,  4,  4,  4);
+		rs_trace = gi.trace(vv, v1, v2, v, target, MASK_SHOT);
+
+		if (rs_trace.ent == ent)
+		{
+			// --- Horizontal component: strafe perpendicular to current facing ---
+			zc->moveyaw = ent->s.angles[YAW] + (random() < 0.5f ? 90.0f : -90.0f);
+			if (zc->moveyaw >  180.0f) zc->moveyaw -= 360.0f;
+			else if (zc->moveyaw < -180.0f) zc->moveyaw += 360.0f;
+
+			// --- Vertical component: swim away from the shot's impact height ---
+			if (rs_trace.endpos[2] > (ent->s.origin[2] + 4))
+			{
+				// Shot hits upper body: swim down
+				if (ent->velocity[2] > -100) ent->velocity[2] -= 150;
+			}
+			else if (zc->waterstate == WAS_IN)
+			{
+				// Shot hits lower body and bot is fully submerged: swim up
+				if (ent->velocity[2] < 0) ent->velocity[2] = 0;
+				if (ent->velocity[2] < 100) ent->velocity[2] += 150;
+			}
+
+		trace_priority = TRP_MOVEKEEP;
+		}
+	}
 	//無視して走る========================
 	if(zc->battlemode & FIRE_IGNORE)
 	{
@@ -1784,7 +1823,50 @@ void Combat_Level0(edict_t *ent,int foundedenemy,int enewep
 
 FIRED:
 	if(zc->secwep_selected == 2) zc->secwep_selected = 1;
-	
+
+	if (Bot[zc->botindex].param[BOP_DODGE]
+		&& ent->groundentity
+		&& !ent->waterlevel
+		&& trace_priority < TRP_MOVEKEEP
+		&& skill >= 5)
+	{
+		// fbattlecount encodes direction + next-switch time:
+		//   > 0  → strafe right, switch when level.time >= fbattlecount
+		//   < 0  → strafe left,  switch when level.time >= -fbattlecount
+		//   == 0 → uninitialized
+		if (zc->fbattlecount == 0.0f || level.time >= fabsf(zc->fbattlecount))
+		{
+			//float interval = 0.2f + random() * 0.4f;  // 0.2–0.6s random interval
+			//float interval = 0.25f + random() * 0.20f;  // 0.25–0.45s random interval
+			float interval = 0.2f + random() * 0.3f;
+			float next = level.time + interval;
+
+			if (zc->fbattlecount == 0.0f)
+				zc->fbattlecount = (random() < 0.5f) ? next : -next;  // random initial dir
+			else
+				zc->fbattlecount = (zc->fbattlecount > 0) ? -next : next;  // flip direction
+		}
+
+		float yaw_offset = (zc->fbattlecount > 0) ? 90.0f : -90.0f;
+		zc->moveyaw = ent->s.angles[YAW] + yaw_offset;
+
+		if (zc->moveyaw > 180.0f)  zc->moveyaw -= 360.0f;
+		else if (zc->moveyaw < -180.0f) zc->moveyaw += 360.0f;
+
+		// "Plant and shoot" window: ~10% of time, per-bot offset.
+		{
+			float still_phase = level.time * 0.25f + zc->botindex * 0.11f;
+			if ((still_phase - (int)still_phase) < 0.1f)
+				ent->moveinfo.speed = 0.5f + random() * 0.5f; //moveinfo.speed is always implicitly full speed. Setting it to 0.5f + random() * 0.5f at each direction switch would make the bot's movement less uniform
+		}
+
+		trace_priority = TRP_MOVEKEEP;
+	}
+	else
+	{
+		zc->fbattlecount = 0.0f;  // reset so next combat entry reinitializes cleanly
+	}
+
 	//チキンやろう========================
 	if(zc->battlemode == FIRE_CHIKEN)
 	{
@@ -1879,4 +1961,3 @@ void UpdateExplIndex(edict_t* ent)
 		if(!mod && ExplIndex[i] == NULL) {ExplIndex[i] = ent;mod = qtrue;}
 	}
 }
-
