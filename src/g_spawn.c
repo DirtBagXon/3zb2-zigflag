@@ -812,7 +812,7 @@ void G_FindRouteLink(edict_t *ent)
 	if(!ctf->value && zigmode->value)
 	{
 		SelectFlagSpawnPoint (ent, v, vv);
-		if(ZIGDrop_FlagCheck(ent,zflag_item))
+		if(ZIGDrop_FlagCheck(ent, zflag_item))
 		{
 			gi.dprintf("Starting ZigFlag mode...\n");
 			VectorCopy (v, zflag_ent->s.origin);

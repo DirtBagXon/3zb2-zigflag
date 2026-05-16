@@ -57,6 +57,7 @@ cvar_t	*playerid;
 cvar_t	*combathud;
 cvar_t	*killerflag;
 cvar_t	*weaponswap;
+cvar_t	*announcer;
 
 //ponpoko
 cvar_t	*gamedir;
@@ -76,7 +77,8 @@ cvar_t	*zigrapple;
 cvar_t	*zigintro;
 cvar_t	*spawnbotfar;
 cvar_t	*respawn_protection;
-int	flagbounce;
+cvar_t	*g_sticky_grenades;
+cvar_t	*g_crouching;
 float	spawncycle;
 float	ctfjob_update;
 //ponpoko
@@ -495,7 +497,6 @@ void G_RunFrame (void)
 {
 	int		i,j;
 	static unsigned short	zflag_stall = 0;
-	static unsigned short	zflag_bounce = 0;
 	static float	next_fragadd = 0;
 	static qboolean	zf_warn = qfalse;
 	static qboolean	zf_move = qfalse;
@@ -529,7 +530,6 @@ void G_RunFrame (void)
 		flagholder = NULL;
 		lastholder = NULL;
 		zflag_stall = 0;
-		zflag_bounce = 0;
 		zf_warn = qfalse;
 		zf_move = qfalse;
 		return;
@@ -734,11 +734,9 @@ void G_RunFrame (void)
 				}
 				zf_move = qtrue;
 				zflag_stall = 0;
-				zflag_bounce++;
 				SelectFlagSpawnPoint (ent, v, vv);
 				ZIGBounce_Flag(ent, zflag_item);
 				VectorCopy (v, zflag_ent->s.origin);
-				flagbounce = zflag_bounce;
 				zflag_ent->solid = SOLID_TRIGGER;
 				HighlightStr(hitxt, "Flag bounced\n", MAX_TEXT);
 				gi.bprintf (PRINT_HIGH, "%s", hitxt);

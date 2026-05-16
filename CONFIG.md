@@ -72,10 +72,10 @@ Route chain files (`.chn`/`.chf`) contain object and level navigation data. See 
 
 ### Prerequisites
 
-- A writable route chain file in the correct directory. Create an empty file if starting fresh:
-  ```bash
-  touch 3zb2/chdtm/q2dm8.chn
-  touch 3zb2/chctf/q2ctf3.chf
+- Make sure your route chain directories are writable:
+  ```
+  3zb2/chdtm/
+  3zb2/chctf/
   ```
 
 ### Steps

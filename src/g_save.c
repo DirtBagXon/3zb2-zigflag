@@ -234,6 +234,7 @@ void InitGame (void)
 	combathud = gi.cvar("combathud", "1", CVAR_SERVERINFO | CVAR_NOSET);
 	killerflag = gi.cvar("killerflag", "1", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	weaponswap = gi.cvar("weaponswap", "0", CVAR_SERVERINFO | CVAR_ARCHIVE);
+	announcer = gi.cvar("announcer", "0", CVAR_ARCHIVE);
 	playerid = gi.cvar("playerid", "0", CVAR_ARCHIVE);
 	spawnbotfar = gi.cvar("spawnbotfar", "0", CVAR_ARCHIVE);
 	zigspawn = gi.cvar("zigspawn", "1", CVAR_ARCHIVE);
@@ -241,6 +242,8 @@ void InitGame (void)
 	zigrapple = gi.cvar("zigrapple", "0", CVAR_SERVERINFO | CVAR_ARCHIVE);
 	cfgpath = gi.cvar("cfgpath", "", CVAR_NOSET);
 	respawn_protection = gi.cvar("respawn_protection", "0", CVAR_ARCHIVE);
+	g_sticky_grenades = gi.cvar("g_sticky_grenades", "0", CVAR_ARCHIVE);
+	g_crouching = gi.cvar("g_crouching", "0", CVAR_ARCHIVE);
 
 	// items
 	InitItems ();
@@ -268,6 +271,15 @@ void InitGame (void)
 
 //ZOID
 	CTFInit();
+
+	if (ctf->value && zigmode->value) {
+		gi.dprintf("zigmode requires CTF/TDM disabled.\n");
+		gi.cvar_set("ctf", "0");
+		gi.cvar_set("tdm", "0");
+		ctf->value = 0;
+		tdm->value = 0;
+	}
+
 //ZOID
 	Load_BotInfo();		//コンフィグ読み込み3ZBConfig.cfg
 }

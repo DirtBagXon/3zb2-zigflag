@@ -25,16 +25,19 @@ The premise is simple: **get the flag and keep it**. Plays on standard Deathmatc
 - Optional auto weapon switching, respawn protection, and grapple
 - Skin and model teams with bonuses/penalties on flag possession and friendly fire
 
-### General
+### Updates and Additions
 
-- `store` / `recall` commands to save and restore player position (_Jump mod style_)
-- Remaining time display for all game modes
+- `store` / `recall` commands to save and restore player position (_Jump mod style_).
+- Remaining time display for all game modes.
 - Basic Team Deathmatch support (`set tdm 1`)
 - Instagib option (`set instagib 1`)
-- Random player spawn points on map start
-- Fixed menu item selection
+- `set g_crouching 1` to enable crouching mid-air.
+- `set g_sticky_grenades 1` for adhesive grenades.
+- `set announcer 1` for callout messages.
+- Random player spawn points on map start.
+- Fixed menu item selection.
 - Improved aim (`aimfix`) - Quake 2 gameplay flaw fixes (`fixflaws`)
-- Use `accuracy` or `stats` and `stats-all` to display stats
+- Use `stats` and `stats-all` for detailed player stats.
 
 See [CONFIG.md](CONFIG.md) for full configuration details.
 
@@ -112,7 +115,6 @@ sv rmb $    # Remove $ bots
 Example server config for ZigFlag:
 
 ```
-exec addbot.cfg
 exec config-zflag.cfg
 map q2dm1
 ```

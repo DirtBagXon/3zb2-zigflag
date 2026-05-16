@@ -466,12 +466,21 @@ static void Grenade_Touch (edict_t *ent, edict_t *other, cplane_t *plane, csurfa
 	if (surf && (surf->flags & SURF_SKY))
 	{
 		G_FreeEdict (ent);
-UpdateExplIndex(NULL);
+		UpdateExplIndex(NULL);
 		return;
 	}
 
 	if (!other->takedamage)
 	{
+		if (g_sticky_grenades->value)
+		{
+			VectorClear(ent->velocity);
+			VectorClear(ent->avelocity);
+			ent->movetype = MOVETYPE_NONE;
+			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/hgrenb1a.wav"), 1, ATTN_NORM, 0);
+			return;
+		}
+
 		if (ent->spawnflags & 1)
 		{
 			if (random() > 0.5)

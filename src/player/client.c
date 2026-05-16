@@ -226,6 +226,36 @@ const int mod_to_frag[64] = {
 	FRAG_UNKNOWN,          // MOD_FLAG
 };
 
+static char *announcer_msgs[] = {
+	"!!! DOUBLE KILL !!!",
+	"!!! TRIPLE KILL !!!",
+	"!!! MULTI KILL !!!",
+	"!!! MEGA KILL !!!",
+	"!!! ULTRA KILL !!!",
+	"!!! MONSTER KILL !!!",
+};
+
+static char *announcer_snd[] = {
+	"announcer/doublekill.wav",
+	"announcer/triplekill.wav",
+	"announcer/multikill.wav",
+	"announcer/megakill.wav",
+	"announcer/ultrakill.wav",
+	"announcer/monsterkill.wav",
+};
+
+void Announcer_Message(edict_t *ent, int streak)
+{
+	if (streak > 7) return;
+
+	int idx = streak - 2;
+
+	if (idx < 0) return;
+
+	gi.centerprintf(ent, "%s", announcer_msgs[idx]);
+	gi.sound(ent, CHAN_AUTO, gi.soundindex(announcer_snd[idx]), 1, ATTN_NORM, 0);
+}
+
 void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 {
 	int			mod = meansOfDeath & ~MOD_FRIENDLY_FIRE;
@@ -478,6 +508,22 @@ void ClientObituary (edict_t *self, edict_t *inflictor, edict_t *attacker)
 					else {
 						attacker->client->resp.score++;
 						attacker->client->resp.frags[mod_to_frag[mod & 63]].kills++;
+
+						float now = level.time;
+						if (now - attacker->client->resp.kill_streak_time < KILL_STREAK_TIMEOUT)
+							attacker->client->resp.kill_streak++;
+						else
+							attacker->client->resp.kill_streak = 1;
+						attacker->client->resp.kill_streak_time = now;
+
+						if (attacker->client->resp.kill_streak >= 2)
+						{
+							attacker->client->resp.pending_kill_streak =
+								attacker->client->resp.kill_streak;
+
+							attacker->client->resp.pending_kill_streak_time =
+								level.time + 0.5f;
+						}
 					}
 					self->client->resp.frags[mod_to_frag[mod & 63]].deaths++;
 				}
@@ -622,6 +668,9 @@ player_die
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
 	int		n;
+
+	self->client->resp.kill_streak = 0;
+	self->client->resp.kill_streak_time = 0;
 
 	VectorClear (self->avelocity);
 
@@ -884,14 +933,6 @@ void FetchClientEntData (edict_t *ent)
 	if (coop->value)
 		ent->client->resp.score = ent->client->pers.score;
 }
-
-void StoreFlagData (edict_t *ent)
-{
-	ent->possession = ent->client->resp.possession;
-	ent->assassin = ent->client->resp.assassin;
-}
-
-
 
 /*
 =======================================================================
@@ -1341,7 +1382,7 @@ void respawn (edict_t *self)
 
 		self->client->respawn_time = level.time;
 
-		Cmd_Store_f(self);
+		Cmd_Store_f(self, qfalse);
 		return;
 	}
 
@@ -1540,9 +1581,6 @@ void PutClientInServer (edict_t *ent)
 	// copy some data from the client to the entity
 	FetchClientEntData (ent);
 
-	// store new scoreboard data over the level
-	StoreFlagData (ent);
-
 	// clear entity values
 	ent->groundentity = NULL;
 	ent->client = &game.clients[index];
@@ -1647,10 +1685,6 @@ void PutClientInServer (edict_t *ent)
 			return;
 	}*/
 //ponpoko
-
-	// restore scoreboard data
-	ent->client->resp.possession = ent->possession;
-	ent->client->resp.assassin = ent->assassin;
 
         // we must link before killbox since it uses absmin/absmax
 	if(fixflaws->value)
@@ -2554,7 +2588,7 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		gi.Pmove (&pm);
 
 		// mid-air crouch support (optional, triggered by +movedown)
-		if (!pm.groundentity && pm.waterlevel == 0 && pm.s.pm_type == PM_NORMAL)
+		if (g_crouching->value && !pm.groundentity && pm.waterlevel == 0 && pm.s.pm_type == PM_NORMAL)
 		{
 			if (pm.cmd.upmove < 0)
 			{
@@ -2662,7 +2696,11 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	// fire weapon from final position if needed
 	if (client->latched_buttons & BUTTON_ATTACK)
 	{
-		if (client->resp.spectator) {
+		if (ent->movetype == MOVETYPE_NOCLIP) {
+
+			client->latched_buttons = 0;
+
+		} else if (client->resp.spectator) {
 
 			client->latched_buttons = 0;
 
@@ -2704,6 +2742,30 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 	}
 }
 
+/*
+==============
+CheckKillAnnouncer
+
+No overlapping announcements
+==============
+*/
+void CheckKillAnnouncer(edict_t *ent)
+{
+	if (ENT_IS_BOT(ent) || !ent->client)
+		return;
+
+	if (ent->client->resp.pending_kill_streak < 2)
+		return;
+
+	if (level.time >= ent->client->resp.pending_kill_streak_time)
+	{
+		Announcer_Message(ent, ent->client->resp.pending_kill_streak);
+
+		ent->client->resp.pending_kill_streak = 0;
+		ent->client->resp.pending_kill_streak_time = 0;
+	}
+}
+
 
 /*
 ==============
@@ -2721,6 +2783,9 @@ void ClientBeginServerFrame (edict_t *ent)
 		return;
 
 	client = ent->client;
+
+	if (announcer->value)
+		CheckKillAnnouncer(ent);
 
 	if (deathmatch->value &&
 		client->pers.spectator != client->resp.spectator &&

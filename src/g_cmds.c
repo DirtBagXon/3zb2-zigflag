@@ -11,12 +11,12 @@
 typedef struct {
 	char		name[32];
 	fragstat_t	frags[FRAG_TOTAL];
-	int			damage_given;
-	int			damage_recvd;
+	int		damage_given;
+	int		damage_recvd;
 } cached_stat_entry_t;
 
 static cached_stat_entry_t cached_stats[MAX_CACHED_STATS];
-static int				num_cached_stats = 0;
+static int	num_cached_stats = 0;
 
 void SaveStatsSnapshot(void)
 {
@@ -33,6 +33,9 @@ void SaveStatsSnapshot(void)
 		for (j = 0; j < FRAG_TOTAL; j++) e->frags[j] = cl->client->resp.frags[j];
 		e->damage_given = cl->client->resp.damage_given;
 		e->damage_recvd = cl->client->resp.damage_recvd;
+		e->frags[FLAG_EVENT].possession = cl->client->resp.possession;
+		e->frags[FLAG_EVENT].assassin = cl->client->resp.assassin;
+
 	}
 }
 
@@ -522,6 +525,11 @@ void Cmd_Drop_f (edict_t *ent)
 	if (!it)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "unknown item: %s\n", s);
+		return;
+	}
+	if (instagib && instagib->value && !Q_stricmp(it->pickup_name, "Slugs"))
+	{
+		gi.cprintf(ent, PRINT_HIGH, "Can't drop slugs in instagib mode\n");
 		return;
 	}
 	if (!it->drop)
@@ -1244,6 +1252,7 @@ void Cmd_Stats_f(edict_t *ent, qboolean check_other)
 		gi.cprintf(ent, PRINT_HIGH, "\nDamage Given: %d  Received: %d\n",
 			target->client->resp.damage_given, target->client->resp.damage_recvd);
 	}
+	CPRepeat(10, 2);
 }
 
 /*
@@ -1254,14 +1263,23 @@ Cmd_StatsAll_f
 void Cmd_StatsAll_f(edict_t *ent)
 {
 	int i, j, x;
+	char header[64], rowfmt[64];
 
 	// Helper macro: compute accuracy % from fragstat
 #define ACC(f, w) ((f)[w].atts > 0 ? (int)(((float)(f)[w].hits * 100.0f / (float)(f)[w].atts) + 0.5f) : 0)
 #define CAPV(v)   ((v) > 100 ? 100 : (v))
 
-	gi.cprintf(ent, PRINT_HIGH, "\n%-9s %2s %3s %3s %3s %3s %3s %3s %3s %3s %3s %3s\n",
-		"Name", "ki", "RA%", "CH%", "RL%", "MG%", "SG%", "SS%", "HB%", "GR%", "GL%", "BL%");
-	gi.cprintf(ent, PRINT_HIGH, "--------------------------------------------------\n");
+	Com_sprintf(header, sizeof(header), "\n%-9s %2s %3s %3s %3s %3s %3s %3s %3s %3s %3s %3s%s%s\n",
+		"Name", "ki", "RA%", "CH%", "RL%", "MG%", "SG%", "SS%", "HB%", "GR%", "GL%", "BL%",
+		zigmode->value ? " FAS" : "",
+		zigmode->value ? " FBN" : "");
+
+	Com_sprintf(rowfmt, sizeof(rowfmt), "%%-9s %%2d %%3d %%3d %%3d %%3d %%3d %%3d %%3d %%3d %%3d %%3d%s%s\n",
+		zigmode->value ? " %3d" : "",
+		zigmode->value ? " %3d" : "");
+
+	gi.cprintf(ent, PRINT_HIGH, "%s", header);
+	CPRepeat(45, zigmode->value ? 60 : 52);
 
 	if (level.intermissiontime && num_cached_stats > 0)
 	{
@@ -1289,14 +1307,25 @@ void Cmd_StatsAll_f(edict_t *ent)
 			char name[10];
 			strncpy(name, e->name, 9); name[9] = '\0';
 
-			gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
-				name, total_kills,
-				CAPV(ACC(f, FRAG_RAILGUN)), CAPV(ACC(f, FRAG_CHAINGUN)),
-				CAPV(ACC(f, FRAG_ROCKETLAUNCHER)), CAPV(ACC(f, FRAG_MACHINEGUN)),
-				CAPV(ACC(f, FRAG_SHOTGUN)), CAPV(ACC(f, FRAG_SUPERSHOTGUN)),
-				CAPV(ACC(f, FRAG_HYPERBLASTER)), CAPV(ACC(f, FRAG_GRENADES)),
-				CAPV(ACC(f, FRAG_GRENADELAUNCHER)), CAPV(ACC(f, FRAG_BLASTER)));
+			if (zigmode->value)
+				gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
+					name, total_kills,
+					CAPV(ACC(f, FRAG_RAILGUN)), CAPV(ACC(f, FRAG_CHAINGUN)),
+					CAPV(ACC(f, FRAG_ROCKETLAUNCHER)), CAPV(ACC(f, FRAG_MACHINEGUN)),
+					CAPV(ACC(f, FRAG_SHOTGUN)), CAPV(ACC(f, FRAG_SUPERSHOTGUN)),
+					CAPV(ACC(f, FRAG_HYPERBLASTER)), CAPV(ACC(f, FRAG_GRENADES)),
+					CAPV(ACC(f, FRAG_GRENADELAUNCHER)), CAPV(ACC(f, FRAG_BLASTER)),
+					f[FLAG_EVENT].assassin, f[FLAG_EVENT].possession);
+			else
+				gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
+					name, total_kills,
+					CAPV(ACC(f, FRAG_RAILGUN)), CAPV(ACC(f, FRAG_CHAINGUN)),
+					CAPV(ACC(f, FRAG_ROCKETLAUNCHER)), CAPV(ACC(f, FRAG_MACHINEGUN)),
+					CAPV(ACC(f, FRAG_SHOTGUN)), CAPV(ACC(f, FRAG_SUPERSHOTGUN)),
+					CAPV(ACC(f, FRAG_HYPERBLASTER)), CAPV(ACC(f, FRAG_GRENADES)),
+					CAPV(ACC(f, FRAG_GRENADELAUNCHER)), CAPV(ACC(f, FRAG_BLASTER)));
 		}
+		CPRepeat(10, 2);
 	}
 	else
 	{
@@ -1328,14 +1357,25 @@ void Cmd_StatsAll_f(edict_t *ent)
 			char name[10];
 			strncpy(name, p->client->pers.netname, 9); name[9] = '\0';
 
-			gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
-				name, total_kills,
-				CAPV(ACC(f, FRAG_RAILGUN)), CAPV(ACC(f, FRAG_CHAINGUN)),
-				CAPV(ACC(f, FRAG_ROCKETLAUNCHER)), CAPV(ACC(f, FRAG_MACHINEGUN)),
-				CAPV(ACC(f, FRAG_SHOTGUN)), CAPV(ACC(f, FRAG_SUPERSHOTGUN)),
-				CAPV(ACC(f, FRAG_HYPERBLASTER)), CAPV(ACC(f, FRAG_GRENADES)),
-				CAPV(ACC(f, FRAG_GRENADELAUNCHER)), CAPV(ACC(f, FRAG_BLASTER)));
+			if (zigmode->value)
+				gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
+					name, total_kills,
+					CAPV(ACC(f, FRAG_RAILGUN)), CAPV(ACC(f, FRAG_CHAINGUN)),
+					CAPV(ACC(f, FRAG_ROCKETLAUNCHER)), CAPV(ACC(f, FRAG_MACHINEGUN)),
+					CAPV(ACC(f, FRAG_SHOTGUN)), CAPV(ACC(f, FRAG_SUPERSHOTGUN)),
+					CAPV(ACC(f, FRAG_HYPERBLASTER)), CAPV(ACC(f, FRAG_GRENADES)),
+					CAPV(ACC(f, FRAG_GRENADELAUNCHER)), CAPV(ACC(f, FRAG_BLASTER)),
+					p->client->resp.assassin, p->client->resp.possession);
+			else
+				gi.cprintf(ent, PRINT_HIGH, "%-9s %2d %3d %3d %3d %3d %3d %3d %3d %3d %3d %3d\n",
+					name, total_kills,
+					CAPV(ACC(f, FRAG_RAILGUN)), CAPV(ACC(f, FRAG_CHAINGUN)),
+					CAPV(ACC(f, FRAG_ROCKETLAUNCHER)), CAPV(ACC(f, FRAG_MACHINEGUN)),
+					CAPV(ACC(f, FRAG_SHOTGUN)), CAPV(ACC(f, FRAG_SUPERSHOTGUN)),
+					CAPV(ACC(f, FRAG_HYPERBLASTER)), CAPV(ACC(f, FRAG_GRENADES)),
+					CAPV(ACC(f, FRAG_GRENADELAUNCHER)), CAPV(ACC(f, FRAG_BLASTER)));
 		}
+		CPRepeat(10, 2);
 	}
 
 #undef ACC
@@ -1396,7 +1436,7 @@ void ClientCommand (edict_t *ent)
 
 	if (Q_stricmp (cmd, "store") == 0)
 	{
-		Cmd_Store_f(ent);
+		Cmd_Store_f(ent, qtrue);
 		return;
 	}
 
@@ -1476,12 +1516,14 @@ void ClientCommand (edict_t *ent)
 		Cmd_Say_f (ent, qfalse, qtrue);
 }
 
-void Cmd_Store_f (edict_t *ent)
+void Cmd_Store_f (edict_t *ent, qboolean verbose)
 {
 	if (!ent->client)
 		return;
 
 	if (!sv_cheats->value) {
+		if (verbose)
+			gi.cprintf(ent, PRINT_HIGH, "Not allowed\n");
 		return;
 	}
 

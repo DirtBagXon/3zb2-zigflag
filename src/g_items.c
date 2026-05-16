@@ -1679,7 +1679,9 @@ void ZIGBounce_Flag(edict_t *ent, gitem_t *item)
 {
 	edict_t *tech;
 
-	G_FreeEdict(zflag_ent);
+	if (zflag_ent)
+		G_FreeEdict(zflag_ent);
+
 	tech = Transition_Flag(ent, item);
 	zflag_ent = tech;
 	return;

@@ -2658,6 +2658,9 @@ void CTFJoinTeam(edict_t *ent, int desired_team)
 
 	PMenu_Close(ent);
 
+	ent->client->pers.spectator = qfalse;
+	ent->client->resp.spectator = qfalse;
+
 	ent->svflags &= ~SVF_NOCLIENT;
 	ent->client->resp.ctf_team = desired_team;
 	ent->client->resp.ctf_state = CTF_STATE_START;
@@ -2690,24 +2693,17 @@ void CTFJoinTeam2(edict_t *ent, pmenu_t *p)
 
 void CTFChaseCam(edict_t *ent, pmenu_t *p)
 {
-	int i;
-	edict_t *e;
-
 	if (ent->client->chase_target) {
 		ent->client->chase_target = NULL;
 		PMenu_Close(ent);
 		return;
 	}
 
-	for (i = 1; i <= maxclients->value; i++) {
-		e = g_edicts + i;
-		if (e->inuse && e->solid != SOLID_NOT) {
-			ent->client->chase_target = e;
-			PMenu_Close(ent);
-			ent->client->update_chase = qtrue;
-			break;
-		}
-	}
+	GetChaseTarget(ent);
+	if (!ent->client->chase_target)
+		ent->client->ps.pmove.pm_flags &= ~PMF_NO_PREDICTION;
+
+	PMenu_Close(ent);
 }
 
 void CTFReturnToMain(edict_t *ent, pmenu_t *p)
@@ -2730,45 +2726,45 @@ void CTFShowScores(edict_t *ent, pmenu_t *p)
 }
 
 pmenu_t creditsmenu[] = {
-	{ "*Quake II",						PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "*ThreeWave Capture the Flag",	PMENU_ALIGN_CENTER, NULL, NULL },
-	{ NULL,								PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "*Programming",					PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Dave 'Zoid' Kirsch",				PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "*Level Design", 					PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Christian Antkow",				PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Tim Willits",					PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Dave 'Zoid' Kirsch",				PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "*Art",							PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "*Quake II",				PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "",					PMENU_ALIGN_CENTER, NULL, NULL },
+	{ NULL,					PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "*Programming",			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Dave 'Zoid' Kirsch",			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "*Level Design", 			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Christian Antkow",			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Tim Willits",			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Dave 'Zoid' Kirsch",			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "*Art",				PMENU_ALIGN_CENTER, NULL, NULL },
 	{ "Adrian Carmack Paul Steed",		PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Kevin Cloud",					PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "*Sound",							PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Tom 'Bjorn' Klok",				PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Kevin Cloud",			PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "*Sound",				PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Tom 'Bjorn' Klok",			PMENU_ALIGN_CENTER, NULL, NULL },
 	{ "*Original CTF Art Design",		PMENU_ALIGN_CENTER, NULL, NULL },
 	{ "Brian 'Whaleboy' Cozzens",		PMENU_ALIGN_CENTER, NULL, NULL },
-	{ NULL,								PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Return to Main Menu",			PMENU_ALIGN_LEFT, NULL, CTFReturnToMain }
+	{ NULL,					PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "Return to Main Menu",		PMENU_ALIGN_LEFT, NULL, CTFReturnToMain }
 };
 
 
 pmenu_t joinmenu[] = {
-	{ "*Quake II",			PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "*ThreeWave Capture the Flag",	PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "*Quake II",				PMENU_ALIGN_CENTER, NULL, NULL },
+	{ "",					PMENU_ALIGN_CENTER, NULL, NULL },
 	{ NULL,					PMENU_ALIGN_CENTER, NULL, NULL },
 	{ NULL,					PMENU_ALIGN_CENTER, NULL, NULL },
-	{ "Join Red Team",		PMENU_ALIGN_LEFT, NULL, CTFJoinTeam1 },
+	{ "Join Red Team",			PMENU_ALIGN_LEFT, NULL, CTFJoinTeam1 },
 	{ NULL,					PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "Join Blue Team",		PMENU_ALIGN_LEFT, NULL, CTFJoinTeam2 },
+	{ "Join Blue Team",			PMENU_ALIGN_LEFT, NULL, CTFJoinTeam2 },
 	{ NULL,					PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "Chase Camera",		PMENU_ALIGN_LEFT, NULL, CTFChaseCam },
-	{ "Credits",			PMENU_ALIGN_LEFT, NULL, CTFCredits },
+	{ "Chase Camera",			PMENU_ALIGN_LEFT, NULL, CTFChaseCam },
+	{ "Credits",				PMENU_ALIGN_LEFT, NULL, CTFCredits },
 	{ NULL,					PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "Use [ and ] to move cursor",	PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "ENTER to select",	PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "ESC to Exit Menu",	PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "(TAB to Return)",	PMENU_ALIGN_LEFT, NULL, NULL },
+	{ "Use [ and ] to move cursor",		PMENU_ALIGN_LEFT, NULL, NULL },
+	{ "ENTER to select",			PMENU_ALIGN_LEFT, NULL, NULL },
+	{ "ESC to Exit Menu",			PMENU_ALIGN_LEFT, NULL, NULL },
+	{ "(TAB to Return)",			PMENU_ALIGN_LEFT, NULL, NULL },
 	{ NULL,					PMENU_ALIGN_LEFT, NULL, NULL },
-	{ "v" CTF_STRING_VERSION,	PMENU_ALIGN_RIGHT, NULL, NULL },
+	{ "v" CTF_STRING_VERSION,		PMENU_ALIGN_RIGHT, NULL, NULL },
 };
 
 int CTFUpdateJoinMenu(edict_t *ent)
@@ -3010,11 +3006,13 @@ void CTFSetupNavSpawn()
 	char	name[256];
 	char	code[8];
 	char	SRCcode[8];
+	const char *dir, *ext;
 	int	i,j;
 	vec3_t	v;
 	edict_t		*other;
 
 	unsigned int size;
+	char zigctf = 0;
 
 //PONKO
 	spawncycle = level.time + FRAMETIME * 20;
@@ -3024,12 +3022,28 @@ void CTFSetupNavSpawn()
 	memset(Route,0,sizeof(Route));
 	memset(code,0,8);
 
-	if(ctf->value) gi.dprintf("We are in CTF mode.\n");
+	if(ctf->value)
+	{
+		dir = "chctf";
+		ext = "chf";
+		gi.dprintf("We are in CTF mode.\n");
+	}
+	else
+	{
+		dir = "chdtm";
+		ext = "chn";
+	}
 
-	if(!ctf->value) snprintf(name,sizeof(name),"%s/%s/chdtm/%s.chn",GET_BASEPATH_STR(),gamepath->string,level.mapname);
-	else snprintf(name,sizeof(name),"%s/%s/chctf/%s.chf",GET_BASEPATH_STR(),gamepath->string,level.mapname);
+	snprintf(name, sizeof(name), "%s/%s/%s/%s.%s", GET_BASEPATH_STR(), gamepath->string, dir, level.mapname, ext);
+	fpout = fopen(name, "rb");
 
-	fpout = fopen(name,"rb");
+	if(fpout == NULL && zigmode->value)
+	{
+		snprintf(name, sizeof(name), "%s/%s/chctf/%s.chf", GET_BASEPATH_STR(), gamepath->string, level.mapname);
+		fpout = fopen(name, "rb");
+		zigctf = 1;
+	}
+
 	if(fpout == NULL)
 	{
 
@@ -3049,8 +3063,8 @@ void CTFSetupNavSpawn()
 		if (fread(code, sizeof(char), 8, fpout) != 8)
 			gi.error("Error reading 8 bytes into code buffer\n");
 
-		if(!ctf->value) memcpy(SRCcode,"3ZBRGDTM",8);
-		else memcpy(SRCcode,"3ZBRGCTF",8);
+		if(ctf->value || zigctf) memcpy(SRCcode,"3ZBRGCTF",8);
+		else memcpy(SRCcode,"3ZBRGDTM",8);
 
 		if(strncmp(code,SRCcode,8))
 		{

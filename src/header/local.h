@@ -88,6 +88,9 @@
 // Ratio of ZIGTICK * FRAMETIME to penalize in killerflag
 #define PENRATIO			0.75
 
+// Announcer kill streak timeout in seconds
+#define KILL_STREAK_TIMEOUT	4.0
+
 // memory tags to allow dynamic memory to be cleaned up
 #define	TAG_GAME	765		// clear when unloading the dll
 #define	TAG_LEVEL	766		// clear when loading a new level
@@ -352,8 +355,6 @@ typedef struct
 	int			framenum;
 	int			autobotframe;
 	float		time;
-
-	qboolean	broadcast;
 
 	char		level_name[MAX_QPATH];	// the descriptive name (Outer Base, etc)
 	char		mapname[MAX_QPATH];		// the server name (base1, etc)
@@ -636,9 +637,11 @@ extern	cvar_t  *respawn_protection;
 extern	cvar_t  *spawnbotfar;
 extern	cvar_t  *killerflag;
 extern	cvar_t  *weaponswap;
+extern	cvar_t  *announcer;
+extern	cvar_t  *g_sticky_grenades;
+extern	cvar_t  *g_crouching;
 
 extern	float	spawncycle;
-extern	int	flagbounce;
 //ponpoko
 
 //ZOID
@@ -698,7 +701,7 @@ void Cmd_Stats_f(edict_t *ent, qboolean check_other);
 void Cmd_Help_f (edict_t *ent);
 void Cmd_Score_f (edict_t *ent);
 
-void Cmd_Store_f (edict_t *ent);
+void Cmd_Store_f (edict_t *ent, qboolean verbose);
 void Cmd_Recall_f (edict_t *ent);
 
 //
@@ -720,6 +723,11 @@ int PowerArmorType (edict_t *ent);
 gitem_t	*GetItemByIndex (int index);
 qboolean Add_Ammo (edict_t *ent, gitem_t *item, int count);
 void Touch_Item (edict_t *ent, edict_t *other, cplane_t *plane, csurface_t *surf);
+
+//
+// announcer
+//
+void Announcer_Message(edict_t *ent, int streak);
 
 //
 // g_utils.c
@@ -1070,6 +1078,7 @@ typedef enum {
 	FRAG_HYPERBLASTER,
 	FRAG_RAILGUN,
 	FRAG_BFG,
+	FLAG_EVENT,
 	FRAG_TOTAL
 } frag_t;
 
@@ -1079,6 +1088,8 @@ typedef struct {
 	int suicides;
 	int hits;
 	int atts;
+	int possession;
+	int assassin;
 } fragstat_t;
 
 extern const int mod_to_frag[64];
@@ -1096,25 +1107,30 @@ typedef struct
 //ZOID
 	int			ctf_team;			// CTF team
 	int			ctf_state;
-	float		ctf_lasthurtcarrier;
-	float		ctf_lastreturnedflag;
-	float		ctf_flagsince;
-	float		ctf_lastfraggedcarrier;
-	qboolean	id_state;
+	float			ctf_lasthurtcarrier;
+	float			ctf_lastreturnedflag;
+	float			ctf_flagsince;
+	float			ctf_lastfraggedcarrier;
+	qboolean		id_state;
 //ZOID
 //ponko
 	int			context;
 //ponko
-	vec3_t		cmd_angles;			// angles sent over in the last command
+	vec3_t			cmd_angles;		// angles sent over in the last command
 	int			game_helpchanged;
 	int			helpchanged;
 
-	qboolean	spectator;			// client is a spectator
+	qboolean		spectator;		// client is a spectator
 
-	fragstat_t	frags[FRAG_TOTAL];
+	fragstat_t		frags[FRAG_TOTAL];
 	int			damage_given;
 	int			damage_recvd;
 	int			last_hit_framenum[FRAG_TOTAL];
+
+	int			kill_streak;
+	int			pending_kill_streak;
+	float			kill_streak_time;
+	float			pending_kill_streak_time;
 } client_respawn_t;
 
 // this structure is cleared on each PutClientInServer(),
@@ -1132,7 +1148,6 @@ struct gclient_s
 
 	qboolean	showscores;			// set layout stat
 //ZOID
-	qboolean	inmenu;				// in menu
 	pmenuhnd_t	*menu;				// current menu
 //ZOID
 	qboolean	showinventory;		// set layout stat
@@ -1315,8 +1330,6 @@ struct edict_s
 	float		flag_pickup_time;
 
 	int			penalty;
-	int			possession;
-	int			assassin;
 	int			health;
 	int			max_health;
 	int			gib_health;

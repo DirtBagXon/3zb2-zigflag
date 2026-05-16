@@ -153,15 +153,11 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	int		i, j, k;
 	int		sorted[MAX_CLIENTS];
 	int		sortedscores[MAX_CLIENTS];
-	int		score, total, rtotal;
+	int		score, total;
 	int		x, y;
 	gclient_t	*cl;
 	edict_t		*cl_ent;
-	char		*tag, *mark;
-
-	// protect bprintf() against SZ_Getspace error
-	int		broadcast = 16;
-	int		topresult = 6;
+	char		*tag;
 
 //ZOID
 	if (ctf->value) {
@@ -192,40 +188,11 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		sortedscores[j] = score;
 		total++;
 	}
-	rtotal = total;
 
 	// print level name and exit rules
 	string[0] = 0;
 
 	stringlength = strlen(string);
-
-	if(level.intermissiontime && !level.broadcast && ent == &g_edicts[1])
-	{
-		if(zigmode->value && zigspawn->value && flagbounce > 0)
-		{
-			CPRepeat('-', strlen(level.mapname) + 11);
-			gi.bprintf(PRINT_HIGH, "| %s | ~ %02d |\n", level.mapname, flagbounce);
-		}
-		else
-		{
-			CPRepeat('-', strlen(level.mapname) + 4);
-			gi.bprintf(PRINT_HIGH, "| %s |\n", level.mapname);
-		}
-
-		if(rtotal <= broadcast) {
-			CPRepeat('-', 54);
-			gi.bprintf(PRINT_HIGH, "| X | Player%-10s ", " ");
-			gi.bprintf(PRINT_HIGH, "|  S  |  P  |  T  |  F  |  A  |\n");
-			CPRepeat('-', 54);
-		}
-		else
-		{
-			CPRepeat('-', 37);
-			gi.bprintf(PRINT_HIGH, "| Will not broadcast to +%d players |\n",
-					broadcast);
-			CPRepeat('-', 37);
-		}
-	}
 
 	// add the clients in sorted order
 	if (total > 12)
@@ -235,7 +202,6 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 	{
 		cl = &game.clients[sorted[i]];
 		cl_ent = g_edicts + 1 + sorted[i];
-		mark = " ";
 
 		x = (i>=6) ? 160 : 0;
 		y = 32 + 32 * (i%6);
@@ -244,10 +210,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		if (cl_ent == ent)
 			tag = "tag1";
 		else if (cl_ent == killer)
-			if (zigmode->value)
-				tag = "zigtag";
-			else
-				tag = "tag2";
+			tag = "tag2";
 		else
 			tag = NULL;
 
@@ -275,21 +238,6 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 			stringlength += copy_len;
 
 			string[stringlength] = '\0';
-		}
-
-		if(level.intermissiontime && !level.broadcast && ent == &g_edicts[1] && rtotal <= broadcast && i < topresult)
-		{
-			if(tag && strcmp(tag, "zigtag") == 0)
-				mark = "F";
-			else if (zigintro->value && !cl->pers.joined && !ENT_IS_BOT(cl_ent))
-				mark = "%";
-			else if(i == 0)
-				mark = "*";
-
-			gi.bprintf(PRINT_HIGH, "| %s | %-16s | %-3d | %-3d | %-3d | +%-2d | +%-2d |\n",
-				mark, cl_ent->client->pers.netname,
-				cl->resp.score, cl->ping, (level.framenum - cl->resp.enterframe)/600,
-				cl_ent->client->resp.possession, cl_ent->client->resp.assassin);
 		}
 
 		// send the layout
@@ -327,12 +275,6 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 
 	gi.WriteByte (svc_layout);
 	gi.WriteString (string);
-
-	if(level.intermissiontime && !level.broadcast && ent == &g_edicts[1] && rtotal <= broadcast)
-		CPRepeat('-', 54);
-
-	if(level.intermissiontime)
-		level.broadcast = qtrue;
 }
 
 
@@ -1016,16 +958,16 @@ void Flag_Msg(char *response, size_t length)
 	switch(x)
 	{
 		case 0:
-			strlcpy(pants, "with a vampirical tendency", length);
+			strlcpy(pants, "with low activity penalty", length);
 			break;
 		case 1:
-			strlcpy(pants, "that's slaying stamina", length);
+			strlcpy(pants, "draining power while idle", length);
 			break;
 		case 2:
-			strlcpy(pants, "while slaughtering health", length);
+			strlcpy(pants, "sapped by lack of movement", length);
 			break;
 		case 3:
-			strlcpy(pants, "drawing their life blood", length);
+			strlcpy(pants, "drained by inactivity", length);
 			break;
 	}
 

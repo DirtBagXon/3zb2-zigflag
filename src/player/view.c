@@ -497,6 +497,9 @@ void P_FallingDamage (edict_t *ent)
 	if (ent->s.modelindex != 255)
 		return;		// not in the player model
 
+	if (instagib && instagib->value)
+		return;
+
 	if (ent->movetype == MOVETYPE_NOCLIP)
 		return;
 
