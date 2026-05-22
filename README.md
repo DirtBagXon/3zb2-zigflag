@@ -84,13 +84,13 @@ Review build scripts before executing.
 Add `FORCE_OSTYPE=Windows_NT` to force an `OSTYPE`.
 
 ```bash
-./build-lin64.sh
+./script/build-lin64.sh
 
-./clean.sh
-./build-win32.sh
+./script/clean.sh
+./script/build-win32.sh
 
-./clean.sh
-./build-win64.sh FORCE_OSTYPE=Windows_NT
+./script/clean.sh
+./script/build-win64.sh FORCE_OSTYPE=Windows_NT
 ```
 
 ## Bot Commands

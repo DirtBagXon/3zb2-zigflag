@@ -54,9 +54,9 @@ jobs:
 
       - name: Build Linux 64-bit
         run: |
-          chmod +x ./clean.sh ./build-lin64.sh
-          ./clean.sh
-          ./build-lin64.sh
+          chmod +x ./script/clean.sh ./script/build-lin64.sh
+          ./script/clean.sh
+          ./script/build-lin64.sh
 
       - name: Package Linux artifacts
         run: |
@@ -97,9 +97,9 @@ jobs:
 
       - name: Build Mac 64-bit
         run: |
-          chmod +x ./clean.sh ./build-mac64.sh
-          ./clean.sh
-          ./build-mac64.sh
+          chmod +x ./script/clean.sh ./script/build-mac64.sh
+          ./script/clean.sh
+          ./script/build-mac64.sh
 
       - name: Package Mac artifacts
         run: |
@@ -146,9 +146,9 @@ jobs:
       - name: Build Windows 32-bit
         shell: msys2 {0}
         run: |
-          chmod +x ./clean.sh ./build-win32.sh
-          ./clean.sh
-          ./build-win32.sh
+          chmod +x ./script/clean.sh ./script/build-win32.sh
+          ./script/clean.sh
+          ./script/build-win32.sh
           cp release/*.dll 3zb2/
           echo "3zb2 build version: $VERSION" > INSTALL.txt
           echo "" >> INSTALL.txt
@@ -192,9 +192,9 @@ jobs:
       - name: Build Windows 64-bit
         shell: msys2 {0}
         run: |
-          chmod +x ./clean.sh ./build-win64.sh
-          ./clean.sh
-          ./build-win64.sh
+          chmod +x ./script/clean.sh ./script/build-win64.sh
+          ./script/clean.sh
+          ./script/build-win64.sh
           cp release/*.dll 3zb2/
           echo "3zb2 build version: $VERSION" > INSTALL.txt
           echo "" >> INSTALL.txt
