@@ -112,6 +112,48 @@ qboolean BotApplyResistance(edict_t *ent)
 	return qfalse;
 }
 
+static qboolean Bot_IsTeamMode (void)
+{
+	return tdm->value || ctf->value ||
+	       ((int)dmflags->value & (DF_MODELTEAMS | DF_SKINTEAMS));
+}
+
+static qboolean Bot_ValidEnemy (edict_t *ent, edict_t *target)
+{
+	if (!target || !target->inuse || target == ent || !target->client ||
+	    target->deadflag || target->solid != SOLID_BBOX ||
+	    target->movetype == MOVETYPE_NOCLIP)
+		return qfalse;
+
+	return !Bot_IsTeamMode() || !OnSameTeam(ent, target);
+}
+
+/* Prefer enemies that matter now instead of whichever client happens to be visited first. */
+static float Bot_TargetPriority (edict_t *ent, edict_t *target, int own_flag_index)
+{
+	vec3_t delta;
+	float priority;
+
+	VectorSubtract(target->s.origin, ent->s.origin, delta);
+	priority = 1200.0f - VectorLength(delta);
+
+	/* Someone actively fighting us is more urgent than a passer-by. */
+	if (target->client->zc.first_target == ent)
+		priority += 900.0f;
+
+	/* In objective modes, intercept the carrier before taking ordinary fights. */
+	if (ctf->value && own_flag_index >= 0 && target->client->pers.inventory[own_flag_index])
+		priority += 2400.0f;
+	else if (!ctf->value && zflag_item && target->client->pers.inventory[ITEM_INDEX(zflag_item)])
+		priority += 1800.0f;
+
+	/* Finishing a weakened opponent is usually better than changing targets. */
+	if (target->health > 0 && target->health < 50)
+		priority += 200.0f;
+
+	return priority;
+}
+
 //return foundedenemy
 int Bot_SearchEnemy (edict_t *ent)
 {
@@ -120,8 +162,9 @@ int Bot_SearchEnemy (edict_t *ent)
 	edict_t		*target,*trent;
 	trace_t		rs_trace;
 
-	int		i,j,k;
+	int		i,j,k,own_flag_index;
 	int		foundedenemy;
+	float		best_priority;
 
 	float	pitch,yaw;
 	float	vr,hr;
@@ -143,12 +186,15 @@ int Bot_SearchEnemy (edict_t *ent)
 	//search for enemy
 	foundedenemy = 0;
 	target = NULL;
+	best_priority = -999999.0f;
 
 	tmpflg = qfalse;	//viewable flag
 	if(zc->first_target != NULL){
-		if(	Bot_trace(ent,zc->first_target)){
+		if(zc->first_target->inuse && !zc->first_target->deadflag &&
+			zc->first_target->client && Bot_trace(ent, zc->first_target)) {
 			tmpflg = qtrue;
 			foundedenemy++;
+			target = zc->first_target;
 		}
 	}
 
@@ -157,22 +203,34 @@ int Bot_SearchEnemy (edict_t *ent)
 	// blue or red?
 	if(ctf->value)
 	{
-		if(ent->client->resp.ctf_team == CTF_TEAM1) k = ITEM_INDEX(FindItem("Blue Flag"));
-		else k = ITEM_INDEX(FindItem("Red Flag"));
+		if(ent->client->resp.ctf_team == CTF_TEAM1) {
+			k = ITEM_INDEX(FindItem("Blue Flag"));
+			own_flag_index = ITEM_INDEX(FindItem("Red Flag"));
+		} else {
+			k = ITEM_INDEX(FindItem("Red Flag"));
+			own_flag_index = ITEM_INDEX(FindItem("Blue Flag"));
+		}
 	}
-	else k = ITEM_INDEX(FindItem("ZB Flag"));
+	else
+	{
+		k = ITEM_INDEX(FindItem("ZB Flag"));
+		own_flag_index = -1;
+	}
+
+	if(target)
+		best_priority = Bot_TargetPriority(ent, target, own_flag_index) + 150.0f;
 
 	// decide da sorting first or last
 	if(random() < 0.5) j = 0;
 	else j = -1;
 
-	if(ent->client->pers.inventory[ITEM_INDEX(zflag_item)])
+	if(zflag_item && ent->client->pers.inventory[ITEM_INDEX(zflag_item)])
 	{
 		ent->client->zc.tmplstate = TMS_LEADER;
 		ent->client->zc.followmate = NULL;	
 	}
 
-	for ( i = 1 ; i <= maxclients->value && target == NULL ; i++)
+	for (i = 1; i <= maxclients->value; i++)
 	{
 		if(j){
 			entcln = g_edicts[i].classname;
@@ -192,14 +250,21 @@ int Bot_SearchEnemy (edict_t *ent)
 				//not ctf mode and sameteam
 				if(!ctf->value && OnSameTeam(ent,trent))
 				{
-					if(trent->client->zc.first_target)
+					if(Bot_ValidEnemy(ent, trent->client->zc.first_target))
 					{
-						if(Bot_traceS(ent,trent->client->zc.first_target)) target = trent->client->zc.first_target;
+						if(Bot_traceS(ent,trent->client->zc.first_target)) {
+							float priority = Bot_TargetPriority(ent, trent->client->zc.first_target,
+									own_flag_index) + 450.0f;
+							if (priority > best_priority) {
+								target = trent->client->zc.first_target;
+								best_priority = priority;
+							}
+						}
 					}
 					if(trmin[2] < JumpMax && VectorLength(trmin) < 400)
 					{
 						yaw = (float)Bot[ent->client->zc.botindex].param[BOP_TEAMWORK];
-						if(trent->client->pers.inventory[ITEM_INDEX(zflag_item)])
+						if(zflag_item && trent->client->pers.inventory[ITEM_INDEX(zflag_item)])
 						{
 							trent->client->zc.tmplstate = TMS_LEADER;
 							trent->client->zc.followmate = NULL;
@@ -291,11 +356,13 @@ int Bot_SearchEnemy (edict_t *ent)
 //						}
 					}
 				}
-				else 
+				else if (Bot_ValidEnemy(ent, trent))
 				{
 					foundedenemy++;
-					if(!tmpflg && target == NULL)
 					{
+						qboolean in_view = qfalse;
+						float priority;
+
 						pitch = Get_pitch(trmin);
 						pitch = fabs(pitch - ent->s.angles[PITCH]);
 						if(pitch > 180) pitch = 360 - pitch;
@@ -305,7 +372,18 @@ int Bot_SearchEnemy (edict_t *ent)
 							yaw = Get_yaw(trmin);
 							yaw = fabs(yaw - ent->s.angles[YAW]);
 							if(yaw > 180) yaw = 360 - yaw;
-							if(yaw <= hr || (ent->client->zc.zcstate & STS_WAITS))	target = trent;
+							if(yaw <= hr || (ent->client->zc.zcstate & STS_WAITS))
+								in_view = qtrue;
+						}
+
+						/* Being shot reveals an opponent even just outside our FOV. */
+						if (trent->client->zc.first_target == ent)
+							in_view = qtrue;
+
+						priority = Bot_TargetPriority(ent, trent, own_flag_index);
+						if (in_view && priority > best_priority) {
+							target = trent;
+							best_priority = priority;
 						}
 					}
 					//
@@ -319,16 +397,28 @@ int Bot_SearchEnemy (edict_t *ent)
 								if(VectorLength(trmin) < 300)
 								{
 									pitch = (float)Bot[ent->client->zc.botindex].param[BOP_REACTION];
-									if((9 * random()) < pitch) target = trent;
+									if((9 * random()) < pitch) {
+										float priority = Bot_TargetPriority(ent, trent, own_flag_index) - 250.0f;
+										if (priority > best_priority) {
+											target = trent;
+											best_priority = priority;
+										}
+									}
 								}
 							}
 							if(target == NULL && trent->mynoise2->teleport_time >= (level.time - FRAMETIME))
 							{
-								VectorSubtract (trent->mynoise->s.origin, ent->s.origin, trmin);
+								VectorSubtract(trent->mynoise2->s.origin, ent->s.origin, trmin);
 								if(VectorLength(trmin) < 100)
 								{
 									pitch = (float)Bot[ent->client->zc.botindex].param[BOP_REACTION];
-									if((9 * random()) < pitch) target = trent;									
+									if((9 * random()) < pitch) {
+										float priority = Bot_TargetPriority(ent, trent, own_flag_index) - 300.0f;
+										if (priority > best_priority) {
+											target = trent;
+											best_priority = priority;
+										}
+									}
 								}								
 							}
 						}
@@ -360,6 +450,7 @@ int Bot_SearchEnemy (edict_t *ent)
 							if(rs_trace.fraction == 1.0 && (9 * random()) < pitch)
 							{
 								target = trent;
+								best_priority = Bot_TargetPriority(ent, trent, own_flag_index) - 350.0f;
 								ent->client->zc.battlemode |= FIRE_ESTIMATE;
 								VectorCopy(trmin,ent->client->zc.vtemp);
 							}
@@ -369,12 +460,7 @@ int Bot_SearchEnemy (edict_t *ent)
 			}
 		}
 	}
-	if(target && !tmpflg) zc->first_target = target;
-	else if(target && zc->first_target) 
-	{
-		if(Get_KindWeapon(target->client->pers.weapon) > 
-			Get_KindWeapon(zc->first_target->client->pers.weapon)) zc->first_target = target;
-	}
+	if(target) zc->first_target = target;
 //	ent->client->zc.zcstate &= ~CTS_COMBS;	//clear combat state
 
 	return (foundedenemy);
@@ -2761,7 +2847,9 @@ DCHCANC://しゃがみっぱなし
 				{
 					if (!tdm_weps[tdm_k]) continue;
 					tdm_idx = ITEM_INDEX(tdm_weps[tdm_k]);
-					if (ent->client->pers.inventory[tdm_idx] && !tdm_team->client->pers.inventory[tdm_idx])
+					if (ent->client->pers.inventory[tdm_idx] > 1 &&
+					    ent->client->pers.weapon != tdm_weps[tdm_k] &&
+					    !tdm_team->client->pers.inventory[tdm_idx])
 					{
 						Drop_Item(ent, tdm_weps[tdm_k]);
 						ent->client->pers.inventory[tdm_idx]--;

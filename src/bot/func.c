@@ -314,7 +314,7 @@ void Bot_Think (edict_t *self)
 //ZOID
 
 		self->client->zc.route_trace = qfalse;
-		if(self->client->respawn_time <= level.time)
+		if (level.time > self->client->respawn_time)
 		{
 			if(self->svflags & SVF_MONSTER)
 			{

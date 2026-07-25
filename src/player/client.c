@@ -703,7 +703,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 			LookAtKiller (self, inflictor, attacker);
 			self->nextthink = level.time + FRAMETIME;
 			self->think = Bot_Think;
-			self->client->respawn_time = level.time + 2.0;
+			self->client->respawn_time = level.time + 1.0;
 			self->s.skinnum = (self - g_edicts - 1);
 		}
 		else
@@ -996,6 +996,36 @@ edict_t *SelectTrueRandomDeathmatchSpawnPoint(void)
 	return level.spawns[rand_uniform(level.numspawns)];
 }
 
+edict_t *SelectRandomDeathmatchSpawnPointAvoidingTelefrag (void)
+{
+	edict_t *spawns[MAX_SPAWNS];
+	edict_t *spot;
+	float range;
+	int i;
+
+	if (level.numspawns == 0)
+		return NULL;
+
+	for (i = 0; i < level.numspawns; i++)
+		spawns[i] = level.spawns[i];
+
+	for (i = level.numspawns - 1; i > 0; i--) {
+		int j = rand_uniform(i + 1);
+		edict_t *tmp = spawns[i];
+		spawns[i] = spawns[j];
+		spawns[j] = tmp;
+	}
+
+	for (i = 0; i < level.numspawns; i++) {
+		spot = spawns[i];
+		range = PlayersRangeFromSpot(spot);
+		if (range > 64)
+			return spot;
+	}
+
+	return SelectTrueRandomDeathmatchSpawnPoint();
+}
+
 edict_t *SelectRandomDeathmatchSpawnPointAvoidClosest (void)
 {
 	edict_t *spot, *spot1, *spot2;
@@ -1142,15 +1172,18 @@ edict_t *SelectDeathmatchSpawnPoint (void)
 {
 	for (int i = 1; i <= maxclients->value; i++)
 	{
-		if (g_edicts[i].inuse && g_edicts[i].health > 0)
-		{
-			if ( (int)(dmflags->value) & DF_SPAWN_FARTHEST)
-				return SelectFarthestDeathmatchSpawnPoint ();
+		if (level.time < 5.0)
+			return SelectRandomDeathmatchSpawnPointAvoidingTelefrag();
 
-			if(fixflaws->value)
-				return SelectRandomDeathmatchSpawnPointAvoidClosest ();
-			else
-				return SelectRandomDeathmatchSpawnPoint ();
+		if ((int)(dmflags->value) & DF_SPAWN_FARTHEST)
+			return SelectFarthestDeathmatchSpawnPoint();
+
+		if (level.numspawns > 2) {
+
+			if (fixflaws->value)
+				return SelectRandomDeathmatchSpawnPointAvoidClosest();
+
+			return SelectRandomDeathmatchSpawnPoint();
 		}
 	}
 
@@ -1208,8 +1241,6 @@ void	SelectSpawnPoint (edict_t *ent, vec3_t origin, vec3_t angles)
 	if (deathmatch->value)
 		if (ctf->value)
 			spot = SelectCTFSpawnPoint(ent);
-		else if (spawnbotfar->value && ((ent)->client && ((ent)->client->zc.botindex || (ent)->client->zc.routeindex > 0)))
-			spot = SelectFarthestDeathmatchSpawnPoint();
 		else
 			spot = SelectDeathmatchSpawnPoint ();
 	else if (coop->value)
